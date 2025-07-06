@@ -1,0 +1,7 @@
+@use "tailwindcss";
+
+@layer utilities {
+    .my-custom-class {
+        background-color: red;
+    }
+}
