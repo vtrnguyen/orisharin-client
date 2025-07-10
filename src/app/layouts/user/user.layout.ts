@@ -12,7 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class UserLayoutComponent {
     navigationItems = [
-        { icon: 'home', label: 'Home', route: '/home', active: false },
+        { icon: 'home', label: 'Home', route: '/', active: false },
         { icon: 'search', label: 'Search', route: '/search', active: false },
         { icon: 'edit', label: 'Create', route: '/create', active: false },
         { icon: 'heart', label: 'Activity', route: '/activity', active: false },

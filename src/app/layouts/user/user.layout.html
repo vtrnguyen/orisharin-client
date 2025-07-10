@@ -63,22 +63,16 @@
     </div>
 
     <div class="flex-1 flex flex-col">
-        <header class="bg-white border-b border-gray-200 px-6 py-4">
-            <div class="flex items-center justify-between">
-                <h1 class="text-xl font-semibold text-gray-900">Home</h1>
-                <div class="flex items-center space-x-4">
-                    <button class="p-2 text-gray-600 hover:text-gray-900">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 17h5l-5 5l5-5m-5 5V3"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </header>
-
         <main class="flex-1 overflow-y-auto">
             <router-outlet></router-outlet>
         </main>
+
+        <button
+            class="fixed bottom-8 right-8 z-50 bg-white hover:bg-gray-100 text-black rounded-2xl shadow-2xl w-20 h-16 flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer"
+            aria-label="Tạo mới">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+        </button>
     </div>
 </div>

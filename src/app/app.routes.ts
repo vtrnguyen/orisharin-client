@@ -45,6 +45,26 @@ export const routes: Routes = [
                 path: '',
                 loadComponent: () => import('./pages/user/home/home.component').then(m => m.HomeComponent)
             },
+            {
+                path: 'activity',
+                loadComponent: () => import('./pages/user/activity/activity.component').then(m => m.ActivityComponent)
+            },
+            {
+                path: 'search',
+                loadComponent: () => import('./pages/user/search/search.component').then(m => m.SearchComponent)
+            },
+            {
+                path: 'profile',
+                loadComponent: () => import('./pages/user/profile/profile.component').then(m => m.ProfileComponent)
+            },
+            {
+                path: 'message',
+                loadComponent: () => import('./pages/user/message/message.component').then(m => m.MessageComponent)
+            },
+            {
+                path: 'notification',
+                loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent)
+            },
         ]
     },
 
