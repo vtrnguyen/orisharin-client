@@ -1,10 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { PostComponent } from '../../../shared/components/post/post.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    PostComponent,
+    FormsModule,
+  ],
   templateUrl: './home.component.html'
 })
 export class HomeComponent {
@@ -40,4 +46,35 @@ export class HomeComponent {
       shares: 0
     }
   ];
+  showPostModal = false;
+  newPostContent = '';
+
+  openPostModal() {
+    this.showPostModal = true;
+  }
+
+  closePostModal() {
+    this.showPostModal = false;
+    this.newPostContent = '';
+  }
+
+  createPost() {
+    if (!this.newPostContent.trim()) return;
+    this.posts.unshift({
+      id: Date.now(),
+      author: {
+        fullName: 'Origin Dev',
+        username: 'origindev',
+        avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
+      },
+      content: this.newPostContent,
+      image: '',
+      createdAt: new Date(),
+      comments: 0,
+      likes: 0,
+      reposts: 0,
+      shares: 0
+    });
+    this.closePostModal();
+  }
 }
