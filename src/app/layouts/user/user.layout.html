@@ -62,11 +62,48 @@
         </nav>
 
         <div class="p-4 lg:p-6 border-t border-gray-200">
-            <div class="flex items-center">
+            <div class="flex items-center cursor-pointer group relative" (click)="toggleUserMenu()">
                 <img [src]="userInfo?.avatar" [alt]="userInfo?.name" class="w-10 h-10 rounded-full">
                 <div class="ml-3 hidden lg:block">
                     <p class="text-sm font-medium text-gray-900">{{ userInfo?.fullName }}</p>
                     <p class="text-xs text-gray-500">{{ userInfo?.username }}</p>
+                </div>
+                <div *ngIf="showUserMenu"
+                    class="absolute left-0 bottom-14 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in px-2 border-gray-300"
+                    (click)="$event.stopPropagation()" (clickOutside)="toggleUserMenu()">
+                    <ul class="py-2">
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Giao diện
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Cài đặt
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Thông tin chi tiết
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Đã thích
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer text-red-500"
+                                (click)="logout()">
+                                Đăng xuất
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

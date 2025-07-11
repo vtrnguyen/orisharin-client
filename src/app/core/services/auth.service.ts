@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../../shared/dtos/auth-response.dto';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,10 @@ export class AuthService {
     private currentUserSubject = new BehaviorSubject<any>(this.getUserFromStorage());
     currentUser$ = this.currentUserSubject.asObservable();
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private router: Router
+    ) { }
 
     login(email: string, password: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
@@ -29,7 +33,7 @@ export class AuthService {
     logout() {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
-        this.currentUserSubject.next(null);
+        this.router.navigate(['/auth/login']);
     }
 
     isLoggedIn(): boolean {
