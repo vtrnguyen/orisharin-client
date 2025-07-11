@@ -13,33 +13,8 @@
                 (click)="openPostModal()">Đăng</button>
         </div>
 
-        <div *ngIf="showPostModal"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-10 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 relative">
-                <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 cursor-pointer"
-                    (click)="closePostModal()">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <div class="flex gap-3 items-start">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg"
-                        class="w-10 h-10 rounded-full object-cover mt-1" alt="avatar" />
-                    <div class="flex-1">
-                        <textarea rows="4"
-                            class="w-full border-none focus:ring-0 resize-none text-gray-900 placeholder-gray-400 bg-transparent"
-                            placeholder="Bạn đang nghĩ gì?" [(ngModel)]="newPostContent"></textarea>
-                        <div class="flex justify-end mt-2">
-                            <button
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-xl shadow transition cursor-pointer"
-                                [disabled]="!newPostContent.trim()" (click)="createPost()">
-                                Đăng bài
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <app-post-modal *ngIf="showPostModal" [avatar]="'https://randomuser.me/api/portraits/men/32.jpg'"
+            [(content)]="newPostContent" (submit)="createPost()" (close)="closePostModal()"></app-post-modal>
 
         <div class="space-y-6">
             <app-post *ngFor="let post of posts" [post]="post"></app-post>

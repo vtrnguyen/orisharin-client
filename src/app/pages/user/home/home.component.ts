@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostComponent } from '../../../shared/components/post/post.component';
 import { FormsModule } from '@angular/forms';
+import { PostModalComponent } from '../../../shared/components/post-modal/post-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -10,6 +11,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     PostComponent,
     FormsModule,
+    PostModalComponent,
   ],
   templateUrl: './home.component.html'
 })
