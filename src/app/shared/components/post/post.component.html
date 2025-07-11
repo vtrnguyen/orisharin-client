@@ -1,34 +1,35 @@
 <div class="bg-white rounded-2xl shadow p-6 flex gap-4 mb-3">
-    <img [src]="post.author.avatar" class="w-12 h-12 rounded-full object-cover" alt="avatar" />
+    <img [src]="author.avatarUrl || 'https://ui-avatars.com/api/?name=' + (author.fullName || author.username)"
+        class="w-12 h-12 rounded-full object-cover" alt="avatar" />
     <div class="flex-1">
         <div class="flex items-center gap-2">
-            <span class="font-semibold text-gray-900">{{ post.author.fullName }}</span>
-            <span class="text-gray-500 text-sm">{{ post.author.username }}</span>
+            <span class="font-semibold text-gray-900">{{ author.fullName }}</span>
+            <span class="text-gray-500 text-sm">{{ author.username }}</span>
             <span class="mx-2 text-gray-400">·</span>
-            <span class="text-gray-400 text-xs">{{ post.createdAt | date:'short' }}</span>
+            <span class="text-gray-400 text-xs">{{ createdAt | date:'short' }}</span>
         </div>
         <div class="mt-2 text-gray-800 text-base whitespace-pre-line">
-            {{ post.content }}
+            {{ content }}
         </div>
-        <div *ngIf="post.image" class="mt-3">
-            <img [src]="post.image" class="rounded-xl max-h-72 object-cover border" alt="post image" />
+        <div *ngIf="image" class="mt-3">
+            <img [src]="image" class="rounded-xl max-h-72 object-cover border" alt="post image" />
         </div>
         <div class="flex gap-8 mt-4 text-gray-500 text-sm">
             <button class="flex items-center gap-1 transition cursor-pointer">
                 <i class="fa-regular fa-heart w-5 h-5 text-lg"></i>
-                <span class="leading-none">{{ post.likes }}</span>
+                <span class="leading-none">{{ likes }}</span>
             </button>
             <button class="flex items-center gap-1 transition cursor-pointer">
                 <i class="fa-regular fa-comment-dots w-5 h-5 text-lg"></i>
-                <span class="leading-none">{{ post.comments }}</span>
+                <span class="leading-none">{{ comments }}</span>
             </button>
             <button class="flex items-center gap-1 transition cursor-pointer">
                 <i class="fa-solid fa-retweet w-5 h-5 text-lg"></i>
-                <span class="leading-none">{{ post.reposts }}</span>
+                <span class="leading-none">{{ reposts }}</span>
             </button>
             <button class="flex items-center gap-1 transition cursor-pointer">
                 <i class="fa-solid fa-share-nodes w-5 h-5 text-lg"></i>
-                <span class="leading-none">{{ post.shares }}</span>
+                <span class="leading-none">{{ shares }}</span>
             </button>
         </div>
     </div>
