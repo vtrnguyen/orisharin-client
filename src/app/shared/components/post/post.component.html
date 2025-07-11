@@ -14,35 +14,21 @@
             <img [src]="post.image" class="rounded-xl max-h-72 object-cover border" alt="post image" />
         </div>
         <div class="flex gap-8 mt-4 text-gray-500 text-sm">
-            <button class="flex items-center gap-1 hover:text-pink-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                    </path>
-                </svg>
-                <span>{{ post.likes }}</span>
+            <button class="flex items-center gap-1 transition cursor-pointer">
+                <i class="fa-regular fa-heart w-5 h-5 text-lg"></i>
+                <span class="leading-none">{{ post.likes }}</span>
             </button>
-            <button class="flex items-center gap-1 hover:text-blue-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v-6m0 0l-3 3m3-3l3 3"></path>
-                </svg>
-                <span>{{ post.comments }}</span>
+            <button class="flex items-center gap-1 transition cursor-pointer">
+                <i class="fa-regular fa-comment-dots w-5 h-5 text-lg"></i>
+                <span class="leading-none">{{ post.comments }}</span>
             </button>
-            <button class="flex items-center gap-1 hover:text-green-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 12l5-5m0 0l5 5m-5-5v12"></path>
-                </svg>
-                <span>{{ post.reposts }}</span>
+            <button class="flex items-center gap-1 transition cursor-pointer">
+                <i class="fa-solid fa-retweet w-5 h-5 text-lg"></i>
+                <span class="leading-none">{{ post.reposts }}</span>
             </button>
-            <button class="flex items-center gap-1 hover:text-gray-700 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M15 8a3 3 0 11-6 0 3 3 0 016 0zm6 11a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>{{ post.shares }}</span>
+            <button class="flex items-center gap-1 transition cursor-pointer">
+                <i class="fa-solid fa-share-nodes w-5 h-5 text-lg"></i>
+                <span class="leading-none">{{ post.shares }}</span>
             </button>
         </div>
     </div>

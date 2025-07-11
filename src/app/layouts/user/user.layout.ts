@@ -2,34 +2,36 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { PostModalComponent } from '../../shared/components/post-modal/post-modal.component';
 
 @Component({
     selector: 'app-user-layout',
     standalone: true,
-    imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+    imports: [
+        RouterOutlet,
+        RouterLink,
+        RouterLinkActive,
+        CommonModule,
+        PostModalComponent,
+    ],
     templateUrl: './user.layout.html',
     styleUrl: './user.layout.scss'
 })
 export class UserLayoutComponent {
-    navigationItems = [
-        { icon: 'home', label: 'Home', route: '/', active: false },
-        { icon: 'search', label: 'Search', route: '/search', active: false },
-        { icon: 'edit', label: 'Create', route: '/create', active: false },
-        { icon: 'heart', label: 'Activity', route: '/activity', active: false },
-        { icon: 'user', label: 'Profile', route: '/profile', active: false }
-    ];
+    userInfo: any;
+    showPostModal = false;
+    newPostContent = '';
 
-    user = {
-        name: '',
-        username: '',
-        avatar: 'https://via.placeholder.com/40'
-    };
+    openPostModal() {
+        this.showPostModal = true;
+    }
+
+    closePostModal() {
+        this.showPostModal = false;
+    }
 
     constructor(private authService: AuthService) {
-        const currentUser = this.authService.getCurrentUser();
-        if (currentUser) {
-            this.user.name = currentUser.fullName;
-            this.user.username = '@' + currentUser.username;
-        }
+        this.userInfo = this.authService.getCurrentUser();
+        this.userInfo.avatar = "https://github.com/vtrnguyen/hosting-image-file/blob/main/oribuyin/avatar/avatar15.png?raw=true";
     }
 }

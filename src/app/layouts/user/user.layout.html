@@ -12,41 +12,50 @@
 
         <nav class="flex-1 px-4 lg:px-6">
             <ul class="space-y-2">
-                <li *ngFor="let item of navigationItems">
-                    <a [routerLink]="item.route" routerLinkActive="bg-gray-100 text-black"
-                        class="flex items-center p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
-                        <div class="w-6 h-6 flex items-center justify-center">
-                            <ng-container [ngSwitch]="item.icon">
-                                <svg *ngSwitchCase="'home'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                    </path>
-                                </svg>
-                                <svg *ngSwitchCase="'search'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                                <svg *ngSwitchCase="'edit'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <svg *ngSwitchCase="'heart'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                    </path>
-                                </svg>
-                                <svg *ngSwitchCase="'user'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                            </ng-container>
+                <li>
+                    <a routerLink="/" routerLinkActive="bg-gray-200 text-black"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                        <div class="w-7 h-7 flex items-center justify-center">
+                            <i class="fa-solid fa-house w-7 h-7 text-2xl"></i>
                         </div>
-                        <span class="ml-3 font-medium hidden lg:block">{{ item.label }}</span>
+                        <span class="ml-3 font-medium hidden lg:block">Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="/search" routerLinkActive="bg-gray-200 text-black"
+                        class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                        <div class="w-7 h-7 flex items-center justify-center">
+                            <i class="fa-solid fa-magnifying-glass w-7 h-7 text-2xl"></i>
+                        </div>
+                        <span class="ml-3 font-medium hidden lg:block">Search</span>
+                    </a>
+                </li>
+                <li>
+                    <button (click)="openPostModal()"
+                        class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group cursor-pointer">
+                        <div class="w-7 h-7 flex items-center justify-center">
+                            <i class="fa-regular fa-plus w-7 h-7 text-2xl"></i>
+                        </div>
+                        <span class="ml-3 font-medium hidden lg:block">Create</span>
+                    </button>
+                </li>
+                <li>
+                    <a routerLink="/activity" routerLinkActive="bg-gray-200 text-black"
+                        class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                        <div class="w-7 h-7 flex items-center justify-center">
+                            <i class="fa-regular fa-heart w-7 h-7 text-2xl"></i>
+                        </div>
+                        <span class="ml-3 font-medium hidden lg:block">Activity</span>
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="/profile" routerLinkActive="bg-gray-200 text-black"
+                        class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                        <div class="w-7 h-7 flex items-center justify-center">
+                            <i class="fa-regular fa-user w-7 h-7 text-2xl"></i>
+                        </div>
+                        <span class="ml-3 font-medium hidden lg:block">Profile</span>
                     </a>
                 </li>
             </ul>
@@ -54,10 +63,10 @@
 
         <div class="p-4 lg:p-6 border-t border-gray-200">
             <div class="flex items-center">
-                <img [src]="user.avatar" [alt]="user.name" class="w-10 h-10 rounded-full">
+                <img [src]="userInfo?.avatar" [alt]="userInfo?.name" class="w-10 h-10 rounded-full">
                 <div class="ml-3 hidden lg:block">
-                    <p class="text-sm font-medium text-gray-900">{{ user.name }}</p>
-                    <p class="text-xs text-gray-500">{{ user.username }}</p>
+                    <p class="text-sm font-medium text-gray-900">{{ userInfo?.fullName }}</p>
+                    <p class="text-xs text-gray-500">{{ userInfo?.username }}</p>
                 </div>
             </div>
         </div>
@@ -78,12 +87,34 @@
 
         <nav
             class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center h-16 md:hidden">
-            <a *ngFor="let item of navigationItems" [routerLink]="item.route" routerLinkActive="text-blue-600"
-                class="flex flex-col items-center justify-center text-gray-500 hover:text-blue-600 transition">
-                <ng-container [ngSwitch]="item.icon">
-                </ng-container>
-                <span class="text-xs mt-1">{{ item.label }}</span>
+            <a routerLink="/" routerLinkActive="text-blue-600" [routerLinkActiveOptions]="{ exact: true }"
+                class="flex flex-col items-center justify-center text-gray-500">
+                <i class="fa-solid fa-house w-6 h-6 text-2xl"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a routerLink="/search" routerLinkActive="text-blue-600"
+                class="flex flex-col items-center justify-center text-gray-500">
+                <i class="fa-solid fa-magnifying-glass w-6 h-6 text-2xl"></i>
+                <span class="text-xs mt-1">Search</span>
+            </a>
+            <button class="flex flex-col items-center justify-center text-gray-500 cursor-pointer"
+                (click)="openPostModal()">
+                <i class="fa-regular fa-plus w-6 h-6 text-2xl"></i>
+                <span class="text-xs mt-1">Create</span>
+            </button>
+            <a routerLink="/activity" routerLinkActive="text-blue-600"
+                class="flex flex-col items-center justify-center text-gray-500">
+                <i class="fa-regular fa-heart w-6 h-6 text-2xl"></i>
+                <span class="text-xs mt-1">Activity</span>
+            </a>
+            <a routerLink="/profile" routerLinkActive="text-blue-600"
+                class="flex flex-col items-center justify-center text-gray-500">
+                <i class="fa-regular fa-user w-6 h-6 text-2xl"></i>
+                <span class="text-xs mt-1">Profile</span>
             </a>
         </nav>
     </div>
 </div>
+
+<app-post-modal *ngIf="showPostModal" [avatar]="'https://randomuser.me/api/portraits/men/32.jpg'"
+    [(content)]="newPostContent" (submit)="openPostModal()" (close)="closePostModal()"></app-post-modal>
