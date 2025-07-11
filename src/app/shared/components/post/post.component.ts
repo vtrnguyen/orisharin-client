@@ -1,15 +1,26 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MediaViewerComponent } from '../image-viewer/media-viewer.component';
+import { isImage, isVideo } from '../../functions/media-type.util';
 
 @Component({
     selector: 'app-post',
     standalone: true,
-    imports: [CommonModule],
+    imports: [
+        CommonModule,
+        MediaViewerComponent,
+    ],
     templateUrl: './post.component.html',
     styleUrls: ['./post.component.scss']
 })
 export class PostComponent {
     @Input() post: any;
+
+    showViewer = false;
+    viewerIndex = 0;
+
+    isImage = isImage;
+    isVideo = isVideo;
 
     get author() {
         return this.post.author || {};
@@ -43,7 +54,7 @@ export class PostComponent {
         return this.post.post?.sharesCount || 0;
     }
 
-    get images() {
+    get medias() {
         return this.post.post?.mediaUrls || [];
     }
 
@@ -64,5 +75,14 @@ export class PostComponent {
 
         // after 30 days, show the date
         return date.toLocaleDateString('vi-VN');
+    }
+
+    openViewer(index: number) {
+        this.viewerIndex = index;
+        this.showViewer = true;
+    }
+
+    closeViewer() {
+        this.showViewer = false;
     }
 }

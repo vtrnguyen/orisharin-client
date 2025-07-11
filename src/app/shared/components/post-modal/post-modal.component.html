@@ -18,8 +18,15 @@
                 </textarea>
                 <div *ngIf="images.length > 0" class="mb-2">
                     <div class="flex gap-3 overflow-x-auto flex-nowrap scrollbar-hide">
-                        <div *ngFor="let img of images; let i = index" class="relative group flex-shrink-0">
-                            <img [src]="img" class="rounded-xl border w-[400px] max-w-full max-h-80 object-cover" />
+                        <div *ngFor="let media of images; let i = index" class="relative group flex-shrink-0">
+                            <ng-container *ngIf="isImage(media); else videoBlock">
+                                <img [src]="media"
+                                    class="rounded-xl border w-[400px] max-w-full max-h-80 object-cover" />
+                            </ng-container>
+                            <ng-template #videoBlock>
+                                <video [src]="media" controls
+                                    class="rounded-xl border w-[400px] max-w-full max-h-80 bg-black object-contain"></video>
+                            </ng-template>
                             <button type="button"
                                 class="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 flex items-center justify-center w-7 h-7 opacity-0 group-hover:opacity-100 transition cursor-pointer"
                                 (click)="removeImage(i)">
@@ -32,7 +39,7 @@
                     <div class="flex gap-2">
                         <label class="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800">
                             <i class="fa-regular fa-image w-6 h-6"></i>
-                            <input type="file" multiple accept="image/*" class="hidden"
+                            <input type="file" multiple accept="image/*,video/*" class="hidden"
                                 (change)="onImageSelected($event)">
                         </label>
                         <label class="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800">
@@ -42,7 +49,7 @@
                     <button class="font-semibold px-4 py-2 rounded-lg shadow transition cursor-pointer"
                         [disabled]="isLoading || (!content.trim() && files.length === 0)" (click)="submitPost()">
                         <ng-container *ngIf="isLoading; else btnText">
-                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang đăng ảnh...
+                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang đăng
                         </ng-container>
                         <ng-template #btnText>Đăng</ng-template>
                     </button>

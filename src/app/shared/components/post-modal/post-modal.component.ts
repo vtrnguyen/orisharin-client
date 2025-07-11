@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { UserService } from '../../../core/services/user.service';
 import { PostService } from '../../../core/services/post.service';
+import { isImage } from '../../functions/media-type.util';
 
 @Component({
   selector: 'app-post-modal',
@@ -26,6 +27,8 @@ export class PostModalComponent implements OnInit, OnDestroy {
   images: string[] = [];
   files: File[] = [];
   isLoading: boolean = false;
+
+  isImage = isImage;
 
   constructor(
     private userService: UserService,

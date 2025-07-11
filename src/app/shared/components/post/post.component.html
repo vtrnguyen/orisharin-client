@@ -9,9 +9,16 @@
         <div class="mt-2 text-gray-800 text-base whitespace-pre-line">
             {{ content }}
         </div>
-        <div *ngIf="images.length > 0" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
-            <img *ngFor="let img of images" [src]="img" class="rounded-xl border max-h-72 object-cover flex-shrink-0"
-                alt="post image" />
+        <div *ngIf="medias.length > 0" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
+            <ng-container *ngFor="let media of medias; let i = index">
+                <img *ngIf="isImage(media)" [src]="media"
+                    class="rounded-xl border max-h-72 object-cover flex-shrink-0 cursor-pointer" alt="post image"
+                    (click)="openViewer(i)" />
+                <video *ngIf="isVideo(media)" [src]="media" controls
+                    class="rounded-xl border max-h-72 object-contain flex-shrink-0 bg-black cursor-pointer"
+                    (click)="openViewer(i)">
+                </video>
+            </ng-container>
         </div>
         <div class="flex gap-8 mt-4 text-gray-500 text-sm">
             <button class="flex items-center gap-1 transition cursor-pointer">
@@ -33,3 +40,6 @@
         </div>
     </div>
 </div>
+
+<app-media-viewer *ngIf="showViewer" [medias]="medias" [startIndex]="viewerIndex" [onClose]="closeViewer.bind(this)">
+</app-media-viewer>
