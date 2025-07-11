@@ -40,8 +40,11 @@
                         </label>
                     </div>
                     <button class="font-semibold px-4 py-2 rounded-lg shadow transition cursor-pointer"
-                        [disabled]="!content.trim() && images.length === 0" (click)="submitPost()">
-                        Đăng
+                        [disabled]="isLoading || (!content.trim() && files.length === 0)" (click)="submitPost()">
+                        <ng-container *ngIf="isLoading; else btnText">
+                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang đăng ảnh...
+                        </ng-container>
+                        <ng-template #btnText>Đăng</ng-template>
                     </button>
                 </div>
             </div>

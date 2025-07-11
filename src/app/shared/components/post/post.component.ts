@@ -43,6 +43,10 @@ export class PostComponent {
         return this.post.post?.sharesCount || 0;
     }
 
+    get images() {
+        return this.post.post?.mediaUrls || [];
+    }
+
     formatTime(dateStr: string): string {
         const date = new Date(dateStr);
         const now = new Date();
@@ -55,7 +59,7 @@ export class PostComponent {
 
         if (diffMin < 1) return 'Vừa xong';
         if (diffMin < 60) return `${diffMin} phút trước`;
-        if (diffHour < 24) return `${diffHour} tiếng trước`;
+        if (diffHour < 24) return `${diffHour} giờ trước`;
         if (diffDay < 30) return `${diffDay} ngày trước`;
 
         // after 30 days, show the date

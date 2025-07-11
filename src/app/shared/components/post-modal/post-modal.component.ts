@@ -24,6 +24,7 @@ export class PostModalComponent implements OnInit, OnDestroy {
 
   userInfo: any;
   images: string[] = [];
+  files: File[] = [];
   isLoading: boolean = false;
 
   constructor(
@@ -44,6 +45,7 @@ export class PostModalComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     if (input.files) {
       Array.from(input.files).forEach(file => {
+        this.files.push(file);
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.images.push(e.target.result);
@@ -56,28 +58,29 @@ export class PostModalComponent implements OnInit, OnDestroy {
 
   removeImage(index: number) {
     this.images.splice(index, 1);
+    this.files.splice(index, 1);
   }
 
   submitPost() {
-    if (!this.content.trim() && this.images.length === 0) return;
-
+    if (!this.content.trim() && this.files.length === 0) return;
     this.isLoading = true;
     this.postService.createPost({
       content: this.content,
-      mediaUrls: this.images
+      files: this.files,
     }).subscribe({
       next: () => {
         this.isLoading = false;
         this.close.emit();
         this.content = '';
         this.images = [];
+        this.files = [];
         this.contentChange.emit(this.content);
       },
       error: (err) => {
         this.isLoading = false;
         alert("Đăng bài thất bại: " + (err?.error?.message || 'Có lỗi xảy ra!'));
       }
-    })
+    });
   }
 
   autoResize(event: Event) {

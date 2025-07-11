@@ -16,12 +16,20 @@ export class PostService {
 
     createPost(data: {
         content: string;
-        mediaUrls?: string[];
-        privacy?: 'public' | 'friends' | 'private';
+        files?: File[];
+        privacy?: 'public' | 'followers' | 'private';
         originalPostId?: string;
         sharedFromPostId?: string;
     }): Observable<any> {
-        return this.http.post<any>(`${this.apiUrl}`, data);
+        const formData = new FormData();
+        formData.append('content', data.content);
+        if (data.privacy) formData.append('privacy', data.privacy);
+        if (data.originalPostId) formData.append('originalPostId', data.originalPostId);
+        if (data.sharedFromPostId) formData.append('sharedFromPostId', data.sharedFromPostId);
+        if (data.files && data.files.length > 0) {
+            data.files.forEach(file => formData.append('files', file));
+        }
+        return this.http.post<any>(`${this.apiUrl}`, formData);
     }
 
     getAllPosts(): Observable<any> {
