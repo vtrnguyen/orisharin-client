@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { UserService } from '../../../core/services/user.service';
+import { PostService } from '../../../core/services/post.service';
 
 @Component({
   selector: 'app-post-modal',
@@ -19,15 +20,15 @@ export class PostModalComponent implements OnInit, OnDestroy {
   @Input() avatar: string = '';
   @Input() content: string = '';
   @Output() contentChange = new EventEmitter<string>();
-  @Output() submit = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 
   userInfo: any;
-
   images: string[] = [];
+  isLoading: boolean = false;
 
   constructor(
-    private userService: UserService
+    private userService: UserService,
+    private postService: PostService
   ) { }
 
   ngOnInit() {
@@ -49,7 +50,6 @@ export class PostModalComponent implements OnInit, OnDestroy {
         };
         reader.readAsDataURL(file);
       });
-      // Reset input để chọn lại cùng ảnh nếu muốn
       input.value = '';
     }
   }
@@ -59,8 +59,25 @@ export class PostModalComponent implements OnInit, OnDestroy {
   }
 
   submitPost() {
-    // Gửi content và images ra ngoài (bạn có thể emit thêm images nếu muốn)
-    this.submit.emit();
+    if (!this.content.trim() && this.images.length === 0) return;
+
+    this.isLoading = true;
+    this.postService.createPost({
+      content: this.content,
+      mediaUrls: this.images
+    }).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.close.emit();
+        this.content = '';
+        this.images = [];
+        this.contentChange.emit(this.content);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        alert("Đăng bài thất bại: " + (err?.error?.message || 'Có lỗi xảy ra!'));
+      }
+    })
   }
 
   autoResize(event: Event) {

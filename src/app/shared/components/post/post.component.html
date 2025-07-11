@@ -3,10 +3,8 @@
         class="w-12 h-12 rounded-full object-cover" alt="avatar" />
     <div class="flex-1">
         <div class="flex items-center gap-2">
-            <span class="font-semibold text-gray-900">{{ author.fullName }}</span>
-            <span class="text-gray-500 text-sm">{{ author.username }}</span>
-            <span class="mx-2 text-gray-400">·</span>
-            <span class="text-gray-400 text-xs">{{ createdAt | date:'short' }}</span>
+            <span class="font-semibold text-gray-900">{{ author.username }}</span>
+            <span class="text-gray-400 text-xs">{{ formatTime(createdAt) }}</span>
         </div>
         <div class="mt-2 text-gray-800 text-base whitespace-pre-line">
             {{ content }}
