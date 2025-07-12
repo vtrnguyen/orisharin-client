@@ -1,4 +1,5 @@
 @use "tailwindcss";
+@use '@ctrl/ngx-emoji-mart/picker';
 
 @layer utilities {
     .my-custom-class {

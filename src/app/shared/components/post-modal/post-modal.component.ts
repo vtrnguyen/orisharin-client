@@ -6,6 +6,7 @@ import { UserService } from '../../../core/services/user.service';
 import { PostService } from '../../../core/services/post.service';
 import { isImage } from '../../functions/media-type.util';
 import { PostEventService } from '../../state-managements/post-event.service';
+import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 
 @Component({
   selector: 'app-post-modal',
@@ -14,6 +15,7 @@ import { PostEventService } from '../../state-managements/post-event.service';
     CommonModule,
     FormsModule,
     ClickOutsideModule,
+    PickerComponent,
   ],
   templateUrl: './post-modal.component.html',
   styleUrls: ['./post-modal.component.scss']
@@ -27,6 +29,7 @@ export class PostModalComponent implements OnInit, OnDestroy {
   images: string[] = [];
   files: File[] = [];
   isLoading: boolean = false;
+  showEmojiPicker = false;
 
   isImage = isImage;
 
@@ -91,5 +94,13 @@ export class PostModalComponent implements OnInit, OnDestroy {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  toggleEmojiPicker() {
+    this.showEmojiPicker = !this.showEmojiPicker;
+  }
+
+  addEmoji(event: any) {
+    this.content += event.emoji.native || event.emoji;
   }
 }

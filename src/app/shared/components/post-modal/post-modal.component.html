@@ -1,13 +1,19 @@
 <div class="fixed flex items-center justify-center inset-0 z-[99] bg-black/80">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-0 relative transition-all duration-300 ease-out opacity-0 scale-95 animate-modal-fade-in"
         (clickOutside)="close.emit()">
-        <!-- Header -->
+
+        <div *ngIf="showEmojiPicker" class="absolute left-1/2 top-8 z-[999]"
+            style="transform: translateX(-50%); min-width:320px; max-width:90vw;"
+            (clickOutside)="showEmojiPicker = false">
+            <emoji-mart (emojiSelect)="addEmoji($event)" [style.width.px]="320" [style.height.px]="380"
+                class="rounded-xl shadow-lg border border-gray-200 bg-white"></emoji-mart>
+        </div>
+
         <div class="flex items-center justify-between border-b border-gray-300 px-6 py-4">
             <button class="font-semibold px-2 py-1 cursor-pointer" (click)="close.emit()">Hủy</button>
             <span class="font-bold text-lg text-gray-800">Đăng bài</span>
             <span class="w-12"></span>
         </div>
-        <!-- Content -->
         <div class="p-6 flex gap-3 items-start">
             <img [src]="avatar" class="w-10 h-10 rounded-full object-cover mt-1" alt="avatar" />
             <div class="flex-1 flex flex-col">
@@ -42,8 +48,9 @@
                             <input type="file" multiple accept="image/*,video/*" class="hidden"
                                 (change)="onImageSelected($event)">
                         </label>
-                        <label class="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800">
-                            <i class="fa-regular fa-face-smile w-6 h-6"></i>
+                        <label
+                            class="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800 relative">
+                            <i class="fa-regular fa-face-smile w-6 h-6" (click)="toggleEmojiPicker()"></i>
                         </label>
                     </div>
                     <button class="font-semibold px-4 py-2 rounded-lg shadow transition cursor-pointer"
