@@ -6,3 +6,21 @@
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
+
+@keyframes like-pop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.4);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-like i {
+    animation: like-pop 0.3s;
+}
