@@ -149,4 +149,4 @@
 </div>
 
 <app-post-modal *ngIf="showPostModal" [avatar]="'https://randomuser.me/api/portraits/men/32.jpg'"
-    [(content)]="newPostContent" (submit)="openPostModal()" (close)="closePostModal()"></app-post-modal>
+    (content)="newPostContent" (submit)="openPostModal()" (close)="closePostModal()"></app-post-modal>

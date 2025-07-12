@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { PostModalComponent } from '../../../shared/components/post-modal/post-modal.component';
 import { PostService } from '../../../core/services/post.service';
 import { Post } from '../../../shared/interfaces/post.interface';
+import { PostEventService } from '../../../shared/state-managements/post-event.service';
 
 @Component({
   selector: 'app-home',
@@ -20,14 +21,18 @@ import { Post } from '../../../shared/interfaces/post.interface';
 export class HomeComponent implements OnInit {
   posts: Post[] = [];
   showPostModal = false;
-  newPostContent = '';
+  newPostContent: string = '';
 
   constructor(
-    private postService: PostService
+    private postService: PostService,
+    private postEventService: PostEventService
   ) { }
 
   ngOnInit() {
     this.loadAllPosts();
+    this.postEventService.postCreated$.subscribe(() => {
+      this.loadAllPosts();
+    });
   }
 
   loadAllPosts() {

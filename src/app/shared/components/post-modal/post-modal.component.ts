@@ -5,6 +5,7 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { UserService } from '../../../core/services/user.service';
 import { PostService } from '../../../core/services/post.service';
 import { isImage } from '../../functions/media-type.util';
+import { PostEventService } from '../../state-managements/post-event.service';
 
 @Component({
   selector: 'app-post-modal',
@@ -20,7 +21,6 @@ import { isImage } from '../../functions/media-type.util';
 export class PostModalComponent implements OnInit, OnDestroy {
   @Input() avatar: string = '';
   @Input() content: string = '';
-  @Output() contentChange = new EventEmitter<string>();
   @Output() close = new EventEmitter<void>();
 
   userInfo: any;
@@ -32,7 +32,8 @@ export class PostModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    private postService: PostService
+    private postService: PostService,
+    private postEventService: PostEventService
   ) { }
 
   ngOnInit() {
@@ -73,11 +74,11 @@ export class PostModalComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: () => {
         this.isLoading = false;
+        this.postEventService.emitPostCreated();
         this.close.emit();
         this.content = '';
         this.images = [];
         this.files = [];
-        this.contentChange.emit(this.content);
       },
       error: (err) => {
         this.isLoading = false;

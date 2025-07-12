@@ -14,7 +14,7 @@
         </div>
 
         <app-post-modal *ngIf="showPostModal" [avatar]="'https://randomuser.me/api/portraits/men/32.jpg'"
-            [(content)]="newPostContent" (close)="closePostModal()" (contentChange)="loadAllPosts()"></app-post-modal>
+            (content)="newPostContent" (close)="closePostModal()"></app-post-modal>
 
         <div class="space-y-6">
             <app-post *ngFor="let post of posts" [post]="post"></app-post>
