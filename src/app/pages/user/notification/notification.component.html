@@ -1,1 +1,30 @@
-<h1>User Search page</h1>
+<app-loading *ngIf="isLoading"></app-loading>
+
+<div *ngIf="!isLoading" class="max-w-2xl mx-auto py-8 px-2">
+    <div class="max-w-xl mx-auto py-6 px-2 relative pt-12">
+        <div *ngIf="notifications.length > 0" class="absolute top-2 right-2 z-10" (clickOutside)="closeMenu()">
+            <button (click)="openMenu()" class="p-2 cursor-pointer">
+                <i class="fa-solid fa-ellipsis text-xl"></i>
+            </button>
+            <div *ngIf="showMenu"
+                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20">
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                    (click)="markAllAsRead(); closeMenu();">
+                    <i class="fa-regular fa-circle-check mr-2 text-green-500"></i> Đánh dấu tất cả là đã đọc
+                </button>
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-500 cursor-pointer"
+                    (click)="deleteAll(); closeMenu();">
+                    <i class="fa-regular fa-trash-can mr-2"></i> Xóa tất cả
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="notifications.length === 0" class="text-gray-400 text-center py-10">
+            Không có thông báo nào.
+        </div>
+        <ng-container *ngFor="let noti of notifications; let last = last">
+            <app-notification-item [noti]="noti" [last]="last"
+                (markAsRead)="handleMarkAsRead($event)"></app-notification-item>
+        </ng-container>
+    </div>
+</div>

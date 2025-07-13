@@ -46,8 +46,8 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/user/home/home.component').then(m => m.HomeComponent)
             },
             {
-                path: 'activity',
-                loadComponent: () => import('./pages/user/activity/activity.component').then(m => m.ActivityComponent)
+                path: 'notifications',
+                loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent)
             },
             {
                 path: 'search',

@@ -6,6 +6,7 @@ import { PostModalComponent } from '../../../shared/components/post-modal/post-m
 import { PostService } from '../../../core/services/post.service';
 import { Post } from '../../../shared/interfaces/post.interface';
 import { PostEventService } from '../../../shared/state-managements/post-event.service';
+import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-home',
@@ -15,13 +16,16 @@ import { PostEventService } from '../../../shared/state-managements/post-event.s
     PostComponent,
     FormsModule,
     PostModalComponent,
+    LoadingComponent,
   ],
-  templateUrl: './home.component.html'
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
   posts: Post[] = [];
   showPostModal = false;
   newPostContent: string = '';
+  isLoading = true;
 
   constructor(
     private postService: PostService,
@@ -36,12 +40,15 @@ export class HomeComponent implements OnInit {
   }
 
   loadAllPosts() {
+    this.isLoading = true;
     this.postService.getAllPosts().subscribe({
       next: (data) => {
         this.posts = data;
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading posts:', error);
+        this.isLoading = false;
       }
     });
   }
