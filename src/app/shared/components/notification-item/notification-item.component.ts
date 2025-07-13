@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
     templateUrl: './notification-item.component.html',
     styleUrls: ['./notification-item.component.scss']
 })
-export class NotificationItemComponen {
+export class NotificationItemComponent {
     @Input() noti: any;
     @Input() last: boolean = false;
     @Output() markAsRead = new EventEmitter<string>();

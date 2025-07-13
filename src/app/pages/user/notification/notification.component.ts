@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationItemComponen } from '../../../shared/components/notification-item/notification-item.component';
+import { NotificationItemComponent } from '../../../shared/components/notification-item/notification-item.component';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
+import { AlertService } from '../../../shared/state-managements/alert.service';
 
 @Component({
   selector: 'app-notification',
   standalone: true,
   imports: [
     CommonModule,
-    NotificationItemComponen,
+    NotificationItemComponent,
     ClickOutsideModule,
     LoadingComponent,
   ],
@@ -23,7 +24,8 @@ export class NotificationComponent implements OnInit {
   isLoading = true;
 
   constructor(
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private alertService: AlertService
   ) { }
 
   ngOnInit() {
@@ -42,9 +44,14 @@ export class NotificationComponent implements OnInit {
     this.notificationService.markAllAsRead().subscribe({
       next: () => {
         this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
+        this.alertService.show(
+          'success',
+          'Đã đọc tất cả thông báo!',
+          2000,
+        );
       },
       error: (error: any) => {
-        console.error('Error marking all notifications as read:', error);
+        this.alertService.show('error', 'Có lỗi xảy ra!', 4000);
       }
     });
   }
@@ -53,9 +60,14 @@ export class NotificationComponent implements OnInit {
     this.notificationService.markAsRead(id).subscribe({
       next: () => {
         this.notifications = this.notifications.map(n => n._id === id ? { ...n, isRead: true } : n);
+        this.alertService.show(
+          'success',
+          'Đã đọc thông báo!',
+          2000
+        );
       },
       error: (error: any) => {
-        console.error('Error marking notification as read:', error);
+        this.alertService.show('error', 'Có lỗi xảy ra!', 4000);
       }
     })
   }

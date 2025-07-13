@@ -1,0 +1,8 @@
+<div *ngIf="show" [ngClass]="alertClass"
+    class="fixed left-4 bottom-6 z-[9999] min-w-[260px] max-w-xs flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-fade-in border">
+    <i [ngClass]="iconClass" class="text-xl"></i>
+    <span class="flex-1">{{ message }}</span>
+    <button (click)="close()" class="ml-2 text-lg text-gray-400 hover:text-gray-600 cursor-pointer">
+        <i class=" fa-solid fa-xmark"></i>
+    </button>
+</div>
