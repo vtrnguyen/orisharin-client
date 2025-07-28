@@ -5,6 +5,7 @@ import { PostComponent } from '../../../shared/components/post/post.component';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
+import { MediaViewerComponent } from '../../../shared/components/media-viewer/media-viewer.component';
 
 @Component({
   selector: 'app-profile',
@@ -14,6 +15,7 @@ import { ActivatedRoute } from '@angular/router';
     PostModalComponent,
     PostComponent,
     ClickOutsideModule,
+    MediaViewerComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
@@ -24,6 +26,8 @@ export class ProfileComponent implements OnInit {
   followers: any[] = [];
   posts: any[] = [];
   showPostModal: boolean = false;
+  showAvatarViewer = false;
+  currentUsername: string = '';
 
   constructor(
     private authService: AuthService,
@@ -32,7 +36,7 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.userInfo = this.authService.getCurrentUser();
-    this.userInfo.avatar = "https://github.com/vtrnguyen/hosting-image-file/blob/main/oribuyin/avatar/avatar15.png?raw=true";
+    this.userInfo.avatar = "https://randomuser.me/api/portraits/men/32.jpg";
     this.userInfo.followers = [
       { avatar: 'https://randomuser.me/api/portraits/men/11.jpg', name: 'User 1' },
       { avatar: 'https://randomuser.me/api/portraits/women/12.jpg', name: 'User 2' },
@@ -44,8 +48,8 @@ export class ProfileComponent implements OnInit {
     if (urlFullname?.startsWith('@')) {
       urlFullname = urlFullname.substring(1);
     }
-    const currentUsername = this.userInfo.username;
-    this.isOwner = urlFullname === currentUsername;
+    this.currentUsername = urlFullname || "";
+    this.isOwner = urlFullname === this.userInfo.username;
   }
 
   openPostModal(): void {
@@ -57,5 +61,12 @@ export class ProfileComponent implements OnInit {
 
   closePostModal() {
     this.showPostModal = false;
+  }
+
+  openAvatarViewer() {
+    this.showAvatarViewer = true;
+  }
+  closeAvatarViewer() {
+    this.showAvatarViewer = false;
   }
 }

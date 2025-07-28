@@ -1,7 +1,7 @@
 <div class="max-w-2xl mx-auto py-8 px-4">
     <div class="profile-title mb-4">
         <p *ngIf="isOwner" class="text-center font-bold">Trang cá nhân</p>
-        <p *ngIf="!isOwner" class="text-center font-bold">{{ userInfo?.username }}</p>
+        <p *ngIf="!isOwner" class="text-center font-bold">{{ currentUsername }}</p>
     </div>
 
     <div class="flex items-center justify-between mb-2">
@@ -10,7 +10,8 @@
             <p class="text-gray-500 text-sm">{{ '@' + (userInfo?.username || 'username') }}</p>
         </div>
         <img [src]="userInfo?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'" alt="Avatar"
-            class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 cursor-pointer" />
+            class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 cursor-pointer"
+            (click)="openAvatarViewer()" />
     </div>
 
     <div class="flex items-center gap-2 mb-4">
@@ -55,6 +56,10 @@
             </ng-template>
         </div>
     </div>
-
-    <app-post-modal *ngIf="showPostModal" [avatar]="userInfo?.avatar" (close)="closePostModal()"></app-post-modal>
 </div>
+
+<app-post-modal *ngIf="showPostModal" [avatar]="userInfo?.avatar" (close)="closePostModal()"></app-post-modal>
+
+<app-media-viewer *ngIf="showAvatarViewer" [medias]="[userInfo?.avatar]" [startIndex]="0"
+    [onClose]="closeAvatarViewer.bind(this)">
+</app-media-viewer>
