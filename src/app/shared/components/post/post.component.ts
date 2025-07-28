@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MediaViewerComponent } from '../image-viewer/media-viewer.component';
+import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
 import { LikeService } from '../../../core/services/like.service';
 import { LikeTargetType } from '../../enums/like-target.enums';
