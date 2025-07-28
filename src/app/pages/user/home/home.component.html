@@ -2,8 +2,9 @@
     <div class="max-w-2xl mx-auto py-8 px-2">
         <div class="bg-white rounded-2xl shadow p-4 mb-3 flex items-center justify-between gap-3">
             <div class="flex items-center flex-1">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-10 h-10 rounded-full object-cover"
-                    alt="avatar" />
+                <img src="https://randomuser.me/api/portraits/men/32.jpg"
+                    class="w-10 h-10 rounded-full object-cover cursor-pointer" alt="avatar"
+                    (click)="navigateToProfile(userInfo.username)" />
                 <button class="flex-1 text-left text-gray-500 px-4 py-2 transition outline-none cursor-text"
                     (click)="openPostModal()">
                     Có gì mới?

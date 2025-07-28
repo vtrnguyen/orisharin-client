@@ -7,6 +7,8 @@ import { PostService } from '../../../core/services/post.service';
 import { Post } from '../../../shared/interfaces/post.interface';
 import { PostEventService } from '../../../shared/state-managements/post-event.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -22,17 +24,22 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
+  userInfo: any;
   posts: Post[] = [];
   showPostModal = false;
   newPostContent: string = '';
   isLoading = true;
 
   constructor(
+    private authService: AuthService,
     private postService: PostService,
-    private postEventService: PostEventService
+    private postEventService: PostEventService,
+    private router: Router
   ) { }
 
   ngOnInit() {
+    this.userInfo = this.authService.getCurrentUser();
+    this.userInfo.avatar = "https://github.com/vtrnguyen/hosting-image-file/blob/main/oribuyin/avatar/avatar15.png?raw=true";
     this.loadAllPosts();
     this.postEventService.postCreated$.subscribe(() => {
       this.loadAllPosts();
@@ -63,5 +70,9 @@ export class HomeComponent implements OnInit {
   }
 
   createPost() {
+  }
+
+  navigateToProfile(userName: string) {
+    this.router.navigate(['/@' + userName]);
   }
 }

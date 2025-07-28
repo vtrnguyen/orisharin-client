@@ -4,6 +4,7 @@ import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
 import { LikeService } from '../../../core/services/like.service';
 import { LikeTargetType } from '../../enums/like-target.enums';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-post',
@@ -28,7 +29,10 @@ export class PostComponent implements OnInit, OnChanges {
     likesCount = 0;
     loadingLike = false;
 
-    constructor(private likeService: LikeService) { }
+    constructor(
+        private likeService: LikeService,
+        private router: Router
+    ) { }
 
     ngOnInit() {
         this.loadLikeInfo();
@@ -71,7 +75,6 @@ export class PostComponent implements OnInit, OnChanges {
             });
         }
     }
-
 
     get author() {
         return this.post.author || {};
@@ -135,5 +138,9 @@ export class PostComponent implements OnInit, OnChanges {
 
     closeViewer() {
         this.showViewer = false;
+    }
+
+    navigateToProfile(userName: string) {
+        this.router.navigate(['/@' + userName]);
     }
 }
