@@ -29,6 +29,8 @@ export class PostComponent implements OnInit, OnChanges {
     likesCount = 0;
     loadingLike = false;
 
+    zoomingIndex: number | null = null;
+
     constructor(
         private likeService: LikeService,
         private router: Router
@@ -132,8 +134,12 @@ export class PostComponent implements OnInit, OnChanges {
     }
 
     openViewer(index: number) {
-        this.viewerIndex = index;
-        this.showViewer = true;
+        this.zoomingIndex = index;
+        setTimeout(() => {
+            this.viewerIndex = index;
+            this.showViewer = true;
+            this.zoomingIndex = null;
+        }, 180);
     }
 
     closeViewer() {
