@@ -2,7 +2,7 @@
     <div
         class="w-20 lg:w-64 bg-white border-r border-gray-200 flex-col h-screen fixed left-0 top-0 z-40 hidden md:flex">
         <div class="p-4 lg:p-6">
-            <div class="flex items-center cursor-pointer">
+            <div class="flex items-center cursor-pointer" (click)="onHomePageClick()">
                 <div
                     class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white shadow group">
                     <img src="images/orisharin_logo.png" alt="OriSharin Logo"
@@ -16,14 +16,13 @@
             <nav class="px-4 lg:px-6">
                 <ul class="space-y-2">
                     <li>
-                        <a routerLink="/" routerLinkActive="bg-gray-200 text-black"
-                            [routerLinkActiveOptions]="{ exact: true }"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                        <button (click)="onHomePageClick()" [ngClass]="{'bg-gray-200 text-black': router.url === '/'}"
+                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-solid fa-house w-7 h-7 text-2xl"></i>
                             </div>
                             <span class="ml-3 font-medium hidden lg:block">Home</span>
-                        </a>
+                        </button>
                     </li>
                     <li>
                         <a routerLink="/search" routerLinkActive="bg-gray-200 text-black"
@@ -128,10 +127,10 @@
 
         <nav
             class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center h-16 md:hidden">
-            <a routerLink="/" routerLinkActive="text-blue-600" [routerLinkActiveOptions]="{ exact: true }"
-                class="flex flex-col items-center justify-center text-gray-500">
+            <button (click)="onHomePageClick()" [ngClass]="{'text-blue-600': router.url === '/'}"
+                class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
                 <i class="fa-solid fa-house w-6 h-6 text-2xl"></i>
-            </a>
+            </button>
             <a routerLink="/search" routerLinkActive="text-blue-600"
                 class="flex flex-col items-center justify-center text-gray-500">
                 <i class="fa-solid fa-magnifying-glass w-6 h-6 text-2xl"></i>

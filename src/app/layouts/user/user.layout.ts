@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { PostModalComponent } from '../../shared/components/post-modal/post-modal.component';
@@ -36,10 +36,19 @@ export class UserLayoutComponent {
     constructor(
         private authService: AuthService,
         public alertService: AlertService,
+        public router: Router
     ) {
         this.alertService.alert$.subscribe(state => this.alertState = state);
         this.userInfo = this.authService.getCurrentUser();
         this.userInfo.avatar = "https://github.com/vtrnguyen/hosting-image-file/blob/main/oribuyin/avatar/avatar15.png?raw=true";
+    }
+
+    onHomePageClick(): void {
+        if (this.router.url === '/' || this.router.url === '') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            this.router.navigate(['/']);
+        }
     }
 
     openPostModal() {
