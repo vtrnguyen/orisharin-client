@@ -52,7 +52,7 @@
                         </a>
                     </li>
                     <li>
-                        <a routerLink="/profile" routerLinkActive="bg-gray-200 text-black"
+                        <a [routerLink]="'/@' + userInfo.username" routerLinkActive="bg-gray-200 text-black"
                             class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-regular fa-user w-7 h-7 text-2xl"></i>

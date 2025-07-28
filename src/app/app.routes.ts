@@ -54,10 +54,6 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/user/search/search.component').then(m => m.SearchComponent)
             },
             {
-                path: 'profile',
-                loadComponent: () => import('./pages/user/profile/profile.component').then(m => m.ProfileComponent)
-            },
-            {
                 path: 'message',
                 loadComponent: () => import('./pages/user/message/message.component').then(m => m.MessageComponent)
             },
@@ -65,6 +61,10 @@ export const routes: Routes = [
                 path: 'notification',
                 loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent)
             },
+            {
+                path: ':fullname',
+                loadComponent: () => import('./pages/user/profile/profile.component').then(m => m.ProfileComponent)
+            }
         ]
     },
 
