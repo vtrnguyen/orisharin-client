@@ -6,6 +6,8 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
 import { MediaViewerComponent } from '../../../shared/components/media-viewer/media-viewer.component';
+import { PostService } from '../../../core/services/post.service';
+import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-profile',
@@ -16,6 +18,7 @@ import { MediaViewerComponent } from '../../../shared/components/media-viewer/me
     PostComponent,
     ClickOutsideModule,
     MediaViewerComponent,
+    LoadingComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
@@ -28,10 +31,12 @@ export class ProfileComponent implements OnInit {
   showPostModal: boolean = false;
   showAvatarViewer = false;
   currentUsername: string = '';
+  isLoading = true;
 
   constructor(
     private authService: AuthService,
-    private route: ActivatedRoute
+    private postService: PostService,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
@@ -50,6 +55,8 @@ export class ProfileComponent implements OnInit {
     }
     this.currentUsername = urlFullname || "";
     this.isOwner = urlFullname === this.userInfo.username;
+
+    this.loadPosts();
   }
 
   openPostModal(): void {
@@ -66,7 +73,22 @@ export class ProfileComponent implements OnInit {
   openAvatarViewer() {
     this.showAvatarViewer = true;
   }
+
   closeAvatarViewer() {
     this.showAvatarViewer = false;
+  }
+
+  private loadPosts(): void {
+    this.isLoading = true;
+    this.postService.getPostByUsername(this.currentUsername).subscribe({
+      next: (posts) => {
+        this.posts = posts;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching posts:', error);
+        this.isLoading = false;
+      }
+    })
   }
 }

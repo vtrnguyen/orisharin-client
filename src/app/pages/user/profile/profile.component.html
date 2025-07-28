@@ -46,12 +46,14 @@
         </div>
 
         <div class="rounded-b-2xl overflow-hidden">
-            <ng-container *ngIf="posts?.length; else noPosts">
+            <app-loading *ngIf="isLoading"></app-loading>
+
+            <ng-container *ngIf="(posts?.length && !isLoading); else noPostsTemplate">
                 <div *ngFor="let post of posts" class="mb-4 last:mb-0">
                     <app-post [post]="post"></app-post>
                 </div>
             </ng-container>
-            <ng-template #noPosts>
+            <ng-template #noPostsTemplate>
                 <div class="text-gray-400 text-center py-8">Chưa có bài viết nào.</div>
             </ng-template>
         </div>
