@@ -1,29 +1,71 @@
 <div class="max-w-2xl mx-auto py-8 px-4">
     <div class="profile-title mb-4">
         <p *ngIf="isOwner" class="text-center font-bold">Trang cá nhân</p>
-        <p *ngIf="!isOwner" class="text-center font-bold">{{ currentUsername }}</p>
+        <p *ngIf="!isOwner" class="text-center font-bold">{{ userInfo.username }}</p>
     </div>
 
     <div class="flex items-center justify-between mb-2">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">{{ userInfo?.fullName || 'Họ tên người dùng' }}</h2>
-            <p class="text-gray-500 text-sm">{{ '@' + (userInfo?.username || 'username') }}</p>
+            <h2 class="text-2xl font-bold text-gray-900">{{ userInfo.fullName || 'Họ tên người dùng' }}</h2>
+            <p class="text-gray-500 text-sm">{{ '@' + (userInfo.username || 'username') }}</p>
         </div>
         <img [src]="userInfo?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'" alt="Avatar"
             class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 cursor-pointer"
             (click)="openAvatarViewer()" />
     </div>
 
-    <div class="flex items-center gap-2 mb-4">
-        <div class="flex -space-x-2">
-            <ng-container *ngFor="let follower of (userInfo?.followers | slice:0:3)">
-                <img src="https://randomuser.me/api/portraits/men/1.jpg"
-                    class="w-6 h-6 rounded-full border-2 border-white shadow object-cover" alt="follower" />
-            </ng-container>
+    <div class="flex items-center mb-4 relative">
+        <div class="flex items-center gap-2 flex-1">
+            <div class="flex -space-x-2">
+                <ng-container *ngFor="let follower of (userInfo?.followers | slice:0:3)">
+                    <img src="https://randomuser.me/api/portraits/men/1.jpg"
+                        class="w-6 h-6 rounded-full border-2 border-white shadow object-cover" alt="follower" />
+                </ng-container>
+            </div>
+            <span class="text-gray-500 text-sm font-medium hover:underline cursor-pointer">
+                {{ userInfo.followersCount }} người theo dõi
+            </span>
         </div>
-        <span class="text-gray-500 text-sm font-medium hover:underline cursor-pointer">
-            {{ userInfo?.followers?.length || 0 }} người theo dõi
-        </span>
+        <div class="absolute right-0 top-0 flex items-center">
+            <button (click)="toggleProfileMenu()"
+                class="w-8 h-8 flex items-center border border-gray-400 justify-center rounded-full hover:bg-gray-100 transition cursor-pointer">
+                <i class="fa-solid fa-ellipsis text-xl text-gray-500"></i>
+            </button>
+            <div *ngIf="showProfileMenu"
+                class="absolute right-0 top-10 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in px-2 border-gray-300"
+                (click)="$event.stopPropagation()" (clickOutside)="closeProfileMenu()">
+                <ul class="py-2">
+                    <li>
+                        <button
+                            class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer">
+                            <span class="font-semibold">Sao chép liên kết</span>
+                            <i class="fa-solid fa-link"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer">
+                            <span class="font-semibold">Giới thiệu về trang cá nhân này</span>
+                            <i class="fa-solid fa-user"></i>
+                        </button>
+                    </li>
+                    <li *ngIf="!isOwner">
+                        <button
+                            class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer text-red-500">
+                            <span class="font-semibold">Chặn</span>
+                            <i class="fa-solid fa-ban"></i>
+                        </button>
+                    </li>
+                    <li *ngIf="!isOwner">
+                        <button
+                            class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer text-red-500">
+                            <span class="font-semibold">Báo cáo</span>
+                            <i class="fa-solid fa-flag"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <button *ngIf="isOwner" class="w-full py-2 mb-4 font-semibold px-4 py-2 rounded-lg shadow transition cursor-pointer"

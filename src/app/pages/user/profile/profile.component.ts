@@ -8,6 +8,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MediaViewerComponent } from '../../../shared/components/media-viewer/media-viewer.component';
 import { PostService } from '../../../core/services/post.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -32,11 +33,13 @@ export class ProfileComponent implements OnInit {
   showAvatarViewer = false;
   currentUsername: string = '';
   isLoading = true;
+  showProfileMenu = false;
 
   constructor(
     private authService: AuthService,
     private postService: PostService,
     private route: ActivatedRoute,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -56,6 +59,7 @@ export class ProfileComponent implements OnInit {
     this.currentUsername = urlFullname || "";
     this.isOwner = urlFullname === this.userInfo.username;
 
+    this.loadUserProfile(this.currentUsername);
     this.loadPosts();
   }
 
@@ -76,6 +80,26 @@ export class ProfileComponent implements OnInit {
 
   closeAvatarViewer() {
     this.showAvatarViewer = false;
+  }
+
+  toggleProfileMenu() {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+  closeProfileMenu() {
+    this.showProfileMenu = false;
+  }
+
+  private loadUserProfile(query: string): void {
+    if (query) {
+      this.userService.getUserProfile(query).subscribe({
+        next: (response: any) => {
+          this.userInfo = response.data;
+        },
+        error: (error: any) => {
+          console.error('Error fetching user profile:', error);
+        }
+      });
+    }
   }
 
   private loadPosts(): void {

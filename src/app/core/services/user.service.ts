@@ -1,12 +1,25 @@
 import { Injectable } from "@angular/core";
+import { environment } from "../../../environments/environment";
+import { HttpClient } from "@angular/common/http";
+import { ApiResponse } from "../../shared/dtos/api-response.dto";
+import { Observable } from "rxjs";
 
 @Injectable({
     providedIn: "root",
 })
 export class UserService {
+    private apiUrl = environment.apiUrl + '/users';
+
+    constructor(
+        private http: HttpClient
+    ) { }
 
     getCurrentUserInfo(): any {
         const user = localStorage.getItem("user");
         return user ? JSON.parse(user) : null;
+    }
+
+    getUserProfile(userId: string): Observable<ApiResponse<any>> {
+        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${userId}`);
     }
 }
