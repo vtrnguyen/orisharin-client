@@ -9,6 +9,7 @@ import { MediaViewerComponent } from '../../../shared/components/media-viewer/me
 import { PostService } from '../../../core/services/post.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { UserService } from '../../../core/services/user.service';
+import { AlertService } from '../../../shared/state-managements/alert.service';
 
 @Component({
   selector: 'app-profile',
@@ -39,7 +40,8 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private postService: PostService,
     private route: ActivatedRoute,
-    private userService: UserService
+    private userService: UserService,
+    private alertService: AlertService
   ) { }
 
   ngOnInit(): void {
@@ -85,7 +87,19 @@ export class ProfileComponent implements OnInit {
   toggleProfileMenu() {
     this.showProfileMenu = !this.showProfileMenu;
   }
+
   closeProfileMenu() {
+    this.showProfileMenu = false;
+  }
+
+  copyPorfileUrl(): void {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      this.alertService.show('success', 'Đã sao chép liên kết!', 4000);
+    }).catch(err => {
+      console.error('Không thể sao chép đường dẫn:', err);
+      this.alertService.show('error', 'Sao chép thất bại!', 4000);
+    });
     this.showProfileMenu = false;
   }
 

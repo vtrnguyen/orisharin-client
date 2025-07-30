@@ -36,7 +36,7 @@
                 (click)="$event.stopPropagation()" (clickOutside)="closeProfileMenu()">
                 <ul class="py-2">
                     <li>
-                        <button
+                        <button (click)="copyPorfileUrl()"
                             class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer">
                             <span class="font-semibold">Sao chép liên kết</span>
                             <i class="fa-solid fa-link"></i>
