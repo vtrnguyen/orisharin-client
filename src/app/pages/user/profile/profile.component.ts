@@ -10,12 +10,14 @@ import { PostService } from '../../../core/services/post.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { UserService } from '../../../core/services/user.service';
 import { AlertService } from '../../../shared/state-managements/alert.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     PostModalComponent,
     PostComponent,
     ClickOutsideModule,
@@ -35,6 +37,12 @@ export class ProfileComponent implements OnInit {
   currentUsername: string = '';
   isLoading = true;
   showProfileMenu = false;
+  showEditProfileModal = false;
+  showAddWebsiteModal = false;
+  newWebsiteUrl = '';
+  modalStep: 'edit' | 'addWebsite' = 'edit';
+  slideDirection: 'left' | 'right' = 'left';
+  isTransitioning = false;
 
   constructor(
     private authService: AuthService,
@@ -70,6 +78,18 @@ export class ProfileComponent implements OnInit {
   }
 
   onEditProfile(): void {
+    this.modalStep = 'edit';
+    this.showEditProfileModal = true;
+  }
+
+  closeEditProfileModal(): void {
+    this.isTransitioning = true;
+
+    setTimeout(() => {
+      this.showEditProfileModal = false;
+      this.modalStep = 'edit';
+      this.isTransitioning = false;
+    }, 150);
   }
 
   closePostModal() {
@@ -92,6 +112,7 @@ export class ProfileComponent implements OnInit {
     this.showProfileMenu = false;
   }
 
+
   copyPorfileUrl(): void {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
@@ -101,6 +122,36 @@ export class ProfileComponent implements OnInit {
       this.alertService.show('error', 'Sao chép thất bại!', 4000);
     });
     this.showProfileMenu = false;
+  }
+
+  openAddWebsiteModal() {
+    this.newWebsiteUrl = '';
+    this.isTransitioning = true;
+
+    setTimeout(() => {
+      this.modalStep = 'addWebsite';
+      this.isTransitioning = false;
+    }, 100);
+  }
+
+  closeAddWebsiteModal() {
+    this.isTransitioning = true;
+
+    setTimeout(() => {
+      this.modalStep = 'edit';
+      this.isTransitioning = false;
+    }, 100);
+  }
+
+  addWebsite() {
+    if (this.newWebsiteUrl.trim()) {
+      if (!this.userInfo.websites) {
+        this.userInfo.websites = [];
+      }
+      this.userInfo.websites.push(this.newWebsiteUrl.trim());
+      this.newWebsiteUrl = '';
+      this.closeAddWebsiteModal();
+    }
   }
 
   private loadUserProfile(query: string): void {

@@ -1,0 +1,151 @@
+// Smooth slide transitions for modal panels
+.transition-transform {
+    transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.transition-opacity {
+    transition: opacity 150ms ease-in-out;
+}
+
+// Ensure proper layering and positioning
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+// Modal slide container
+.overflow-hidden {
+    overflow: hidden;
+}
+
+// Transform utilities for smooth slides
+.transform {
+    transform: var(--tw-transform);
+}
+
+.translate-x-0 {
+    --tw-translate-x: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.translate-x-full {
+    --tw-translate-x: 100%;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.-translate-x-full {
+    --tw-translate-x: -100%;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+// Custom scrollbar for textarea
+textarea::-webkit-scrollbar {
+    width: 6px;
+}
+
+textarea::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+// Enhanced focus styles
+input:focus,
+textarea:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+// Button hover effects
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+// Modal backdrop blur effect
+.bg-black\/80 {
+    backdrop-filter: blur(4px);
+}
+
+// Smooth slide animation keyframes for better control
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0.8;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0.8;
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0.8;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0.8;
+    }
+}
+
+// Responsive modal sizing
+@media (max-width: 640px) {
+    .max-w-lg {
+        max-width: calc(100vw - 2rem);
+        margin: 1rem;
+    }
+
+    .p-6 {
+        padding: 1.5rem;
+    }
+}
