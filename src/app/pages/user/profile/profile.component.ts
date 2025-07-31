@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostModalComponent } from '../../../shared/components/post-modal/post-modal.component';
 import { PostComponent } from '../../../shared/components/post/post.component';
@@ -40,9 +40,7 @@ export class ProfileComponent implements OnInit {
   showEditProfileModal = false;
   showAddWebsiteModal = false;
   newWebsiteUrl = '';
-  modalStep: 'edit' | 'addWebsite' = 'edit';
-  slideDirection: 'left' | 'right' = 'left';
-  isTransitioning = false;
+  showAvatarMenu: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -78,18 +76,13 @@ export class ProfileComponent implements OnInit {
   }
 
   onEditProfile(): void {
-    this.modalStep = 'edit';
     this.showEditProfileModal = true;
+    document.body.style.overflow = 'hidden';
   }
 
   closeEditProfileModal(): void {
-    this.isTransitioning = true;
-
-    setTimeout(() => {
-      this.showEditProfileModal = false;
-      this.modalStep = 'edit';
-      this.isTransitioning = false;
-    }, 150);
+    this.showEditProfileModal = false;
+    document.body.style.overflow = 'auto';
   }
 
   closePostModal() {
@@ -112,6 +105,25 @@ export class ProfileComponent implements OnInit {
     this.showProfileMenu = false;
   }
 
+  onUploadAvatar() {
+
+  }
+
+  onRemoveAvatar() {
+
+  }
+
+  openAvatarMenu(): void {
+    this.showAvatarMenu = true;
+  }
+
+  closeAvatarMenu(): void {
+    this.showAvatarMenu = false;
+  }
+
+  onUsernameInputClick(): void {
+    this.alertService.show('warning', 'Tên người dùng không thể thay đổi!', 3000);
+  }
 
   copyPorfileUrl(): void {
     const url = window.location.href;
@@ -126,21 +138,13 @@ export class ProfileComponent implements OnInit {
 
   openAddWebsiteModal() {
     this.newWebsiteUrl = '';
-    this.isTransitioning = true;
-
-    setTimeout(() => {
-      this.modalStep = 'addWebsite';
-      this.isTransitioning = false;
-    }, 100);
+    this.showEditProfileModal = false;
+    this.showAddWebsiteModal = true;
   }
 
   closeAddWebsiteModal() {
-    this.isTransitioning = true;
-
-    setTimeout(() => {
-      this.modalStep = 'edit';
-      this.isTransitioning = false;
-    }, 100);
+    this.showAddWebsiteModal = false;
+    this.showEditProfileModal = true;
   }
 
   addWebsite() {
@@ -153,7 +157,6 @@ export class ProfileComponent implements OnInit {
       this.closeAddWebsiteModal();
     }
   }
-
   private loadUserProfile(query: string): void {
     if (query) {
       this.userService.getUserProfile(query).subscribe({
