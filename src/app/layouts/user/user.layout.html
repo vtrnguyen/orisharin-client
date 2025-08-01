@@ -112,8 +112,18 @@
         </div>
     </div>
 
+    <header
+        class="fixed top-0 left-0 right-0 z-40 bg-white/70 backdrop-blur-md border-b border-gray-200/50 h-16 flex items-center justify-center md:hidden">
+        <div class="flex items-center cursor-pointer" (click)="onHomePageClick()">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden bg-white shadow group">
+                <img src="images/orisharin_logo.png" alt="OriSharin Logo"
+                    class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-110" />
+            </div>
+        </div>
+    </header>
+
     <div class="flex-1 flex flex-col md:ml-20 lg:ml-64">
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 overflow-y-auto pt-16 md:pt-0">
             <router-outlet></router-outlet>
         </main>
 
