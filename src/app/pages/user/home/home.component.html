@@ -13,8 +13,8 @@
                 (click)="openPostModal()">Đăng</button>
         </div>
 
-        <app-post-modal *ngIf="showPostModal" [avatar]="'https://randomuser.me/api/portraits/men/32.jpg'"
-            (content)="newPostContent" (close)="closePostModal()"></app-post-modal>
+        <app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatar" (content)="newPostContent"
+            (close)="closePostModal()"></app-post-modal>
 
         <app-loading *ngIf="isLoading"></app-loading>
 

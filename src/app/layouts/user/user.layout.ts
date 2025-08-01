@@ -7,6 +7,7 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { AlertService } from '../../shared/state-managements/alert.service';
 import { AlertComponent } from '../../shared/components/alert/alert.component';
 import { AlertState } from '../../shared/interfaces/alert.interface';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
     selector: 'app-user-layout',
@@ -36,11 +37,12 @@ export class UserLayoutComponent {
     constructor(
         private authService: AuthService,
         public alertService: AlertService,
+        private userService: UserService,
         public router: Router
     ) {
         this.alertService.alert$.subscribe(state => this.alertState = state);
         this.userInfo = this.authService.getCurrentUser();
-        this.userInfo.avatar = "https://github.com/vtrnguyen/hosting-image-file/blob/main/oribuyin/avatar/avatar15.png?raw=true";
+        this.userInfo.avatar = this.userService.getCurrentUserAvatarUrl() || this.userInfo.avatar;
     }
 
     onHomePageClick(): void {
