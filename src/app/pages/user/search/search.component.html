@@ -1,1 +1,41 @@
-<h1>User Search page</h1>
+<div class="max-w-2xl mx-auto py-8 px-2">
+    <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-center gap-3 rounded-2xl px-4 py-3 border border-gray-200 transition mb-4">
+            <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
+            <input type="text" [(ngModel)]="searchValue" (ngModelChange)="onSearchChange()"
+                class="flex-1 bg-transparent border-none outline-none text-base" placeholder="Tìm kiếm"
+                autocomplete="off" />
+        </div>
+
+        <div class="mb-3 flex items-center gap-2">
+            <span class="font-semibold text-gray-400 text-sm">Gợi ý theo dõi</span>
+        </div>
+
+        <div>
+            <ng-container *ngFor="let user of filteredSuggestions; let last = last">
+                <div class="flex items-center justify-between px-1 py-2 cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <img [src]="user.avatar"
+                            class="w-10 h-10 rounded-full object-cover border border-gray-200 cursor-pointer"
+                            alt="avatar" />
+                        <div>
+                            <div class="font-semibold text-gray-900 hover:underline cursor-pointer">{{ user.username }}
+                            </div>
+                            <div class="text-gray-400 text-sm mb-1">{{ user.fullName }}</div>
+                            <div class="text-gray-500 text-sm">{{ user.description }}</div>
+                        </div>
+                    </div>
+                    <button (click)="toggleFollow(user)"
+                        [ngClass]="user.isFollowing ? 'bg-gray-200 text-gray-700' : 'bg-blue-600 text-white hover:bg-blue-700'"
+                        class="px-4 py-2 rounded-xl font-semibold shadow transition cursor-pointer min-w-[110px] text-center">
+                        {{ user.isFollowing ? 'Đang theo dõi' : 'Theo dõi' }}
+                    </button>
+                </div>
+                <hr *ngIf="!last" class="my-4 border-gray-200" />
+            </ng-container>
+            <div *ngIf="filteredSuggestions.length === 0" class="text-center text-gray-400 py-8">
+                Không tìm thấy kết quả phù hợp.
+            </div>
+        </div>
+    </div>
+</div>
