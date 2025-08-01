@@ -9,6 +9,7 @@ import { PostEventService } from '../../../shared/state-managements/post-event.s
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -34,12 +35,13 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private postService: PostService,
     private postEventService: PostEventService,
-    private router: Router
+    private router: Router,
+    private userService: UserService,
   ) { }
 
   ngOnInit() {
     this.userInfo = this.authService.getCurrentUser();
-    this.userInfo.avatar = "https://github.com/vtrnguyen/hosting-image-file/blob/main/oribuyin/avatar/avatar15.png?raw=true";
+    this.userInfo.avatar = this.userService.getCurrentUserAvatarUrl();
     this.loadAllPosts();
     this.postEventService.postCreated$.subscribe(() => {
       this.loadAllPosts();

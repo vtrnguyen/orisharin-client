@@ -229,8 +229,11 @@ export class ProfileComponent implements OnInit {
     }
 
     this.userService.updateUserProfile(updateData).subscribe({
-      next: () => {
+      next: (response: any) => {
         this.isUpdatingProfile = false;
+        if (response && response.data && response.data.avatarUrl) {
+          this.userService.setCurrentUserAvatarUrl(response.data.avatarUrl);
+        }
         this.alertService.show('success', 'Cập nhật thành công!', 3000);
         this.closeEditProfileModal();
         this.loadUserProfile(this.currentUsername);

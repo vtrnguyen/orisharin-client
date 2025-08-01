@@ -19,6 +19,19 @@ export class UserService {
         return user ? JSON.parse(user) : null;
     }
 
+    getCurrentUserAvatarUrl(): string {
+        const user = this.getCurrentUserInfo();
+        return user ? user.avatarUrl : '';
+    }
+
+    setCurrentUserAvatarUrl(avatarUrl: string): void {
+        const user = this.getCurrentUserInfo();
+        if (user) {
+            user.avatarUrl = avatarUrl;
+            localStorage.setItem("user", JSON.stringify(user));
+        }
+    }
+
     getUserProfile(userId: string): Observable<ApiResponse<any>> {
         return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${userId}`);
     }
