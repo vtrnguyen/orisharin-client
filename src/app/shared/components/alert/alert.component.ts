@@ -35,9 +35,11 @@ export class AlertComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['show'] && this.show) {
+        if ((changes['show'] && this.show) || changes['message'] || changes['type']) {
             clearTimeout(this.timeout);
-            this.timeout = setTimeout(() => this.close(), this.duration);
+            if (this.show) {
+                this.timeout = setTimeout(() => this.close(), this.duration);
+            }
         }
     }
 
