@@ -8,8 +8,11 @@
         <div>
             <h2 class="text-2xl font-bold text-gray-900">{{ userInfo.fullName || 'Họ tên người dùng' }}</h2>
             <p class="text-gray-500 text-sm">{{ '@' + (userInfo.username || 'username') }}</p>
+            <p class="text-gray-400 text-base mt-3" *ngIf="userInfo.bio">
+                {{ userInfo.bio }}
+            </p>
         </div>
-        <img [src]="userInfo?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'" alt="Avatar"
+        <img [src]="userInfo.avatarUrl || ''" alt="Avatar"
             class="w-28 h-28 rounded-full object-cover border-2 border-gray-200 cursor-pointer"
             (click)="openAvatarViewer()" />
     </div>
@@ -17,9 +20,10 @@
     <div class="flex items-center mb-4 relative">
         <div class="flex items-center gap-2 flex-1">
             <div class="flex -space-x-2">
-                <ng-container *ngFor="let follower of (userInfo?.followers | slice:0:3)">
-                    <img src="https://randomuser.me/api/portraits/men/1.jpg"
-                        class="w-6 h-6 rounded-full border-2 border-white shadow object-cover" alt="follower" />
+                <ng-container *ngFor="let following of followings">
+                    <img [src]="following.avatarUrl || 'https://randomuser.me/api/portraits/men/1.jpg'"
+                        class="w-6 h-6 rounded-full border-2 border-white shadow object-cover" alt="following"
+                        [title]="following.fullName || following.username" />
                 </ng-container>
             </div>
             <span class="text-gray-500 text-sm font-medium hover:underline cursor-pointer">
@@ -36,7 +40,7 @@
                 (click)="$event.stopPropagation()" (clickOutside)="closeProfileMenu()">
                 <ul class="py-2">
                     <li>
-                        <button (click)="copyPorfileUrl()"
+                        <button (click)="copyProfileUrl()"
                             class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer">
                             <span class="font-semibold">Sao chép liên kết</span>
                             <i class="fa-solid fa-link"></i>
@@ -76,8 +80,7 @@
     <div class="bg-white rounded-2xl shadow px-4 py-2 mb-6">
         <div *ngIf="isOwner" class="flex items-center justify-between gap-3 p-4 rounded-t-2xl border-b border-gray-300">
             <div class="flex items-center flex-1">
-                <img [src]="userInfo?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'"
-                    class="w-10 h-10 rounded-full object-cover" alt="avatar" />
+                <img [src]="userInfo.avatarUrl || ''" class="w-10 h-10 rounded-full object-cover" alt="avatar" />
                 <button class="flex-1 text-left text-gray-500 px-4 py-2 transition outline-none cursor-text"
                     (click)="openPostModal()">
                     Có gì mới?
@@ -102,9 +105,9 @@
     </div>
 </div>
 
-<app-post-modal *ngIf="showPostModal" [avatar]="userInfo?.avatar" (close)="closePostModal()"></app-post-modal>
+<app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatarUrl || ''" (close)="closePostModal()"></app-post-modal>
 
-<app-media-viewer *ngIf="showAvatarViewer" [medias]="[userInfo?.avatar]" [startIndex]="0"
+<app-media-viewer *ngIf="showAvatarViewer" [medias]="[userInfo.avatarUrl || '']" [startIndex]="0"
     [onClose]="closeAvatarViewer.bind(this)">
 </app-media-viewer>
 
@@ -131,8 +134,7 @@
                         </div>
 
                         <div class="relative ml-4">
-                            <img [src]="userInfo?.avatar || 'https://randomuser.me/api/portraits/men/32.jpg'"
-                                alt="Avatar"
+                            <img [src]="avatarPreview || userInfo.avatarUrl || ''" alt="Avatar"
                                 class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 cursor-pointer transition-colors duration-200"
                                 (click)="openAvatarMenu()" />
 
@@ -172,12 +174,12 @@
                     <div>
                         <label class="block text-sm font-medium mb-2 text-gray-700">Website</label>
                         <div class="space-y-3 max-h-[200px] overflow-y-auto">
-                            <ng-container *ngFor="let url of userInfo.websites; let i = index">
+                            <ng-container *ngFor="let url of userInfo.websiteLinks; let i = index">
                                 <div class="flex gap-2 items-center">
-                                    <input [(ngModel)]="userInfo.websites[i]" name="website{{i}}" type="url"
+                                    <input [(ngModel)]="userInfo.websiteLinks[i]" name="website{{i}}" type="url"
                                         class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                                         placeholder="https://example.com" />
-                                    <button type="button" (click)="userInfo.websites.splice(i,1)"
+                                    <button type="button" (click)="userInfo.websiteLinks.splice(i,1)"
                                         class="p-3 text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer">
                                         <i class="fa-solid fa-trash text-sm"></i>
                                     </button>
@@ -192,9 +194,12 @@
                         </div>
                     </div>
 
-                    <button type="submit"
+                    <button type="submit" [disabled]="isUpdatingProfile"
                         class="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 mt-6 cursor-pointer">
-                        Lưu thay đổi
+                        <ng-container *ngIf="isUpdatingProfile; else btnText">
+                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang lưu
+                        </ng-container>
+                        <ng-template #btnText>Lưu thay đổi</ng-template>
                     </button>
                 </form>
             </div>

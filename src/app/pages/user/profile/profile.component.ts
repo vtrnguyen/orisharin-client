@@ -11,6 +11,7 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { UserService } from '../../../core/services/user.service';
 import { AlertService } from '../../../shared/state-managements/alert.service';
 import { FormsModule } from '@angular/forms';
+import { FollowingUserDto, UserProfileDto, UserProfileResponseDto } from '../../../shared/dtos/user-profile.dto';
 
 @Component({
   selector: 'app-profile',
@@ -28,7 +29,8 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
-  userInfo: any;
+  userInfo: UserProfileDto = {} as UserProfileDto;
+  followings: FollowingUserDto[] = [];
   isOwner: boolean = false;
   posts: any[] = [];
   showPostModal: boolean = false;
@@ -43,6 +45,7 @@ export class ProfileComponent implements OnInit {
   selectedAvatar: File | null = null;
   avatarPreview: string | null = null;
   avatarRemoved: boolean = false;
+  isUpdatingProfile: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -54,8 +57,6 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.userInfo = this.authService.getCurrentUser();
-    this.userInfo.avatar = "https://randomuser.me/api/portraits/men/32.jpg";
-
     let urlFullname = this.route.snapshot.paramMap.get('fullname');
     if (urlFullname?.startsWith('@')) {
       urlFullname = urlFullname.substring(1);
@@ -79,25 +80,33 @@ export class ProfileComponent implements OnInit {
   closeEditProfileModal(): void {
     this.showEditProfileModal = false;
     document.body.style.overflow = 'auto';
+
+    // Reset avatar states
+    this.selectedAvatar = null;
+    this.avatarPreview = null;
+    this.avatarRemoved = false;
+
+    // Reload user info to reset any preview changes
+    this.loadUserProfile(this.currentUsername);
   }
 
-  closePostModal() {
+  closePostModal(): void {
     this.showPostModal = false;
   }
 
-  openAvatarViewer() {
+  openAvatarViewer(): void {
     this.showAvatarViewer = true;
   }
 
-  closeAvatarViewer() {
+  closeAvatarViewer(): void {
     this.showAvatarViewer = false;
   }
 
-  toggleProfileMenu() {
+  toggleProfileMenu(): void {
     this.showProfileMenu = !this.showProfileMenu;
   }
 
-  closeProfileMenu() {
+  closeProfileMenu(): void {
     this.showProfileMenu = false;
   }
 
@@ -106,20 +115,22 @@ export class ProfileComponent implements OnInit {
     if (input.files && input.files[0]) {
       this.selectedAvatar = input.files[0];
       this.avatarRemoved = false;
+
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.avatarPreview = e.target.result;
-        this.userInfo.avatar = this.avatarPreview;
       };
       reader.readAsDataURL(this.selectedAvatar);
+
+      this.closeAvatarMenu();
     }
   }
 
-  onRemoveAvatar() {
+  onRemoveAvatar(): void {
     this.selectedAvatar = null;
-    this.avatarRemoved = true;
     this.avatarPreview = null;
-    this.userInfo.avatar = '';
+    this.avatarRemoved = true;
+    this.closeAvatarMenu();
   }
 
   openAvatarMenu(): void {
@@ -134,7 +145,7 @@ export class ProfileComponent implements OnInit {
     this.alertService.show('warning', 'Tên người dùng không thể thay đổi!', 3000);
   }
 
-  copyPorfileUrl(): void {
+  copyProfileUrl(): void {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
       this.alertService.show('success', 'Đã sao chép liên kết!', 4000);
@@ -145,26 +156,37 @@ export class ProfileComponent implements OnInit {
     this.showProfileMenu = false;
   }
 
-  openAddWebsiteModal() {
+  openAddWebsiteModal(): void {
     this.newWebsiteUrl = '';
     this.showEditProfileModal = false;
     this.showAddWebsiteModal = true;
   }
 
-  closeAddWebsiteModal() {
+  closeAddWebsiteModal(): void {
     this.showAddWebsiteModal = false;
     this.showEditProfileModal = true;
   }
 
-  addWebsite() {
-    if (this.newWebsiteUrl.trim()) {
-      if (!this.userInfo.websites) {
-        this.userInfo.websites = [];
-      }
-      this.userInfo.websites.push(this.newWebsiteUrl.trim());
-      this.newWebsiteUrl = '';
-      this.closeAddWebsiteModal();
+  addWebsite(): void {
+    const url = this.newWebsiteUrl.trim();
+    if (!url) return;
+
+    try {
+      new URL(url);
+    } catch {
+      this.alertService.show('error', 'Đường dẫn không hợp lệ!', 3000);
+      return;
     }
+
+    if (this.userInfo.websiteLinks && this.userInfo.websiteLinks.some(u => u.trim().toLowerCase() === url.toLowerCase())) {
+      this.alertService.show('error', 'Đường dẫn đã tồn tại!', 3000);
+      return;
+    }
+
+    if (!this.userInfo.websiteLinks) this.userInfo.websiteLinks = [];
+    this.userInfo.websiteLinks.push(url);
+    this.newWebsiteUrl = '';
+    this.closeAddWebsiteModal();
   }
 
   isValidUrl(url: string): boolean {
@@ -182,35 +204,39 @@ export class ProfileComponent implements OnInit {
   }
 
   onSubmitProfile(): void {
-    const urls = this.userInfo.websites || [];
+    const urls = this.userInfo.websiteLinks || [];
     const urlSet = new Set(urls.map((u: string) => u.trim().toLowerCase()));
     if (urlSet.size !== urls.length) {
       this.alertService.show('error', 'Các liên kết không được trùng nhau!', 4000);
       return;
     }
-    const isValidUrl = (url: string) => {
-      try {
-        new URL(url);
-        return true;
-      } catch {
-        return false;
-      }
-    };
-    if (urls.some((url: string) => !isValidUrl(url))) {
+    if (urls.some((url: string) => !this.isValidUrl(url))) {
       this.alertService.show('error', 'Có liên kết không hợp lệ!', 4000);
       return;
     }
 
-    this.userService.updateUserProfile({
+    this.isUpdatingProfile = true;
+
+    const updateData: any = {
       bio: this.userInfo.bio,
-      websiteLinks: urls
-    }).subscribe({
-      next: (res: any) => {
+      websiteLinks: this.userInfo.websiteLinks
+    };
+    if (this.selectedAvatar) {
+      updateData.avatar = this.selectedAvatar;
+    }
+    if (this.avatarRemoved && !this.selectedAvatar) {
+      updateData.avatar = null;
+    }
+
+    this.userService.updateUserProfile(updateData).subscribe({
+      next: () => {
+        this.isUpdatingProfile = false;
         this.alertService.show('success', 'Cập nhật thành công!', 3000);
         this.closeEditProfileModal();
         this.loadUserProfile(this.currentUsername);
       },
       error: () => {
+        this.isUpdatingProfile = false;
         this.alertService.show('error', 'Cập nhật thất bại!', 4000);
       }
     });
@@ -220,7 +246,12 @@ export class ProfileComponent implements OnInit {
     if (query) {
       this.userService.getUserProfile(query).subscribe({
         next: (response: any) => {
-          this.userInfo = response.data;
+          const data: UserProfileResponseDto = response.data;
+          this.userInfo = data.user;
+          this.followings = data.followings || [];
+          this.avatarPreview = null;
+          this.selectedAvatar = null;
+          this.avatarRemoved = false;
         },
         error: (error: any) => {
           console.error('Error fetching user profile:', error);
@@ -240,6 +271,6 @@ export class ProfileComponent implements OnInit {
         console.error('Error fetching posts:', error);
         this.isLoading = false;
       }
-    })
+    });
   }
 }

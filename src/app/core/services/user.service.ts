@@ -32,8 +32,18 @@ export class UserService {
     ): Observable<ApiResponse<any>> {
         const formData = new FormData();
         if (data.bio !== undefined) formData.append("bio", data.bio);
-        if (data.websiteLinks) data.websiteLinks.forEach(url => formData.append("websiteLinks", url));
-        if (data.avatar) formData.append("avatar", data.avatar);
+
+        if (data.websiteLinks) {
+            if (data.websiteLinks.length === 0) {
+                formData.append("websiteLinks", "");
+            } else {
+                data.websiteLinks.forEach(url => formData.append("websiteLinks", url));
+            }
+        }
+
+        if (data.avatar !== undefined && data.avatar !== null) {
+            formData.append("avatar", data.avatar);
+        }
 
         return this.http.patch<ApiResponse<any>>(`${this.apiUrl}/profile`, formData);
     }
