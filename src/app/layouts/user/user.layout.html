@@ -19,43 +19,43 @@
                         <button (click)="onHomePageClick()" [ngClass]="{'bg-gray-200 text-black': router.url === '/'}"
                             class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
-                                <i class="fa-solid fa-house w-7 h-7 text-2xl"></i>
+                                <i class="fa-solid fa-house text-2xl"></i>
                             </div>
                             <span class="ml-3 font-medium hidden lg:block">Trang chủ</span>
                         </button>
                     </li>
                     <li>
                         <a routerLink="/search" routerLinkActive="bg-gray-200 text-black"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
-                                <i class="fa-solid fa-magnifying-glass w-7 h-7 text-2xl"></i>
+                                <i class="fa-solid fa-magnifying-glass text-2xl"></i>
                             </div>
                             <span class="ml-3 font-medium hidden lg:block">Tìm kiếm</span>
                         </a>
                     </li>
                     <li>
                         <button (click)="openPostModal()"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group cursor-pointer">
+                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
-                                <i class="fa-regular fa-plus w-7 h-7 text-2xl"></i>
+                                <i class="fa-regular fa-plus text-2xl"></i>
                             </div>
                             <span class="ml-3 font-medium hidden lg:block">Tạo</span>
                         </button>
                     </li>
                     <li>
                         <a routerLink="/notifications" routerLinkActive="bg-gray-200 text-black"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
-                                <i class="fa-regular fa-heart w-7 h-7 text-2xl"></i>
+                                <i class="fa-regular fa-heart text-2xl"></i>
                             </div>
                             <span class="ml-3 font-medium hidden lg:block">Thông báo</span>
                         </a>
                     </li>
                     <li>
                         <a [routerLink]="'/@' + userInfo.username" routerLinkActive="bg-gray-200 text-black"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
+                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
-                                <i class="fa-regular fa-user w-7 h-7 text-2xl"></i>
+                                <i class="fa-regular fa-user text-2xl"></i>
                             </div>
                             <span class="ml-3 font-medium hidden lg:block">Trang cá nhân</span>
                         </a>
