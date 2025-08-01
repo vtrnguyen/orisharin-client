@@ -22,4 +22,19 @@ export class UserService {
     getUserProfile(userId: string): Observable<ApiResponse<any>> {
         return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${userId}`);
     }
+
+    updateUserProfile(
+        data: {
+            bio?: string;
+            websiteLinks?: string[];
+            avatar?: File;
+        }
+    ): Observable<ApiResponse<any>> {
+        const formData = new FormData();
+        if (data.bio !== undefined) formData.append("bio", data.bio);
+        if (data.websiteLinks) data.websiteLinks.forEach(url => formData.append("websiteLinks", url));
+        if (data.avatar) formData.append("avatar", data.avatar);
+
+        return this.http.patch<ApiResponse<any>>(`${this.apiUrl}/profile`, formData);
+    }
 }

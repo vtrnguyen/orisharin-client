@@ -30,7 +30,6 @@ import { FormsModule } from '@angular/forms';
 export class ProfileComponent implements OnInit {
   userInfo: any;
   isOwner: boolean = false;
-  followers: any[] = [];
   posts: any[] = [];
   showPostModal: boolean = false;
   showAvatarViewer = false;
@@ -41,6 +40,9 @@ export class ProfileComponent implements OnInit {
   showAddWebsiteModal = false;
   newWebsiteUrl = '';
   showAvatarMenu: boolean = false;
+  selectedAvatar: File | null = null;
+  avatarPreview: string | null = null;
+  avatarRemoved: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -53,12 +55,6 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     this.userInfo = this.authService.getCurrentUser();
     this.userInfo.avatar = "https://randomuser.me/api/portraits/men/32.jpg";
-    this.userInfo.followers = [
-      { avatar: 'https://randomuser.me/api/portraits/men/11.jpg', name: 'User 1' },
-      { avatar: 'https://randomuser.me/api/portraits/women/12.jpg', name: 'User 2' },
-      { avatar: 'https://randomuser.me/api/portraits/men/13.jpg', name: 'User 3' },
-      { avatar: 'https://randomuser.me/api/portraits/women/14.jpg', name: 'User 4' }
-    ];
 
     let urlFullname = this.route.snapshot.paramMap.get('fullname');
     if (urlFullname?.startsWith('@')) {
@@ -105,12 +101,25 @@ export class ProfileComponent implements OnInit {
     this.showProfileMenu = false;
   }
 
-  onUploadAvatar() {
-
+  onAvatarFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedAvatar = input.files[0];
+      this.avatarRemoved = false;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.avatarPreview = e.target.result;
+        this.userInfo.avatar = this.avatarPreview;
+      };
+      reader.readAsDataURL(this.selectedAvatar);
+    }
   }
 
   onRemoveAvatar() {
-
+    this.selectedAvatar = null;
+    this.avatarRemoved = true;
+    this.avatarPreview = null;
+    this.userInfo.avatar = '';
   }
 
   openAvatarMenu(): void {
@@ -157,6 +166,56 @@ export class ProfileComponent implements OnInit {
       this.closeAddWebsiteModal();
     }
   }
+
+  isValidUrl(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  hasDuplicateUrls(urls: string[]): boolean {
+    const set = new Set(urls.map(u => u.trim().toLowerCase()));
+    return set.size !== urls.length;
+  }
+
+  onSubmitProfile(): void {
+    const urls = this.userInfo.websites || [];
+    const urlSet = new Set(urls.map((u: string) => u.trim().toLowerCase()));
+    if (urlSet.size !== urls.length) {
+      this.alertService.show('error', 'Các liên kết không được trùng nhau!', 4000);
+      return;
+    }
+    const isValidUrl = (url: string) => {
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    if (urls.some((url: string) => !isValidUrl(url))) {
+      this.alertService.show('error', 'Có liên kết không hợp lệ!', 4000);
+      return;
+    }
+
+    this.userService.updateUserProfile({
+      bio: this.userInfo.bio,
+      websiteLinks: urls
+    }).subscribe({
+      next: (res: any) => {
+        this.alertService.show('success', 'Cập nhật thành công!', 3000);
+        this.closeEditProfileModal();
+        this.loadUserProfile(this.currentUsername);
+      },
+      error: () => {
+        this.alertService.show('error', 'Cập nhật thất bại!', 4000);
+      }
+    });
+  }
+
   private loadUserProfile(query: string): void {
     if (query) {
       this.userService.getUserProfile(query).subscribe({
