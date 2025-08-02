@@ -68,4 +68,15 @@ export class UserLayoutComponent {
     logout() {
         this.authService.logout();
     }
+
+    goToProfile() {
+        const url = '/@' + this.userInfo.username;
+        if (this.router.url === url) {
+            this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+                this.router.navigate([url]);
+            });
+        } else {
+            this.router.navigate([url]);
+        }
+    }
 }

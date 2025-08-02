@@ -147,6 +147,13 @@ export class PostComponent implements OnInit, OnChanges {
     }
 
     navigateToProfile(userName: string) {
-        this.router.navigate(['/@' + userName]);
+        const url = '/@' + userName;
+        if (this.router.url === url) {
+            this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+                this.router.navigate([url]);
+            });
+        } else {
+            this.router.navigate([url]);
+        }
     }
 }

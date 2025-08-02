@@ -52,13 +52,14 @@
                         </a>
                     </li>
                     <li>
-                        <a [routerLink]="'/@' + userInfo.username" routerLinkActive="bg-gray-200 text-black"
+                        <button (click)="goToProfile()"
+                            [ngClass]="{'bg-gray-200 text-black': router.url === '/@' + userInfo.username}"
                             class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-regular fa-user text-2xl"></i>
                             </div>
                             <span class="ml-3 font-medium hidden lg:block">Trang cá nhân</span>
-                        </a>
+                        </button>
                     </li>
                 </ul>
             </nav>
@@ -153,10 +154,10 @@
                 class="flex flex-col items-center justify-center text-gray-500">
                 <i class="fa-regular fa-heart w-6 h-6 text-2xl"></i>
             </a>
-            <a [routerLink]="'/@' + userInfo.username" routerLinkActive="text-blue-600"
-                class="flex flex-col items-center justify-center text-gray-500">
+            <button (click)="goToProfile()"
+                class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
                 <i class="fa-regular fa-user w-6 h-6 text-2xl"></i>
-            </a>
+            </button>
         </nav>
     </div>
 </div>
