@@ -1,6 +1,6 @@
 
 export interface UserProfileDto {
-    _id: string;
+    id: string;
     accountId: string;
     username: string;
     fullName: string;

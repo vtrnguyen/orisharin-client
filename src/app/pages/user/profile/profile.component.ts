@@ -12,6 +12,7 @@ import { UserService } from '../../../core/services/user.service';
 import { AlertService } from '../../../shared/state-managements/alert.service';
 import { FormsModule } from '@angular/forms';
 import { FollowingUserDto, UserProfileDto, UserProfileResponseDto } from '../../../shared/dtos/user-profile.dto';
+import { FollowService } from '../../../core/services/follow.service';
 
 @Component({
   selector: 'app-profile',
@@ -46,23 +47,29 @@ export class ProfileComponent implements OnInit {
   avatarPreview: string | null = null;
   avatarRemoved: boolean = false;
   isUpdatingProfile: boolean = false;
+  isFollowing: boolean = false;
+  isFollowLoading: boolean = false;
+  currentUserId: string = "";
+  showUnfollowConfirm = false;
 
   constructor(
     private authService: AuthService,
     private postService: PostService,
     private route: ActivatedRoute,
     private userService: UserService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private followService: FollowService
   ) { }
 
   ngOnInit(): void {
-    this.userInfo = this.authService.getCurrentUser();
+    const currentUser = this.authService.getCurrentUser();
+    this.currentUserId = currentUser.id;
     let urlFullname = this.route.snapshot.paramMap.get('fullname');
     if (urlFullname?.startsWith('@')) {
       urlFullname = urlFullname.substring(1);
     }
     this.currentUsername = urlFullname || "";
-    this.isOwner = urlFullname === this.userInfo.username;
+    this.isOwner = urlFullname === currentUser.username;
 
     this.loadUserProfile(this.currentUsername);
     this.loadPosts();
@@ -245,16 +252,59 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  onFollow(): void {
+    const currentUser = this.authService.getCurrentUser();
+    this.isFollowing = true;
+    this.followService.follow(currentUser.id, this.userInfo.id).subscribe({
+      next: (response: any) => {
+        this.isFollowing = true;
+        this.isFollowLoading = false;
+        this.alertService.show('success', `Đã theo dõi ${this.userInfo.fullName}!`, 3000);
+        this.userInfo.followersCount++;
+      },
+      error: (error: any) => {
+        this.isFollowLoading = false;
+      },
+    });
+  }
+
+  onUnfollow(): void {
+    const currentUser = this.authService.getCurrentUser();
+    this.isFollowing = true;
+    this.followService.unfollow(currentUser.id, this.userInfo.id).subscribe({
+      next: (response: any) => {
+        this.isFollowing = false;
+        this.isFollowLoading = false;
+        this.alertService.show('success', `Đã bỏ theo dõi ${this.userInfo.fullName}!`, 3000);
+        this.userInfo.followersCount--;
+      },
+      error: (error: any) => {
+        this.isFollowLoading = false;
+      },
+    });
+  }
+
+  confirmUnfollow(): void {
+    this.showUnfollowConfirm = false;
+    this.onUnfollow();
+  }
+
   private loadUserProfile(query: string): void {
     if (query) {
       this.userService.getUserProfile(query).subscribe({
         next: (response: any) => {
-          const data: UserProfileResponseDto = response.data;
-          this.userInfo = data.user;
-          this.followings = data.followings || [];
+          const user = {
+            ...response.data.user,
+            id: response.data.user._id,
+          } as UserProfileDto;
+          this.userInfo = user;
+          this.followings = response.data.followings || [];
           this.avatarPreview = null;
           this.selectedAvatar = null;
           this.avatarRemoved = false;
+          if (!this.isOwner) {
+            this.checkIsFollowing();
+          }
         },
         error: (error: any) => {
           console.error('Error fetching user profile:', error);
@@ -273,6 +323,17 @@ export class ProfileComponent implements OnInit {
       error: (error) => {
         console.error('Error fetching posts:', error);
         this.isLoading = false;
+      }
+    });
+  }
+
+  private checkIsFollowing(): void {
+    this.followService.checkFollow(this.currentUserId, this.userInfo.id).subscribe({
+      next: (response: any) => {
+        this.isFollowing = !!(response && response.data.isFollowing);
+      },
+      error: () => {
+        this.isFollowing = false;
       }
     });
   }

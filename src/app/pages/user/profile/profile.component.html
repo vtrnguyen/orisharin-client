@@ -17,7 +17,7 @@
             (click)="openAvatarViewer()" />
     </div>
 
-    <div class="flex items-center mb-4 relative">
+    <div class="flex items-center mb-6 relative">
         <div class="flex items-center gap-2 flex-1">
             <div class="flex -space-x-2">
                 <ng-container *ngFor="let following of followings">
@@ -72,10 +72,25 @@
         </div>
     </div>
 
-    <button *ngIf="isOwner" class="w-full py-2 mb-4 font-semibold px-4 py-2 rounded-lg shadow transition cursor-pointer"
+    <button *ngIf="isOwner"
+        class="w-full py-2 mb-4 font-semibold rounded-lg bg-white text-black border border-gray-300 hover:bg-gray-100 transition-all cursor-pointer"
         (click)="onEditProfile()">
         Chỉnh sửa trang cá nhân
     </button>
+    <div *ngIf="!isOwner" class="flex gap-2 mb-4">
+        <button class="flex-1 py-2 font-semibold rounded-lg transition-all cursor-pointer"
+            [ngClass]="isFollowing ? 'bg-white text-black border border-gray-300 hover:bg-gray-100' : 'bg-black text-white hover:bg-gray-900'"
+            [disabled]="isFollowLoading" (click)="isFollowing ? showUnfollowConfirm = true : onFollow()">
+            <ng-container *ngIf="isFollowLoading">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+            </ng-container>
+            {{ isFollowing ? 'Đang theo dõi' : 'Theo dõi' }}
+        </button>
+        <button
+            class="flex-1 py-2 font-semibold rounded-lg bg-white text-black border border-gray-300 hover:bg-gray-100 transition-all cursor-pointer">
+            Nhắc đến
+        </button>
+    </div>
 
     <div class="bg-white rounded-2xl shadow px-4 py-2 mb-6">
         <div *ngIf="isOwner" class="flex items-center justify-between gap-3 p-4 rounded-t-2xl border-b border-gray-300">
@@ -243,6 +258,29 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="showUnfollowConfirm">
+    <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[260px] p-3 flex flex-col items-center animate-modal-fade-in"
+            (clickOutside)="showUnfollowConfirm = false">
+            <img [src]="userInfo.avatarUrl || ''" class="w-16 h-16 rounded-full object-cover mb-4" alt="avatar" />
+            <div class="font-semibold mb-2 text-center">Bỏ theo dõi {{ userInfo.username }}?</div>
+            <div class="w-full h-px bg-gray-200 my-3"></div>
+            <div class="flex w-full">
+                <button type="button" class="flex-1 rounded-bl-2xl text-sm cursor-pointer transition"
+                    (click)="showUnfollowConfirm = false">
+                    Hủy
+                </button>
+                <div class="w-px bg-gray-200"></div>
+                <button type="button"
+                    class="flex-1 rounded-br-2xl text-red-600 font-semibold text-sm cursor-pointer transition"
+                    (click)="confirmUnfollow()">
+                    Bỏ theo dõi
+                </button>
             </div>
         </div>
     </div>
