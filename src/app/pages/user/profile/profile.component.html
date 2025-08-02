@@ -26,7 +26,8 @@
                         [title]="following.fullName || following.username" />
                 </ng-container>
             </div>
-            <span class="text-gray-500 text-sm font-medium hover:underline cursor-pointer">
+            <span class="text-gray-500 text-sm font-medium hover:underline cursor-pointer"
+                (click)="openFollowModal('followers')">
                 {{ userInfo.followersCount }} người theo dõi
             </span>
         </div>
@@ -273,6 +274,84 @@
             <div class="flex w-full">
                 <button type="button" class="flex-1 rounded-bl-2xl text-sm cursor-pointer transition"
                     (click)="showUnfollowConfirm = false">
+                    Hủy
+                </button>
+                <div class="w-px bg-gray-200"></div>
+                <button type="button"
+                    class="flex-1 rounded-br-2xl text-red-600 font-semibold text-sm cursor-pointer transition"
+                    (click)="confirmUnfollow()">
+                    Bỏ theo dõi
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="showFollowModal">
+    <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-0 flex flex-col animate-modal-fade-in"
+            (clickOutside)="showFollowModal = false">
+            <div class="flex">
+                <button class="flex-1 py-3 font-semibold cursor-pointer"
+                    [ngClass]="followTab === 'followers' ? 'border-b-2 border-back text-back' : 'text-gray-300'"
+                    (click)="followTab = 'followers'; loadFollowList()">
+                    Người theo dõi
+                </button>
+                <button class="flex-1 py-3 font-semibold cursor-pointer"
+                    [ngClass]="followTab === 'following' ? 'border-b-2 border-back text-back' : 'text-gray-300'"
+                    (click)="followTab = 'following'; loadFollowList()">
+                    Đang theo dõi
+                </button>
+            </div>
+            <div class="max-h-[350px] overflow-y-auto p-4">
+                <app-loading *ngIf="loadingFollowList"></app-loading>
+                <ng-container *ngIf="!loadingFollowList">
+                    <ng-container
+                        *ngIf="(followTab === 'followers' ? followersList : followingList).length; else noUserTemplate">
+                        <div
+                            *ngFor="let user of (followTab === 'followers' ? followersList : followingList); let last = last">
+                            <div class="flex items-center gap-3 py-2 cursor-pointer">
+                                <img [src]="user.avatarUrl || ''"
+                                    class="w-10 h-10 rounded-full object-cover border border-gray-300 cursor-pointer" />
+                                <div class="flex-1">
+                                    <div class="font-semibold">{{ user.username }}</div>
+                                    <div class="text-gray-500 text-sm">{{ user.fullName }}</div>
+                                </div>
+                                <ng-container *ngIf="user.id !== currentUserId">
+                                    <button *ngIf="!user.isFollowed"
+                                        class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
+                                        (click)="onFollow(user)">
+                                        Theo dõi
+                                    </button>
+                                    <button *ngIf="user.isFollowed"
+                                        class="px-4 py-1 rounded-lg border border-gray-300 text-black text-sm font-semibold cursor-pointer"
+                                        (click)="selectedUserToUnfollow = user">
+                                        Bỏ theo dõi
+                                    </button>
+                                </ng-container>
+                            </div>
+                            <hr *ngIf="!last" class="my-4 border-gray-300" />
+                        </div>
+                    </ng-container>
+                </ng-container>
+                <ng-template #noUserTemplate>
+                    <div class="text-gray-400 text-sm text-center py-2">Không có người dùng nào.</div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="selectedUserToUnfollow">
+    <div class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center">
+        <div
+            class="bg-white rounded-2xl shadow-xl w-full max-w-[260px] p-3 flex flex-col items-center animate-modal-fade-in">
+            <img [src]="selectedUserToUnfollow.avatarUrl || ''" class="w-16 h-16 rounded-full object-cover mb-4" />
+            <div class="font-semibold mb-2 text-center">Bỏ theo dõi {{ selectedUserToUnfollow.username }}?</div>
+            <div class="w-full h-px bg-gray-200 my-3"></div>
+            <div class="flex w-full">
+                <button type="button" class="flex-1 rounded-bl-2xl text-sm cursor-pointer transition"
+                    (click)="selectedUserToUnfollow = null">
                     Hủy
                 </button>
                 <div class="w-px bg-gray-200"></div>

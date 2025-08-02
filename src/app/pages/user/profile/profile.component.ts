@@ -52,6 +52,14 @@ export class ProfileComponent implements OnInit {
   currentUserId: string = "";
   showUnfollowConfirm = false;
 
+  // folows modal properties
+  showFollowModal = false;
+  followTab: 'followers' | 'following' = 'followers';
+  followersList: any[] = [];
+  followingList: any[] = [];
+  loadingFollowList = false;
+  selectedUserToUnfollow: any = null;
+
   constructor(
     private authService: AuthService,
     private postService: PostService,
@@ -115,6 +123,18 @@ export class ProfileComponent implements OnInit {
 
   closeProfileMenu(): void {
     this.showProfileMenu = false;
+  }
+
+  openFollowModal(tab: "followers" | "following"): void {
+    this.followTab = tab;
+    this.showFollowModal = true;
+    this.loadFollowList();
+  }
+
+  closeFollowModal() {
+    this.showFollowModal = false;
+    this.followersList = [];
+    this.followingList = [];
   }
 
   onAvatarFileChange(event: Event): void {
@@ -252,41 +272,50 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  onFollow(): void {
-    const currentUser = this.authService.getCurrentUser();
-    this.isFollowing = true;
-    this.followService.follow(currentUser.id, this.userInfo.id).subscribe({
-      next: (response: any) => {
-        this.isFollowing = true;
+  onFollow(user?: any): void {
+    const target = user || this.userInfo;
+    this.isFollowLoading = true;
+    this.followService.follow(this.currentUserId, target.id).subscribe({
+      next: () => {
+        target.isFollowed = true;
+        if (!user) {
+          this.isFollowing = true;
+          this.userInfo.followersCount++;
+        }
         this.isFollowLoading = false;
-        this.alertService.show('success', `Đã theo dõi ${this.userInfo.fullName}!`, 3000);
-        this.userInfo.followersCount++;
       },
-      error: (error: any) => {
+      error: () => {
         this.isFollowLoading = false;
-      },
+      }
     });
   }
 
-  onUnfollow(): void {
-    const currentUser = this.authService.getCurrentUser();
-    this.isFollowing = true;
-    this.followService.unfollow(currentUser.id, this.userInfo.id).subscribe({
-      next: (response: any) => {
-        this.isFollowing = false;
+  onUnfollow(user?: any): void {
+    const target = user || this.userInfo;
+    this.isFollowLoading = true;
+    this.followService.unfollow(this.currentUserId, target.id).subscribe({
+      next: () => {
+        target.isFollowed = false;
+        if (!user) {
+          this.isFollowing = false;
+          this.userInfo.followersCount--;
+        }
         this.isFollowLoading = false;
-        this.alertService.show('success', `Đã bỏ theo dõi ${this.userInfo.fullName}!`, 3000);
-        this.userInfo.followersCount--;
       },
-      error: (error: any) => {
+      error: () => {
         this.isFollowLoading = false;
-      },
+      }
     });
   }
 
-  confirmUnfollow(): void {
-    this.showUnfollowConfirm = false;
-    this.onUnfollow();
+  confirmUnfollow(user?: any): void {
+    if (user) {
+      this.onUnfollow(user);
+      this.selectedUserToUnfollow = null;
+    } else {
+      this.showUnfollowConfirm = false;
+      this.onUnfollow();
+    }
   }
 
   private loadUserProfile(query: string): void {
@@ -336,5 +365,23 @@ export class ProfileComponent implements OnInit {
         this.isFollowing = false;
       }
     });
+  }
+
+  loadFollowList(): void {
+    this.loadingFollowList = true;
+    const userId = this.userInfo.id;
+    if (this.followTab === 'followers') {
+      this.followService.getFollowers(userId).subscribe(res => {
+        console.log('Followers:', res);
+        this.followersList = res.data || [];
+        this.loadingFollowList = false;
+      });
+    } else {
+      this.followService.getFollowing(userId).subscribe(res => {
+        console.log('Following:', res);
+        this.followingList = res.data || [];
+        this.loadingFollowList = false;
+      });
+    }
   }
 }
