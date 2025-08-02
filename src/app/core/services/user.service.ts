@@ -24,6 +24,10 @@ export class UserService {
         return user ? user.avatarUrl : '';
     }
 
+    introduceUser(query: string): Observable<ApiResponse<any>> {
+        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/introduce/${query}`);
+    }
+
     setCurrentUserAvatarUrl(avatarUrl: string): void {
         const user = this.getCurrentUserInfo();
         if (user) {

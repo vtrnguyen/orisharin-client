@@ -48,7 +48,7 @@
                         </button>
                     </li>
                     <li>
-                        <button
+                        <button (click)="openIntroduceModal(); closeProfileMenu()"
                             class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer">
                             <span class="font-semibold">Giới thiệu về trang cá nhân này</span>
                             <i class="fa-solid fa-user"></i>
@@ -360,6 +360,31 @@
                     (click)="confirmUnfollow(selectedUserToUnfollow)">
                     Bỏ theo dõi
                 </button>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="showIntroduceModal">
+    <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[350px] p-6 animate-modal-fade-in relative"
+            (clickOutside)="showIntroduceModal = false">
+            <div *ngIf="isLoadingIntroduce" class="flex justify-center items-center py-8">
+                <i class="fa-solid fa-spinner fa-spin text-2xl text-gray-400"></i>
+            </div>
+            <ng-container *ngIf="!isLoadingIntroduce && introduceInfo">
+                <div class="flex flex-col items-center">
+                    <img [src]="introduceInfo.avatarUrl || ''"
+                        class="w-20 h-20 rounded-full object-cover mb-3 border border-gray-400" />
+                    <div class="font-bold text-lg mb-1">{{ introduceInfo.fullName }}</div>
+                    <div class="text-gray-500 mb-2">{{ '@' + introduceInfo.username }}</div>
+                    <div class="text-gray-400 text-sm">
+                        Ngày tham gia: {{ introduceInfo.createdAt | date:'dd/MM/yyyy' }}
+                    </div>
+                </div>
+            </ng-container>
+            <div *ngIf="!isLoadingIntroduce && !introduceInfo" class="text-center text-gray-400 py-8">
+                Không thể tải thông tin người dùng.
             </div>
         </div>
     </div>

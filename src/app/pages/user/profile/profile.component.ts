@@ -60,6 +60,11 @@ export class ProfileComponent implements OnInit {
   loadingFollowList = false;
   selectedUserToUnfollow: any = null;
 
+  // introduce modal properties
+  showIntroduceModal = false;
+  introduceInfo: any = null;
+  isLoadingIntroduce = false;
+
   constructor(
     private authService: AuthService,
     private postService: PostService,
@@ -135,6 +140,26 @@ export class ProfileComponent implements OnInit {
     this.showFollowModal = false;
     this.followersList = [];
     this.followingList = [];
+  }
+
+  openIntroduceModal(): void {
+    this.isLoadingIntroduce = true;
+    this.showIntroduceModal = true;
+    this.userService.introduceUser(this.userInfo.id).subscribe({
+      next: (res) => {
+        this.introduceInfo = res.data;
+        this.isLoadingIntroduce = false;
+      },
+      error: () => {
+        this.isLoadingIntroduce = false;
+        this.introduceInfo = null;
+      }
+    });
+  }
+
+  closeIntroduceModal(): void {
+    this.showIntroduceModal = false;
+    this.introduceInfo = null;
   }
 
   onAvatarFileChange(event: Event): void {
