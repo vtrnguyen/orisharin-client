@@ -283,6 +283,7 @@ export class ProfileComponent implements OnInit {
           this.userInfo.followersCount++;
         }
         this.isFollowLoading = false;
+        this.alertService.show('success', `Đã theo dõi ${target.username}!`, 3000);
       },
       error: () => {
         this.isFollowLoading = false;
@@ -301,6 +302,7 @@ export class ProfileComponent implements OnInit {
           this.userInfo.followersCount--;
         }
         this.isFollowLoading = false;
+        this.alertService.show('success', `Đã bỏ theo dõi ${target.username}!`, 3000);
       },
       error: () => {
         this.isFollowLoading = false;
@@ -372,13 +374,11 @@ export class ProfileComponent implements OnInit {
     const userId = this.userInfo.id;
     if (this.followTab === 'followers') {
       this.followService.getFollowers(userId).subscribe(res => {
-        console.log('Followers:', res);
         this.followersList = res.data || [];
         this.loadingFollowList = false;
       });
     } else {
       this.followService.getFollowing(userId).subscribe(res => {
-        console.log('Following:', res);
         this.followingList = res.data || [];
         this.loadingFollowList = false;
       });
