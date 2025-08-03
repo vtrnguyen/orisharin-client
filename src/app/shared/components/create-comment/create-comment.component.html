@@ -8,18 +8,18 @@
         </div>
 
         <div class="p-6 flex gap-3 items-start border-b border-gray-200">
-            <img [src]="parent?.author?.avatarUrl || 'https://ui-avatars.com/api/?name=' + (parent?.author?.fullName || parent?.author?.username)"
+            <img [src]="parentAuthor?.avatarUrl || 'https://ui-avatars.com/api/?name=' + (parentAuthor?.fullName || parentAuthor?.username)"
                 class="w-10 h-10 rounded-full object-cover mt-1" alt="avatar" />
             <div class="flex-1">
                 <div class="flex items-center gap-2">
-                    <span class="font-semibold text-gray-900">{{ parent?.author?.username }}</span>
-                    <span class="text-gray-400 text-xs">{{ parent?.post?.createdAt | date:'short' }}</span>
+                    <span class="font-semibold text-gray-900">{{ parentAuthor?.username }}</span>
+                    <span class="text-gray-400 text-xs">{{ parentCreatedAt | date:'short' }}</span>
                 </div>
                 <div class="mt-2 text-gray-800 text-base whitespace-pre-line">
-                    {{ parent?.post?.content }}
+                    {{ parentContent }}
                 </div>
-                <div *ngIf="parent?.post?.mediaUrls?.length > 0" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
-                    <ng-container *ngFor="let media of parent.post.mediaUrls">
+                <div *ngIf="parentMediaUrls.length > 0" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
+                    <ng-container *ngFor="let media of parentMediaUrls">
                         <img *ngIf="media.endsWith('.jpg') || media.endsWith('.jpeg') || media.endsWith('.png') || media.endsWith('.webp')"
                             [src]="media" class="rounded-xl border max-h-40 object-cover flex-shrink-0" />
                         <video *ngIf="media.endsWith('.mp4') || media.endsWith('.mov') || media.endsWith('.webm')"

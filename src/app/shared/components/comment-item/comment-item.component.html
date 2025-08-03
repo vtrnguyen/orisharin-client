@@ -3,7 +3,7 @@
     <div class="flex-1">
         <div class="flex items-center gap-2">
             <span class="font-semibold text-gray-900">{{ comment?.authorId?.username }}</span>
-            <span class="text-gray-400 text-xs">{{ comment?.createdAt | date:'short' }}</span>
+            <span class="text-gray-400 text-xs">{{ formatTime(comment?.createdAt) }}</span>
         </div>
         <div class="mt-1 text-gray-800 text-base whitespace-pre-line">
             {{ comment?.content }}
@@ -23,7 +23,6 @@
             </button>
             <button class="flex items-center gap-1 cursor-pointer hover:text-blue-500" (click)="reply.emit()">
                 <i class="fa-regular fa-comment-dots"></i>
-                <span>Trả lời</span>
             </button>
         </div>
     </div>

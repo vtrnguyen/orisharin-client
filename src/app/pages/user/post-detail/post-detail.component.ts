@@ -2,14 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PostComponent } from '../../../shared/components/post/post.component';
-import { CommentService } from '../../../core/services/comment.service';
 import { CreateCommentComponent } from '../../../shared/components/create-comment/create-comment.component';
 import { CommentItemComponent } from '../../../shared/components/comment-item/comment-item.component';
+import { PostService } from '../../../core/services/post.service';
 
 @Component({
     selector: 'app-post-detail',
     standalone: true,
-    imports: [CommonModule, PostComponent, CreateCommentComponent, CommentItemComponent],
+    imports: [
+        CommonModule,
+        PostComponent,
+        CreateCommentComponent,
+        CommentItemComponent
+    ],
     templateUrl: './post-detail.component.html',
     styleUrls: ['./post-detail.component.scss']
 })
@@ -21,11 +26,11 @@ export class PostDetailComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
-        private commentService: CommentService
+        private postService: PostService,
     ) { }
 
     ngOnInit() {
-        const postId = this.route.snapshot.paramMap.get('id');
+        this.loadPostDetail();
     }
 
     loadComments(postId: string) {
@@ -42,5 +47,19 @@ export class PostDetailComponent implements OnInit {
         this.loadComments(this.post.id || this.post._id);
         this.showCommentModal = false;
         this.selectedParent = null;
+    }
+
+    private loadPostDetail() {
+        const postId = this.route.snapshot.paramMap.get('id');
+        if (postId) {
+            this.postService.getPostById(postId).subscribe(res => {
+                if (res?.data) {
+                    this.post = res.data.post;
+                    this.comments = res.data.comments || [];
+                }
+
+                console.log('Post detail loaded:', this.post);
+            });
+        }
     }
 }

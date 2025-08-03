@@ -11,10 +11,13 @@ export class CommentService {
 
     constructor(private http: HttpClient) { }
 
-    createComment(data: { postId?: string; parentId?: string; authorId: string; content: string }, files: File[] = []): Observable<any> {
+    createComment(
+        data: { postId?: string; parentCommentId?: string; authorId: string; content: string },
+        files: File[] = []
+    ): Observable<any> {
         const formData = new FormData();
         if (data.postId) formData.append('postId', data.postId);
-        if (data.parentId) formData.append('parentId', data.parentId);
+        if (data.parentCommentId) formData.append('parentCommentId', data.parentCommentId);
         formData.append('authorId', data.authorId);
         formData.append('content', data.content);
         files.forEach(file => formData.append("files", file));

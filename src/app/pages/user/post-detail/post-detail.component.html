@@ -1,20 +1,14 @@
 <div class="max-w-2xl mx-auto py-8 px-4">
     <app-post *ngIf="post" [post]="post"></app-post>
 
-    <div class="mb-6">
-        <button
-            class="w-full py-2 rounded-lg bg-white border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100"
-            (click)="openReplyModal(post)">
-            Viết bình luận...
-        </button>
-    </div>
-
     <div *ngIf="comments.length > 0">
-        <div *ngFor="let cmt of comments" class="mb-4">
-            <app-comment-item [comment]="cmt" (reply)="openReplyModal(cmt)"></app-comment-item>
-            <div *ngIf="cmt.replies?.length > 0" class="ml-8 mt-2">
-                <app-comment-item *ngFor="let reply of cmt.replies" [comment]="reply"
-                    (reply)="openReplyModal(reply)"></app-comment-item>
+        <div *ngFor="let cmt of comments; let last = last" class="mb-4">
+            <div class="pb-4" [ngClass]="{'border-b border-gray-300': !last}">
+                <app-comment-item [comment]="cmt" (reply)="openReplyModal(cmt)"></app-comment-item>
+                <div *ngIf="cmt.replies?.length > 0" class="ml-8 mt-2">
+                    <app-comment-item *ngFor="let reply of cmt.replies" [comment]="reply"
+                        (reply)="openReplyModal(reply)"></app-comment-item>
+                </div>
             </div>
         </div>
     </div>

@@ -41,7 +41,6 @@ export class CreateCommentComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('CreateCommentComponent initialized with parent:', this.parent);
   }
 
   onImageSelected(event: Event) {
@@ -70,13 +69,23 @@ export class CreateCommentComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     const authorId = currentUser?.id || this.userInfo?.id;
 
-    const postId = this.parent?.post?._id || this.parent?.postId || this.parent?.id;
-    const parentId = this.parent?.commentId || undefined;
+    let postId = '';
+    let parentCommentId: string | undefined = undefined;
+
+    if (this.parent && (this.parent.postId || this.parent.post)) {
+      // reply comment
+      postId = this.parent.postId || this.parent.post?._id || this.parent.post?.id;
+      parentCommentId = this.parent._id || this.parent.id;
+    } else {
+      // comment on post
+      postId = this.parent?._id || this.parent?.id;
+      parentCommentId = undefined;
+    }
 
     this.commentService.createComment(
       {
         postId,
-        parentId,
+        parentCommentId,
         authorId,
         content: this.content,
       },
@@ -110,5 +119,18 @@ export class CreateCommentComponent implements OnInit {
 
   addEmoji(event: any) {
     this.content += event.emoji?.native || event.emoji;
+  }
+
+  get parentContent() {
+    return this.parent?.content || this.parent?.post?.content || '';
+  }
+  get parentMediaUrls() {
+    return this.parent?.mediaUrls || this.parent?.post?.mediaUrls || [];
+  }
+  get parentCreatedAt() {
+    return this.parent?.createdAt || this.parent?.post?.createdAt || '';
+  }
+  get parentAuthor() {
+    return this.parent?.author || this.parent?.authorId || this.parent?.post?.author || this.parent?.post?.authorId || {};
   }
 }

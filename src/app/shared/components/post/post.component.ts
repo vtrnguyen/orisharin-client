@@ -41,7 +41,6 @@ export class PostComponent implements OnInit, OnChanges {
     ) { }
 
     ngOnInit() {
-        console.log('PostComponent initialized with post:', this.post.post);
         this.loadLikeInfo();
     }
 
@@ -92,11 +91,11 @@ export class PostComponent implements OnInit, OnChanges {
     }
 
     get content() {
-        return this.post.post?.content || '';
+        return this.post?.content || this.post?.post?.content || '';
     }
 
     get createdAt() {
-        return this.post.post?.createdAt || '';
+        return this.post?.createdAt || this.post?.post?.createdAt || '';
     }
 
     get likes() {
@@ -116,7 +115,7 @@ export class PostComponent implements OnInit, OnChanges {
     }
 
     get medias() {
-        return this.post.post?.mediaUrls || [];
+        return this.post?.mediaUrls || this.post?.post?.mediaUrls || [];
     }
 
     formatTime(dateStr: string): string {
