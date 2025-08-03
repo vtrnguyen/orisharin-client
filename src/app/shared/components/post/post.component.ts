@@ -162,6 +162,19 @@ export class PostComponent implements OnInit, OnChanges {
         }
     }
 
+    navigateToPostDetail(event: MouseEvent): void {
+        const target = event.target as HTMLElement;
+        if (
+            target.closest("button") || target.closest(".no-post-detail")
+        ) return;
+
+        const username = this.author.username;
+        const postId = this.post?.post?._id || this.post?.id;
+        if (username && postId) {
+            this.router.navigate([`@${username}`, 'post', postId]);
+        }
+    }
+
     onCommentCreated(): void {
         if (this.post?.post) {
             this.post.post.commentsCount = (this.post.post.commentsCount || 0) + 1;

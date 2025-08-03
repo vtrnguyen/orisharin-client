@@ -1,0 +1,30 @@
+<div class="flex gap-3 items-start">
+    <img [src]="comment?.authorId?.avatarUrl" class="w-8 h-8 rounded-full object-cover" />
+    <div class="flex-1">
+        <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-900">{{ comment?.authorId?.username }}</span>
+            <span class="text-gray-400 text-xs">{{ comment?.createdAt | date:'short' }}</span>
+        </div>
+        <div class="mt-1 text-gray-800 text-base whitespace-pre-line">
+            {{ comment?.content }}
+        </div>
+        <div *ngIf="comment?.mediaUrls?.length > 0" class="mt-2 flex gap-2 overflow-x-auto scrollbar-hide">
+            <ng-container *ngFor="let media of comment.mediaUrls">
+                <img *ngIf="media.endsWith('.jpg') || media.endsWith('.jpeg') || media.endsWith('.png') || media.endsWith('.webp')"
+                    [src]="media" class="rounded-xl border max-h-32 object-cover flex-shrink-0" />
+                <video *ngIf="media.endsWith('.mp4') || media.endsWith('.mov') || media.endsWith('.webm')" [src]="media"
+                    controls class="rounded-xl border max-h-32 object-contain flex-shrink-0 bg-black"></video>
+            </ng-container>
+        </div>
+        <div class="flex gap-4 mt-2 text-gray-500 text-sm">
+            <button class="flex items-center gap-1 cursor-pointer hover:text-red-500" (click)="toggleLike()">
+                <i [ngClass]="liked ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart'"></i>
+                <span>{{ likesCount }}</span>
+            </button>
+            <button class="flex items-center gap-1 cursor-pointer hover:text-blue-500" (click)="reply.emit()">
+                <i class="fa-regular fa-comment-dots"></i>
+                <span>Trả lời</span>
+            </button>
+        </div>
+    </div>
+</div>

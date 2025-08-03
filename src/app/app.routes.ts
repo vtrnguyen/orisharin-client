@@ -62,6 +62,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent)
             },
             {
+                path: ':username/post/:id',
+                loadComponent: () => import('./pages/user/post-detail/post-detail.component').then(m => m.PostDetailComponent)
+            },
+            {
                 path: ':fullname',
                 loadComponent: () => import('./pages/user/profile/profile.component').then(m => m.ProfileComponent)
             }
