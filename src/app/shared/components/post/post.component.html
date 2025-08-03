@@ -32,7 +32,8 @@
                     class="w-5 h-5 text-lg transition-all duration-200" [class.scale-110]="liked"></i>
                 <span class="leading-none">{{ likesCount }}</span>
             </button>
-            <button class="flex items-center gap-1 transition cursor-pointer rounded-full px-4 py-2 hover:bg-gray-100">
+            <button class="flex items-center gap-1 transition cursor-pointer rounded-full px-4 py-2 hover:bg-gray-100"
+                (click)="showCommentModal = true">
                 <i class="fa-regular fa-comment-dots w-5 h-5 text-lg"></i>
                 <span class="leading-none">{{ comments }}</span>
             </button>
@@ -50,3 +51,7 @@
 
 <app-media-viewer *ngIf="showViewer" [medias]="medias" [startIndex]="viewerIndex" [onClose]="closeViewer.bind(this)">
 </app-media-viewer>
+
+<app-create-comment *ngIf="showCommentModal" [parent]="post" (close)="showCommentModal = false"
+    (commentCreated)="showCommentModal = false">
+</app-create-comment>

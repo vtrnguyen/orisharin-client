@@ -5,6 +5,7 @@ import { isImage, isVideo } from '../../functions/media-type.util';
 import { LikeService } from '../../../core/services/like.service';
 import { LikeTargetType } from '../../enums/like-target.enums';
 import { Router } from '@angular/router';
+import { CreateCommentComponent } from '../create-comment/create-comment.component';
 
 @Component({
     selector: 'app-post',
@@ -12,6 +13,7 @@ import { Router } from '@angular/router';
     imports: [
         CommonModule,
         MediaViewerComponent,
+        CreateCommentComponent
     ],
     templateUrl: './post.component.html',
     styleUrls: ['./post.component.scss']
@@ -30,6 +32,8 @@ export class PostComponent implements OnInit, OnChanges {
     loadingLike = false;
 
     zoomingIndex: number | null = null;
+
+    showCommentModal = false;
 
     constructor(
         private likeService: LikeService,
