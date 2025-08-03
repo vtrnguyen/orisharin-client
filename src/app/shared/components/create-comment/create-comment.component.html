@@ -7,7 +7,6 @@
             <span class="w-12"></span>
         </div>
 
-        <!-- Phần hiển thị bài viết/bình luận gốc -->
         <div class="p-6 flex gap-3 items-start border-b border-gray-200">
             <img [src]="parent?.author?.avatarUrl || 'https://ui-avatars.com/api/?name=' + (parent?.author?.fullName || parent?.author?.username)"
                 class="w-10 h-10 rounded-full object-cover mt-1" alt="avatar" />
@@ -31,7 +30,6 @@
             </div>
         </div>
 
-        <!-- Phần nhập bình luận -->
         <div class="p-6 flex gap-3 items-start">
             <img [src]="userInfo?.avatarUrl" class="w-10 h-10 rounded-full object-cover mt-1" alt="avatar" />
             <div class="flex-1 flex flex-col">
@@ -43,7 +41,14 @@
                 <div *ngIf="images.length > 0" class="mb-2">
                     <div class="flex gap-3 overflow-x-auto flex-nowrap scrollbar-hide">
                         <div *ngFor="let media of images; let i = index" class="relative group flex-shrink-0">
-                            <img [src]="media" class="rounded-xl border w-[200px] max-w-full max-h-40 object-cover" />
+                            <ng-container *ngIf="!isVideo(media); else videoPreview">
+                                <img [src]="media"
+                                    class="rounded-xl border w-[200px] max-w-full max-h-40 object-cover" />
+                            </ng-container>
+                            <ng-template #videoPreview>
+                                <video [src]="media" controls
+                                    class="rounded-xl border w-[200px] max-w-full max-h-40 bg-black object-contain"></video>
+                            </ng-template>
                             <button type="button"
                                 class="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 flex items-center justify-center w-7 h-7 opacity-0 group-hover:opacity-100 transition cursor-pointer"
                                 (click)="removeImage(i)">
@@ -56,13 +61,13 @@
                     <div class="flex gap-2">
                         <label class="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800">
                             <i class="fa-regular fa-image w-6 h-6"></i>
-                            <input type="file" multiple accept="image/*" class="hidden"
+                            <input type="file" multiple accept="image/*,video/*" class="hidden"
                                 (change)="onImageSelected($event)">
                         </label>
                         <label
                             class="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800 relative">
                             <i class="fa-regular fa-face-smile w-6 h-6" (click)="toggleEmojiPicker()"></i>
-                            <div *ngIf="showEmojiPicker" class="absolute left-0 top-8 z-[999]"
+                            <div *ngIf="showEmojiPicker" class="absolute left-0 -top-8 z-[999]"
                                 style="min-width:320px; max-width:90vw;" (clickOutside)="showEmojiPicker = false">
                                 <emoji-mart (emojiSelect)="addEmoji($event)" [style.width.px]="320"
                                     [style.height.px]="380"
@@ -73,9 +78,9 @@
                     <button class="font-semibold px-4 py-2 rounded-lg shadow transition cursor-pointer"
                         [disabled]="isLoading || (!content.trim() && files.length === 0)" (click)="submitComment()">
                         <ng-container *ngIf="isLoading; else btnText">
-                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang gửi
+                            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang đăng
                         </ng-container>
-                        <ng-template #btnText>Gửi</ng-template>
+                        <ng-template #btnText>Đăng</ng-template>
                     </button>
                 </div>
             </div>

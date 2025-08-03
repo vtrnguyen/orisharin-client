@@ -53,5 +53,5 @@
 </app-media-viewer>
 
 <app-create-comment *ngIf="showCommentModal" [parent]="post" (close)="showCommentModal = false"
-    (commentCreated)="showCommentModal = false">
+    (commentCreated)="onCommentCreated()">
 </app-create-comment>

@@ -41,6 +41,7 @@ export class PostComponent implements OnInit, OnChanges {
     ) { }
 
     ngOnInit() {
+        console.log('PostComponent initialized with post:', this.post.post);
         this.loadLikeInfo();
     }
 
@@ -159,5 +160,14 @@ export class PostComponent implements OnInit, OnChanges {
         } else {
             this.router.navigate([url]);
         }
+    }
+
+    onCommentCreated(): void {
+        if (this.post?.post) {
+            this.post.post.commentsCount = (this.post.post.commentsCount || 0) + 1;
+        } else {
+            this.post.commentsCount = (this.post.commentsCount || 0) + 1;
+        }
+        this.showCommentModal = false;
     }
 }

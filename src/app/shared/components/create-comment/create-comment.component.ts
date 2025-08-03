@@ -4,6 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { UserService } from '../../../core/services/user.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { CommentService } from '../../../core/services/comment.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { AlertService } from '../../state-managements/alert.service';
+import { isImage, isVideo } from '../../functions/media-type.util';
 
 @Component({
   selector: 'app-create-comment',
@@ -24,7 +28,15 @@ export class CreateCommentComponent implements OnInit {
   showEmojiPicker = false;
   userInfo: any;
 
-  constructor(private userService: UserService) {
+  isVideo = isVideo;
+  isImage = isImage;
+
+  constructor(
+    private userService: UserService,
+    private commentService: CommentService,
+    private authService: AuthService,
+    private alertService: AlertService,
+  ) {
     this.userInfo = this.userService.getCurrentUserInfo();
   }
 
@@ -50,17 +62,40 @@ export class CreateCommentComponent implements OnInit {
     this.files.splice(index, 1);
   }
 
-  submitComment() {
+  submitComment(): void {
     if (!this.content.trim() && this.files.length === 0) return;
     this.isLoading = true;
-    setTimeout(() => {
-      this.isLoading = false;
-      this.commentCreated.emit({ content: this.content, files: this.files });
-      this.close.emit();
-      this.content = '';
-      this.images = [];
-      this.files = [];
-    }, 1000);
+
+    // get current user id
+    const currentUser = this.authService.getCurrentUser();
+    const authorId = currentUser?.id || this.userInfo?.id;
+
+    const postId = this.parent?.post?._id || this.parent?.postId || this.parent?.id;
+    const parentId = this.parent?.commentId || undefined;
+
+    this.commentService.createComment(
+      {
+        postId,
+        parentId,
+        authorId,
+        content: this.content,
+      },
+      this.files
+    ).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        this.commentCreated.emit(response.data);
+        this.close.emit();
+        this.content = "";
+        this.images = [];
+        this.files = [];
+        this.alertService.show("success", "Đã gửi bình luận!");
+      },
+      error: (error: any) => {
+        this.isLoading = false;
+        this.alertService.show("error", "Đã có lỗi xảy ra khi gửi bình luận. Vui lòng thử lại sau.");
+      }
+    })
   }
 
   autoResize(event: Event) {
