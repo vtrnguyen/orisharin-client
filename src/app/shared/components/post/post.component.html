@@ -1,11 +1,11 @@
 <div class="bg-white rounded-2xl shadow p-4 flex gap-4 mb-3 cursor-pointer" (click)="navigateToPostDetail($event)">
-    <img (click)="navigateToProfile(author.username)"
+    <img (click)="navigateToProfile(router, author.username)"
         [src]="author.avatarUrl || 'https://ui-avatars.com/api/?name=' + (author.fullName || author.username)"
         class="no-post-detail w-8 h-8 rounded-full object-cover cursor-pointer" alt="avatar" />
     <div class="flex-1">
         <div class="flex items-center gap-2">
             <span class="no-post-detail font-semibold text-gray-900 cursor-pointer hover:underline"
-                (click)="navigateToProfile(author.username)">{{ author.username }}</span>
+                (click)="navigateToProfile(router, author.username)">{{ author.username }}</span>
             <span class="text-gray-400 text-xs">{{ formatTime(createdAt) }}</span>
         </div>
         <div class="mt-2 text-gray-800 text-base whitespace-pre-line">

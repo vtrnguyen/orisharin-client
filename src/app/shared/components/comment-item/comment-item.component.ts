@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { navigateToProfile } from '../../functions/navigate-to-profile';
 
 @Component({
     selector: 'app-comment-item',
@@ -14,6 +16,10 @@ export class CommentItemComponent {
 
     liked = false;
     likesCount = 0;
+
+    navigateToProfile = navigateToProfile;
+
+    constructor(public router: Router) { }
 
     ngOnInit() {
         this.likesCount = this.comment?.likesCount || 0;

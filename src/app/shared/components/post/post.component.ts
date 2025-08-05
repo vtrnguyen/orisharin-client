@@ -6,6 +6,7 @@ import { LikeService } from '../../../core/services/like.service';
 import { LikeTargetType } from '../../enums/like-target.enums';
 import { Router } from '@angular/router';
 import { CreateCommentComponent } from '../create-comment/create-comment.component';
+import { navigateToProfile } from '../../functions/navigate-to-profile';
 
 @Component({
     selector: 'app-post',
@@ -26,6 +27,7 @@ export class PostComponent implements OnInit, OnChanges {
 
     isImage = isImage;
     isVideo = isVideo;
+    navigateToProfile = navigateToProfile;
 
     liked = false;
     likesCount = 0;
@@ -37,7 +39,7 @@ export class PostComponent implements OnInit, OnChanges {
 
     constructor(
         private likeService: LikeService,
-        private router: Router
+        public router: Router
     ) { }
 
     ngOnInit() {
@@ -148,17 +150,6 @@ export class PostComponent implements OnInit, OnChanges {
 
     closeViewer() {
         this.showViewer = false;
-    }
-
-    navigateToProfile(userName: string) {
-        const url = '/@' + userName;
-        if (this.router.url === url) {
-            this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-                this.router.navigate([url]);
-            });
-        } else {
-            this.router.navigate([url]);
-        }
     }
 
     navigateToPostDetail(event: MouseEvent): void {

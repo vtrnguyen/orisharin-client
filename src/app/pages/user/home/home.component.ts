@@ -10,6 +10,7 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
+import { navigateToProfile } from '../../../shared/functions/navigate-to-profile';
 
 @Component({
   selector: 'app-home',
@@ -31,11 +32,13 @@ export class HomeComponent implements OnInit {
   newPostContent: string = '';
   isLoading = true;
 
+  navigateToProfile = navigateToProfile;
+
   constructor(
     private authService: AuthService,
     private postService: PostService,
     private postEventService: PostEventService,
-    private router: Router,
+    public router: Router,
     private userService: UserService,
   ) { }
 
@@ -72,9 +75,5 @@ export class HomeComponent implements OnInit {
   }
 
   createPost() {
-  }
-
-  navigateToProfile(userName: string) {
-    this.router.navigate(['/@' + userName]);
   }
 }

@@ -1,8 +1,11 @@
 <div class="flex gap-3 items-start">
-    <img [src]="comment?.authorId?.avatarUrl" class="w-8 h-8 rounded-full object-cover" />
+    <img [src]="comment?.authorId?.avatarUrl" class="w-8 h-8 rounded-full object-cover cursor-pointer"
+        (click)="navigateToProfile(router, comment?.authorId?.username)" />
     <div class="flex-1">
         <div class="flex items-center gap-2">
-            <span class="font-semibold text-gray-900">{{ comment?.authorId?.username }}</span>
+            <span class="font-semibold text-gray-900 hover:underline cursor-pointer"
+                (click)="navigateToProfile(router, comment?.authorId?.username)">{{ comment?.authorId?.username
+                }}</span>
             <span class="text-gray-400 text-xs">{{ formatTime(comment?.createdAt) }}</span>
         </div>
         <div class="mt-1 text-gray-800 text-base whitespace-pre-line">
