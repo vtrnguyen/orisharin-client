@@ -5,13 +5,21 @@
         <div *ngFor="let cmt of comments; let last = last" class="mb-4">
             <div class="pb-4" [ngClass]="{'border-b border-gray-300': !last}">
                 <app-comment-item [comment]="cmt" (reply)="openReplyModal(cmt)"></app-comment-item>
+
                 <div *ngIf="cmt.replies?.length > 0" class="ml-8 mt-2">
-                    <app-comment-item *ngFor="let reply of cmt.replies" [comment]="reply"
-                        (reply)="openReplyModal(reply)"></app-comment-item>
+                    <div *ngFor="let reply of cmt.replies; let isLast = last" class="relative">
+                        <div *ngIf="!isLast" class="absolute left-4 top-8 w-0.5 bg-gray-200"
+                            style="height: calc(100% + 8px);"></div>
+
+                        <div class="mb-2">
+                            <app-comment-item [comment]="reply" (reply)="openReplyModal(reply)"></app-comment-item>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
     <div *ngIf="comments.length === 0" class="text-gray-400 text-center py-8">Chưa có bình luận nào.</div>
 
     <app-create-comment *ngIf="showCommentModal" [parent]="selectedParent" (close)="showCommentModal = false"
