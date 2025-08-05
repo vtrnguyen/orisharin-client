@@ -51,6 +51,7 @@ export class ProfileComponent implements OnInit {
   isFollowLoading: boolean = false;
   currentUserId: string = "";
   showUnfollowConfirm = false;
+  editBio: string = '';
 
   // folows modal properties
   showFollowModal = false;
@@ -93,6 +94,7 @@ export class ProfileComponent implements OnInit {
   }
 
   onEditProfile(): void {
+    this.editBio = this.userInfo.bio || '';
     this.showEditProfileModal = true;
     document.body.style.overflow = 'hidden';
   }
@@ -270,7 +272,7 @@ export class ProfileComponent implements OnInit {
     this.isUpdatingProfile = true;
 
     const updateData: any = {
-      bio: this.userInfo.bio,
+      bio: this.editBio,
       websiteLinks: this.userInfo.websiteLinks
     };
     if (this.selectedAvatar) {
@@ -282,6 +284,7 @@ export class ProfileComponent implements OnInit {
 
     this.userService.updateUserProfile(updateData).subscribe({
       next: (response: any) => {
+        this.editBio = '';
         this.isUpdatingProfile = false;
         if (response && response.data && response.data.avatarUrl) {
           this.userService.setCurrentUserAvatarUrl(response.data.avatarUrl);
