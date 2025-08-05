@@ -11,12 +11,16 @@
         <div class="mt-1 text-gray-800 text-base whitespace-pre-line">
             {{ comment?.content }}
         </div>
-        <div *ngIf="comment?.mediaUrls?.length > 0" class="mt-2 flex gap-2 overflow-x-auto scrollbar-hide">
-            <ng-container *ngFor="let media of comment.mediaUrls">
-                <img *ngIf="media.endsWith('.jpg') || media.endsWith('.jpeg') || media.endsWith('.png') || media.endsWith('.webp')"
-                    [src]="media" class="rounded-xl border max-h-32 object-cover flex-shrink-0" />
-                <video *ngIf="media.endsWith('.mp4') || media.endsWith('.mov') || media.endsWith('.webm')" [src]="media"
-                    controls class="rounded-xl border max-h-32 object-contain flex-shrink-0 bg-black"></video>
+        <div *ngIf="medias.length > 0" class="mt-2 flex gap-2 overflow-x-auto scrollbar-hide">
+            <ng-container *ngFor="let media of medias; let i = index">
+                <img *ngIf="isImage(media)" [src]="media"
+                    class="rounded-xl border border-gray-300 max-h-32 object-cover flex-shrink-0 cursor-pointer transition-transform duration-200"
+                    [class.scale-110]="zoomingIndex === i" alt="comment image" (click)="openViewer(i)" />
+
+                <video *ngIf="isVideo(media)" [src]="media" controls
+                    class="rounded-xl border border-gray-300 max-h-32 object-contain flex-shrink-0 bg-black cursor-pointer transition-transform duration-200"
+                    [class.scale-110]="zoomingIndex === i" (click)="openViewer(i)">
+                </video>
             </ng-container>
         </div>
         <div class="flex gap-4 mt-2 text-gray-500 text-sm">
@@ -30,3 +34,7 @@
         </div>
     </div>
 </div>
+
+<!-- Media Viewer -->
+<app-media-viewer *ngIf="showViewer" [medias]="medias" [startIndex]="viewerIndex" [onClose]="closeViewer.bind(this)">
+</app-media-viewer>
