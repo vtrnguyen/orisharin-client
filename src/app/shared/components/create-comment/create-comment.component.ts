@@ -8,6 +8,7 @@ import { CommentService } from '../../../core/services/comment.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AlertService } from '../../state-managements/alert.service';
 import { isImage, isVideo } from '../../functions/media-type.util';
+import { formatTime } from '../../functions/formatTime.util';
 
 @Component({
   selector: 'app-create-comment',
@@ -30,6 +31,7 @@ export class CreateCommentComponent implements OnInit {
 
   isVideo = isVideo;
   isImage = isImage;
+  formatTime = formatTime;
 
   constructor(
     private userService: UserService,

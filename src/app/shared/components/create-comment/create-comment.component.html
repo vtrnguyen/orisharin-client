@@ -13,7 +13,7 @@
             <div class="flex-1">
                 <div class="flex items-center gap-2">
                     <span class="font-semibold text-gray-900">{{ parentAuthor?.username }}</span>
-                    <span class="text-gray-400 text-xs">{{ parentCreatedAt | date:'short' }}</span>
+                    <span class="text-gray-400 text-xs">{{ formatTime(parentCreatedAt) }}</span>
                 </div>
                 <div class="mt-2 text-gray-800 text-base whitespace-pre-line">
                     {{ parentContent }}
