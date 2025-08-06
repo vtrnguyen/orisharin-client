@@ -13,24 +13,9 @@
 
         <div>
             <ng-container *ngFor="let user of filteredSuggestions; let last = last">
-                <div class="flex items-center justify-between px-1 py-2 cursor-pointer">
-                    <div class="flex items-center gap-3">
-                        <img [src]="user.avatar"
-                            class="w-10 h-10 rounded-full object-cover border border-gray-200 cursor-pointer"
-                            alt="avatar" />
-                        <div>
-                            <div class="font-semibold text-gray-900 hover:underline cursor-pointer">{{ user.username }}
-                            </div>
-                            <div class="text-gray-400 text-sm mb-1">{{ user.fullName }}</div>
-                            <div class="text-gray-500 text-sm">{{ user.description }}</div>
-                        </div>
-                    </div>
-                    <button (click)="toggleFollow(user)"
-                        [ngClass]="user.isFollowing ? 'bg-gray-200 text-gray-700' : 'bg-blue-600 text-white hover:bg-blue-700'"
-                        class="px-4 py-2 rounded-xl font-semibold shadow transition cursor-pointer min-w-[110px] text-center">
-                        {{ user.isFollowing ? 'Đang theo dõi' : 'Theo dõi' }}
-                    </button>
-                </div>
+                <app-user-list-item [user]="user" [showFollowButton]="true" (follow)="toggleFollow(user)"
+                    (unfollow)="toggleFollow(user)">
+                </app-user-list-item>
                 <hr *ngIf="!last" class="my-4 border-gray-200" />
             </ng-container>
             <div *ngIf="filteredSuggestions.length === 0" class="text-center text-gray-400 py-8">

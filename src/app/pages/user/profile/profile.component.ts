@@ -13,6 +13,7 @@ import { AlertService } from '../../../shared/state-managements/alert.service';
 import { FormsModule } from '@angular/forms';
 import { FollowingUserDto, UserProfileDto, UserProfileResponseDto } from '../../../shared/dtos/user-profile.dto';
 import { FollowService } from '../../../core/services/follow.service';
+import { UserListItemComponent } from '../../../shared/components/user-list-item/user-list-item.component';
 
 @Component({
   selector: 'app-profile',
@@ -25,6 +26,7 @@ import { FollowService } from '../../../core/services/follow.service';
     ClickOutsideModule,
     MediaViewerComponent,
     LoadingComponent,
+    UserListItemComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],

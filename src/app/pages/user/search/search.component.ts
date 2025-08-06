@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UserListItemComponent } from '../../../shared/components/user-list-item/user-list-item.component';
 
 interface UserSuggestion {
   avatar: string;
@@ -13,7 +14,11 @@ interface UserSuggestion {
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    UserListItemComponent,
+  ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })

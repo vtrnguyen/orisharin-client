@@ -309,30 +309,13 @@
                 <ng-container *ngIf="!loadingFollowList">
                     <ng-container
                         *ngIf="(followTab === 'followers' ? followersList : followingList).length; else noUserTemplate">
-                        <div
+                        <ng-container
                             *ngFor="let user of (followTab === 'followers' ? followersList : followingList); let last = last">
-                            <div class="flex items-center gap-3 py-2 cursor-pointer">
-                                <img [src]="user.avatarUrl || ''"
-                                    class="w-10 h-10 rounded-full object-cover border border-gray-300 cursor-pointer" />
-                                <div class="flex-1">
-                                    <div class="font-semibold">{{ user.username }}</div>
-                                    <div class="text-gray-500 text-sm">{{ user.fullName }}</div>
-                                </div>
-                                <ng-container *ngIf="user.id !== currentUserId">
-                                    <button *ngIf="!user.isFollowed"
-                                        class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
-                                        (click)="onFollow(user)">
-                                        Theo dõi
-                                    </button>
-                                    <button *ngIf="user.isFollowed"
-                                        class="px-4 py-1 rounded-lg border border-gray-300 text-black text-sm font-semibold cursor-pointer"
-                                        (click)="selectedUserToUnfollow = user">
-                                        Bỏ theo dõi
-                                    </button>
-                                </ng-container>
-                            </div>
+                            <app-user-list-item [user]="user" [currentUserId]="currentUserId" (follow)="onFollow(user)"
+                                (unfollow)="selectedUserToUnfollow = user">
+                            </app-user-list-item>
                             <hr *ngIf="!last" class="my-4 border-gray-300" />
-                        </div>
+                        </ng-container>
                     </ng-container>
                 </ng-container>
                 <ng-template #noUserTemplate>
