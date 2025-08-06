@@ -26,21 +26,29 @@ export class MediaViewerComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.current = this.startIndex || 0;
         document.body.style.overflow = 'hidden';
+        window.addEventListener('keydown', this.handleKeyDown);
     }
 
     ngOnDestroy() {
         document.body.style.overflow = 'auto';
+        window.removeEventListener('keydown', this.handleKeyDown)
     }
 
-    prev() {
+    prev(): void {
         this.current = (this.current - 1 + this.medias.length) % this.medias.length;
     }
 
-    next() {
+    next(): void {
         this.current = (this.current + 1) % this.medias.length;
     }
 
-    close() {
+    close(): void {
         this.onClose();
+    }
+
+    private handleKeyDown = (event: KeyboardEvent): void => {
+        if (event.key === 'Escape') {
+            this.close();
+        }
     }
 }
