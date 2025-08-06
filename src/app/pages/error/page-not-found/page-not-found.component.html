@@ -1,1 +1,28 @@
-<h1>User home page</h1>
+<div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div class="max-w-md w-full text-center">
+        <div class="mb-6">
+            <img src="/images/orisharin_logo.png" alt="OriSharin" class="w-20 h-20 mx-auto mb-4 rounded-xl" />
+            <h1 class="text-2xl font-bold text-gray-900">OriSharin</h1>
+        </div>
+
+        <div class="mb-8">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-2">Rất tiếc, trang không tồn tại</h3>
+            <p class="text-gray-500 mb-6">
+                Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
+            </p>
+        </div>
+
+        <div class="flex gap-3 justify-center">
+            <button (click)="goBack()"
+                class="px-4 py-2 bg-white text-sm font-semibold rounded-lg hover:bg-white-700 border border-gray-200 transition-colors duration-200 cursor-pointer">
+                <i class="fa-solid fa-arrow-left mr-1"></i>
+                Trang trước
+            </button>
+            <button (click)="goHome()"
+                class="px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors duration-200 cursor-pointer">
+                <i class="fa-solid fa-home mr-1"></i>
+                Trang chủ
+            </button>
+        </div>
+    </div>
+</div>

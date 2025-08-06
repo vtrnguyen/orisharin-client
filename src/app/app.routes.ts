@@ -62,6 +62,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent)
             },
             {
+                path: 'not-found',
+                loadComponent: () => import('./pages/error/page-not-found/page-not-found.component').then(m => m.PageNotFoundComponent)
+            },
+            {
                 path: ':username/post/:id',
                 loadComponent: () => import('./pages/user/post-detail/post-detail.component').then(m => m.PostDetailComponent)
             },
