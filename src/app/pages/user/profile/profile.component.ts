@@ -4,7 +4,7 @@ import { PostModalComponent } from '../../../shared/components/post-modal/post-m
 import { PostComponent } from '../../../shared/components/post/post.component';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { AuthService } from '../../../core/services/auth.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MediaViewerComponent } from '../../../shared/components/media-viewer/media-viewer.component';
 import { PostService } from '../../../core/services/post.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
@@ -74,7 +74,8 @@ export class ProfileComponent implements OnInit {
     private route: ActivatedRoute,
     private userService: UserService,
     private alertService: AlertService,
-    private followService: FollowService
+    private followService: FollowService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -354,21 +355,25 @@ export class ProfileComponent implements OnInit {
     if (query) {
       this.userService.getUserProfile(query).subscribe({
         next: (response: any) => {
-          const user = {
-            ...response.data.user,
-            id: response.data.user._id,
-          } as UserProfileDto;
-          this.userInfo = user;
-          this.followings = response.data.followings || [];
-          this.avatarPreview = null;
-          this.selectedAvatar = null;
-          this.avatarRemoved = false;
-          if (!this.isOwner) {
-            this.checkIsFollowing();
+          if (response && response.success === true) {
+            const user = {
+              ...response.data.user,
+              id: response.data.user._id,
+            } as UserProfileDto;
+            this.userInfo = user;
+            this.followings = response.data.followings || [];
+            this.avatarPreview = null;
+            this.selectedAvatar = null;
+            this.avatarRemoved = false;
+            if (!this.isOwner) {
+              this.checkIsFollowing();
+            }
+          } else {
+            this.router.navigate(['/not-found']);
           }
         },
         error: (error: any) => {
-          console.error('Error fetching user profile:', error);
+          this.router.navigate(['/not-found']);
         }
       });
     }
