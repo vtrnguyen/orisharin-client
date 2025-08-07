@@ -1,11 +1,24 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+<div class="min-h-screen bg-white flex items-center justify-center p-4 relative">
     <div class="w-full max-w-md">
-        <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="bg-white p-8">
             <router-outlet></router-outlet>
         </div>
-
         <div class="text-center mt-6 text-sm text-gray-500">
             © 2025 OriSharin. All rights reserved.
         </div>
     </div>
+
+    <div
+        class="hidden md:block fixed bottom-56 right-8 z-50 text-sm text-gray-400 font-medium select-none pointer-events-none w-44 text-center">
+        Quét để tải ứng dụng
+    </div>
+    <button
+        class="hidden md:flex fixed bottom-8 right-8 z-50 rounded-2xl shadow-2xl w-44 h-44 items-center justify-center transition-all duration-200 cursor-pointer border border-gray-300 float-zoom-out"
+        (click)="showQrViewer = true" aria-label="Tải ứng dụng">
+        <img src="images/origintech_qr.png" alt="QR tải ứng dụng" class="w-36 h-36 object-contain" />
+    </button>
+
+    <app-media-viewer *ngIf="showQrViewer" [medias]="[qrImageUrl]" [startIndex]="0"
+        [onClose]="closeQrViewer.bind(this)">
+    </app-media-viewer>
 </div>

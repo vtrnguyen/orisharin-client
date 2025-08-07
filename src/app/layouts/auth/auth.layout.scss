@@ -1,0 +1,23 @@
+body {
+    background: #fff;
+}
+
+@keyframes zoom-out {
+    0% {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.float-zoom-out {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.float-zoom-out:hover {
+    transform: scale(1.08);
+}
