@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
@@ -9,6 +9,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AlertService } from '../../state-managements/alert.service';
 import { isImage, isVideo } from '../../functions/media-type.util';
 import { formatTime } from '../../functions/format-time.util';
+import { navigateToProfile } from '../../functions/navigate-to-profile';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-comment',
@@ -17,7 +19,7 @@ import { formatTime } from '../../functions/format-time.util';
   templateUrl: './create-comment.component.html',
   styleUrl: './create-comment.component.scss'
 })
-export class CreateCommentComponent implements OnInit {
+export class CreateCommentComponent implements OnInit, OnDestroy {
   @Input() parent: any;
   @Output() close = new EventEmitter<void>();
   @Output() commentCreated = new EventEmitter<any>();
@@ -32,17 +34,24 @@ export class CreateCommentComponent implements OnInit {
   isVideo = isVideo;
   isImage = isImage;
   formatTime = formatTime;
+  navigateToProfile = navigateToProfile;
 
   constructor(
     private userService: UserService,
     private commentService: CommentService,
     private authService: AuthService,
     private alertService: AlertService,
+    public router: Router
   ) {
     this.userInfo = this.userService.getCurrentUserInfo();
   }
 
   ngOnInit() {
+    document.body.style.overflow = 'hidden';
+  }
+
+  ngOnDestroy() {
+    document.body.style.overflow = 'auto';
   }
 
   onImageSelected(event: Event) {
