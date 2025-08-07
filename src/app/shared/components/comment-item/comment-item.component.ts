@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
-import { formatTime } from '../../functions/formatTime.util';
+import { formatTime } from '../../functions/format-time.util';
 
 @Component({
     selector: 'app-comment-item',

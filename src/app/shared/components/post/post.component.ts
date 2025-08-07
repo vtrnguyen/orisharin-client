@@ -7,7 +7,11 @@ import { LikeTargetType } from '../../enums/like-target.enums';
 import { Router } from '@angular/router';
 import { CreateCommentComponent } from '../create-comment/create-comment.component';
 import { navigateToProfile } from '../../functions/navigate-to-profile';
-import { formatTime } from '../../functions/formatTime.util';
+import { formatTime } from '../../functions/format-time.util';
+import { isOwner } from '../../functions/is-owner';
+import { UserService } from '../../../core/services/user.service';
+import { ClickOutsideModule } from 'ng-click-outside';
+import { AlertService } from '../../state-managements/alert.service';
 
 @Component({
     selector: 'app-post',
@@ -15,7 +19,8 @@ import { formatTime } from '../../functions/formatTime.util';
     imports: [
         CommonModule,
         MediaViewerComponent,
-        CreateCommentComponent
+        CreateCommentComponent,
+        ClickOutsideModule,
     ],
     templateUrl: './post.component.html',
     styleUrls: ['./post.component.scss']
@@ -30,6 +35,7 @@ export class PostComponent implements OnInit, OnChanges {
     isVideo = isVideo;
     navigateToProfile = navigateToProfile;
     formatTime = formatTime;
+    isOwner = isOwner;
 
     liked = false;
     likesCount = 0;
@@ -37,14 +43,25 @@ export class PostComponent implements OnInit, OnChanges {
 
     zoomingIndex: number | null = null;
 
-    showCommentModal = false;
+    showCommentModal: boolean = false;
+    isOwnerPost: boolean = false;
+
+    // checking isOwner properties
+    currentUserName: string = '';
+    postUserName: string = '';
+
+    showPostMenu: boolean = false;
 
     constructor(
         private likeService: LikeService,
-        public router: Router
+        private userService: UserService,
+        public router: Router,
+        private alertService: AlertService
     ) { }
 
     ngOnInit() {
+        this.currentUserName = this.userService.getCurrentUserInfo().username;
+        this.postUserName = this.post.author.username;
         this.loadLikeInfo();
     }
 
@@ -84,6 +101,39 @@ export class PostComponent implements OnInit, OnChanges {
                 error: () => { this.loadingLike = false; }
             });
         }
+    }
+
+    togglePostMenu(event: MouseEvent) {
+        event.stopPropagation();
+        this.showPostMenu = !this.showPostMenu;
+    }
+
+    closePostMenu() {
+        this.showPostMenu = false;
+    }
+
+    onEditPost() {
+        this.closePostMenu();
+    }
+
+    onDeletePost() {
+        this.closePostMenu();
+    }
+
+    onCopyPostUrl() {
+        const url = window.location.origin + `/@${this.author.username}/post/${this.post?.post?._id || this.post?.id}`;
+        navigator.clipboard.writeText(url).then(() => {
+            this.alertService.show('success', 'Đã sao chép đường dẫn bài viết');
+        });
+        this.closePostMenu();
+    }
+
+    onArchivePost() {
+        this.closePostMenu();
+    }
+
+    onReportPost() {
+        this.closePostMenu();
     }
 
     get author() {

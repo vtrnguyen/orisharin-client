@@ -57,8 +57,6 @@ export class PostDetailComponent implements OnInit {
                     this.post = res.data.post;
                     this.comments = res.data.comments || [];
                 }
-
-                console.log('Post detail loaded:', this.post);
             });
         }
     }

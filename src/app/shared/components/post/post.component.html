@@ -2,11 +2,52 @@
     <img (click)="navigateToProfile(router, author.username)"
         [src]="author.avatarUrl || 'https://ui-avatars.com/api/?name=' + (author.fullName || author.username)"
         class="no-post-detail w-8 h-8 rounded-full object-cover cursor-pointer" alt="avatar" />
-    <div class="flex-1">
-        <div class="flex items-center gap-2">
-            <span class="no-post-detail font-semibold text-gray-900 cursor-pointer hover:underline"
-                (click)="navigateToProfile(router, author.username)">{{ author.username }}</span>
-            <span class="text-gray-400 text-xs">{{ formatTime(createdAt) }}</span>
+    <div class="flex-1 relative">
+        <div class="flex items-center gap-2 justify-between">
+            <div class="flex items-center gap-2">
+                <span class="no-post-detail font-semibold text-gray-900 cursor-pointer hover:underline"
+                    (click)="navigateToProfile(router, author.username)">{{ author.username }}</span>
+                <span class="text-gray-400 text-xs">{{ formatTime(createdAt) }}</span>
+            </div>
+            <button
+                class="no-post-detail w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-200 transition duration-150 cursor-pointer"
+                (click)="togglePostMenu($event)">
+                <i class="fa-solid fa-ellipsis text-lg text-gray-500"></i>
+            </button>
+            <div *ngIf="showPostMenu"
+                class="absolute right-0 top-10 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in px-2 border-gray-300"
+                (click)="$event.stopPropagation()" (clickOutside)="closePostMenu()">
+                <ul class="py-2">
+                    <li *ngIf="isOwner(postUserName, currentUserName)"
+                        class="flex items-center justify-between px-4 py-2 cursor-pointer rounded-lg transition-all hover:bg-gray-100"
+                        (click)="onEditPost()">
+                        <span class="font-medium text-gray-800">Chỉnh sửa</span>
+                        <i class="fa-solid fa-pen-to-square text-gray-500"></i>
+                    </li>
+                    <li *ngIf="isOwner(postUserName, currentUserName)"
+                        class="flex items-center justify-between px-4 py-2 cursor-pointer rounded-lg transition-all hover:bg-red-50"
+                        (click)="onDeletePost()">
+                        <span class="font-medium text-red-600">Xóa</span>
+                        <i class="fa-solid fa-trash-can text-red-500"></i>
+                    </li>
+                    <li class="flex items-center justify-between px-4 py-2 cursor-pointer rounded-lg transition-all hover:bg-gray-100"
+                        (click)="onCopyPostUrl()">
+                        <span class="font-medium text-gray-800">Sao chép liên kết</span>
+                        <i class="fa-solid fa-link text-gray-500"></i>
+                    </li>
+                    <li class="flex items-center justify-between px-4 py-2 cursor-pointer rounded-lg transition-all hover:bg-gray-100"
+                        (click)="onArchivePost()">
+                        <span class="font-medium text-gray-800">Lưu trữ</span>
+                        <i class="fa-solid fa-bookmark text-gray-500"></i>
+                    </li>
+                    <li *ngIf="!isOwner(postUserName, currentUserName)"
+                        class="flex items-center justify-between px-4 py-2 cursor-pointer rounded-lg transition-all hover:bg-red-50"
+                        (click)="onReportPost()">
+                        <span class="font-medium text-red-600">Báo cáo</span>
+                        <i class="fa-solid fa-flag text-red-500"></i>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="mt-2 text-gray-800 text-base whitespace-pre-line">
             {{ content }}
