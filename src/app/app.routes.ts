@@ -14,11 +14,13 @@ export const routes: Routes = [
             },
             {
                 path: 'login',
-                loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent)
+                loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent),
+                title: "OriSharin - Đăng nhập"
             },
             {
                 path: 'register',
-                loadComponent: () => import('./pages/auth/register/register.component').then(m => m.RegisterComponent)
+                loadComponent: () => import('./pages/auth/register/register.component').then(m => m.RegisterComponent),
+                title: "OriSharin - Đăng ký tài khoản"
             },
         ]
     },
@@ -35,7 +37,8 @@ export const routes: Routes = [
             },
             {
                 path: 'dashboard',
-                loadComponent: () => import('./pages/admin/dashboard/dashboard.component').then(m => m.DashboardComponent)
+                loadComponent: () => import('./pages/admin/dashboard/dashboard.component').then(m => m.DashboardComponent),
+                title: "Dashboard"
             },
         ]
     },
@@ -47,35 +50,43 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadComponent: () => import('./pages/user/home/home.component').then(m => m.HomeComponent)
+                loadComponent: () => import('./pages/user/home/home.component').then(m => m.HomeComponent),
+                title: "OriSharin - Trang chủ"
             },
             {
                 path: 'notifications',
-                loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent)
+                loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent),
+                title: "OriSharin - Thông báo"
             },
             {
                 path: 'search',
-                loadComponent: () => import('./pages/user/search/search.component').then(m => m.SearchComponent)
+                loadComponent: () => import('./pages/user/search/search.component').then(m => m.SearchComponent),
+                title: "OriSharin - Tìm kiếm"
             },
             {
                 path: 'message',
-                loadComponent: () => import('./pages/user/message/message.component').then(m => m.MessageComponent)
+                loadComponent: () => import('./pages/user/message/message.component').then(m => m.MessageComponent),
+                title: "OriSharin - Tin nhắn"
             },
             {
                 path: 'notification',
-                loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent)
+                loadComponent: () => import('./pages/user/notification/notification.component').then(m => m.NotificationComponent),
+                title: "OriSharin - Thông báo"
             },
             {
                 path: 'not-found',
-                loadComponent: () => import('./pages/error/page-not-found/page-not-found.component').then(m => m.PageNotFoundComponent)
+                loadComponent: () => import('./pages/error/page-not-found/page-not-found.component').then(m => m.PageNotFoundComponent),
+                title: "Không tìm thấy trang"
             },
             {
                 path: ':username/post/:id',
-                loadComponent: () => import('./pages/user/post-detail/post-detail.component').then(m => m.PostDetailComponent)
+                loadComponent: () => import('./pages/user/post-detail/post-detail.component').then(m => m.PostDetailComponent),
+                title: "Bài đăng"
             },
             {
                 path: ':fullname',
-                loadComponent: () => import('./pages/user/profile/profile.component').then(m => m.ProfileComponent)
+                loadComponent: () => import('./pages/user/profile/profile.component').then(m => m.ProfileComponent),
+                title: "Trang cá nhân"
             }
         ]
     },
