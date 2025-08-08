@@ -1,76 +1,67 @@
 <div class="flex min-h-screen bg-white">
-    <div
-        class="w-20 lg:w-64 bg-white border-r border-gray-200 flex-col h-screen fixed left-0 top-0 z-40 hidden md:flex">
-        <div class="p-4 lg:p-6">
-            <div class="flex items-center cursor-pointer" (click)="onHomePageClick()">
+    <div class="w-20 bg-white border-r border-gray-200 flex-col h-screen fixed left-0 top-0 z-40 hidden md:flex">
+        <div class="p-4">
+            <div class="flex items-center justify-center cursor-pointer" (click)="onHomePageClick()">
                 <div
                     class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white shadow group">
                     <img src="images/orisharin_logo.png" alt="OriSharin Logo"
                         class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-110" />
                 </div>
-                <span class="ml-3 text-2xl font-bold hidden lg:block">OriSharin</span>
             </div>
         </div>
 
         <div class="flex-1 flex flex-col justify-center">
-            <nav class="px-4 lg:px-6">
+            <nav class="px-4">
                 <ul class="space-y-2">
                     <li>
                         <button (click)="onHomePageClick()" [ngClass]="{'bg-gray-200 text-black': router.url === '/'}"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-solid fa-house text-2xl"></i>
                             </div>
-                            <span class="ml-3 font-medium hidden lg:block">Trang chủ</span>
                         </button>
                     </li>
                     <li>
                         <a routerLink="/search" routerLinkActive="bg-gray-200 text-black"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-solid fa-magnifying-glass text-2xl"></i>
                             </div>
-                            <span class="ml-3 font-medium hidden lg:block">Tìm kiếm</span>
                         </a>
                     </li>
                     <li>
                         <button (click)="openPostModal()"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 bg-gray-00 hover:bg-gray-200 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-regular fa-plus text-2xl"></i>
                             </div>
-                            <span class="ml-3 font-medium hidden lg:block">Tạo</span>
                         </button>
                     </li>
                     <li>
                         <a routerLink="/notifications" routerLinkActive="bg-gray-200 text-black"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-regular fa-heart text-2xl"></i>
                             </div>
-                            <span class="ml-3 font-medium hidden lg:block">Thông báo</span>
                         </a>
                     </li>
                     <li>
                         <button (click)="goToProfile()"
                             [ngClass]="{'bg-gray-200 text-black': router.url === '/@' + userInfo.username}"
-                            class="flex items-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full text-left cursor-pointer">
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-regular fa-user text-2xl"></i>
                             </div>
-                            <span class="ml-3 font-medium hidden lg:block">Trang cá nhân</span>
                         </button>
                     </li>
                 </ul>
             </nav>
         </div>
 
-        <div class="p-4 lg:p-6 border-t border-gray-200">
-            <div class="flex items-center cursor-pointer group relative" (click)="toggleUserMenu()">
-                <img [src]="userInfo?.avatar" [alt]="userInfo?.name" class="w-10 h-10 rounded-full">
-                <div class="ml-3 hidden lg:block">
-                    <p class="text-sm font-medium text-gray-900">{{ userInfo?.fullName }}</p>
-                    <p class="text-xs text-gray-500">{{ userInfo?.username }}</p>
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center justify-center cursor-pointer group relative" (click)="toggleUserMenu()">
+                <div class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+                    <i class="fa-solid fa-bars-staggered text-2xl text-gray-700"></i>
                 </div>
                 <div *ngIf="showUserMenu"
                     class="absolute left-0 bottom-14 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in px-2 border-gray-300"
@@ -123,7 +114,7 @@
         </div>
     </header>
 
-    <div class="flex-1 flex flex-col md:ml-20 lg:ml-64">
+    <div class="flex-1 flex flex-col md:ml-20">
         <main class="flex-1 overflow-y-auto pt-16 md:pt-0">
             <router-outlet></router-outlet>
         </main>
@@ -146,7 +137,8 @@
                 class="flex flex-col items-center justify-center text-gray-500">
                 <i class="fa-solid fa-magnifying-glass w-6 h-6 text-2xl"></i>
             </a>
-            <button class="flex flex-col items-center justify-center text-gray-500 cursor-pointer"
+            <button
+                class="flex flex-col items-center justify-center text-gray-500 cursor-pointer bg-gray-100 rounded-lg hover:bg-gray-200"
                 (click)="openPostModal()">
                 <i class="fa-regular fa-plus w-6 h-6 text-2xl"></i>
             </button>
