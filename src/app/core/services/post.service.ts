@@ -36,6 +36,10 @@ export class PostService {
         return this.http.get<Post>(`${this.apiUrl}`);
     }
 
+    getPostsPaginated(page: number = 1, limit: number = 10): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`);
+    }
+
     getPostById(id: string): Observable<any> {
         return this.http.get<any>(`${this.apiUrl}/${id}`);
     }

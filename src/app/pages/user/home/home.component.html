@@ -2,7 +2,7 @@
     <div class="max-w-2xl mx-auto py-8 px-2">
         <div class="bg-white rounded-2xl shadow p-4 mb-3 flex items-center justify-between gap-3">
             <div class="flex items-center flex-1">
-                <img [src]='userInfo.avatar' class="w-10 h-10 rounded-full object-cover cursor-pointer" alt="avatar"
+                <img [src]="userInfo.avatar" class="w-10 h-10 rounded-full object-cover cursor-pointer" alt="avatar"
                     (click)="navigateToProfile(router, userInfo.username)" />
                 <button class="flex-1 text-left text-gray-500 px-4 py-2 transition outline-none cursor-text"
                     (click)="openPostModal()">
@@ -13,13 +13,12 @@
                 (click)="openPostModal()">Đăng</button>
         </div>
 
-        <app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatar" (content)="newPostContent"
-            (close)="closePostModal()"></app-post-modal>
+        <app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatar" (close)="closePostModal()"></app-post-modal>
+
+        <div class="space-y-6">
+            <app-post *ngFor="let item of posts" [post]="item"></app-post>
+        </div>
 
         <app-loading *ngIf="isLoading"></app-loading>
-
-        <div *ngIf="!isLoading" class="space-y-6">
-            <app-post *ngFor="let post of posts" [post]="post"></app-post>
-        </div>
     </div>
 </div>
