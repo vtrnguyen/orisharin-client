@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { FollowingUserDto, UserProfileDto, UserProfileResponseDto } from '../../../shared/dtos/user-profile.dto';
 import { FollowService } from '../../../core/services/follow.service';
 import { UserListItemComponent } from '../../../shared/components/user-list-item/user-list-item.component';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-delete-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-profile',
@@ -27,6 +28,7 @@ import { UserListItemComponent } from '../../../shared/components/user-list-item
     MediaViewerComponent,
     LoadingComponent,
     UserListItemComponent,
+    ConfirmModalComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
@@ -320,6 +322,11 @@ export class ProfileComponent implements OnInit {
         this.isFollowLoading = false;
       }
     });
+  }
+
+  onUnfollowClick() {
+    this.showUnfollowConfirm = true;
+    this.selectedUserToUnfollow = null;
   }
 
   onUnfollow(user?: any): void {

@@ -22,4 +22,12 @@ export class NotificationService {
     markAllAsRead(): Observable<any> {
         return this.http.patch(`${this.apiUrl}/me/read-all`, {});
     }
+
+    deleteById(notiId: string): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/${notiId}`);
+    }
+
+    deleteAll(): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/me/all`);
+    }
 }

@@ -24,7 +24,7 @@
                         <li>
                             <button
                                 class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer text-red-500"
-                                (click)="deleteAll(); closeMenu()">
+                                (click)="showConfirmDeleteAll = true; closeMenu()">
                                 <span class="font-semibold">Xóa tất cả</span>
                                 <i class="fa-solid fa-trash text-red-500"></i>
                             </button>
@@ -44,3 +44,8 @@
         </div>
     </div>
 </div>
+
+<app-confirm-modal *ngIf="showConfirmDeleteAll" message="Bạn có chắc muốn xóa toàn bộ thông báo?" confirmText="Xóa"
+    cancelText="Hủy" confirmColor="text-red-600" (confirm)="deleteAll(); showConfirmDeleteAll = false"
+    (cancel)="showConfirmDeleteAll = false">
+</app-confirm-modal>

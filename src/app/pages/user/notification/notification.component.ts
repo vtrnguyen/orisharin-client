@@ -5,6 +5,8 @@ import { NotificationService } from '../../../core/services/notification.service
 import { ClickOutsideModule } from 'ng-click-outside';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { AlertService } from '../../../shared/state-managements/alert.service';
+import { UserService } from '../../../core/services/user.service';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-delete-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-notification',
@@ -14,18 +16,21 @@ import { AlertService } from '../../../shared/state-managements/alert.service';
     NotificationItemComponent,
     ClickOutsideModule,
     LoadingComponent,
+    ConfirmModalComponent
   ],
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
 })
 export class NotificationComponent implements OnInit {
   notifications: any[] = [];
-  showMenu = false;
-  isLoading = true;
+  showMenu: boolean = false;
+  isLoading: boolean = true;
+  showConfirmDeleteAll: boolean = false;
 
   constructor(
     private notificationService: NotificationService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private userService: UserService
   ) { }
 
   ngOnInit() {
@@ -80,7 +85,20 @@ export class NotificationComponent implements OnInit {
   }
 
   deleteAll() {
-    this.notifications = [];
+    if (this.notifications.length === 0) {
+      this.alertService.show('warning', 'Không có thông báo nào để xóa!');
+      return;
+    }
+
+    this.notificationService.deleteAll().subscribe({
+      next: () => {
+        this.notifications = [];
+        this.alertService.show('success', 'Đã xóa tất cả thông báo!', 2000);
+      },
+      error: (error: any) => {
+        this.alertService.show('error', 'Có lỗi xảy ra!', 4000);
+      }
+    });
   }
 
   private loadNotifications() {

@@ -81,7 +81,7 @@
     <div *ngIf="!isOwner" class="flex gap-2 mb-4">
         <button class="flex-1 py-2 font-semibold rounded-lg transition-all cursor-pointer"
             [ngClass]="isFollowing ? 'bg-white text-black border border-gray-300 hover:bg-gray-100' : 'bg-black text-white hover:bg-gray-900'"
-            [disabled]="isFollowLoading" (click)="isFollowing ? showUnfollowConfirm = true : onFollow()">
+            [disabled]="isFollowLoading" (click)="isFollowing ? onUnfollowClick() : onFollow()">
             <ng-container *ngIf="isFollowLoading">
                 <i class="fa-solid fa-spinner fa-spin mr-2"></i>
             </ng-container>
@@ -224,6 +224,7 @@
     </div>
 </ng-container>
 
+<!-- add website modal -->
 <ng-container *ngIf="showAddWebsiteModal">
     <div class="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative animate-modal-fade-in"
@@ -265,29 +266,7 @@
     </div>
 </ng-container>
 
-<ng-container *ngIf="showUnfollowConfirm">
-    <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[260px] p-3 flex flex-col items-center animate-modal-fade-in"
-            (clickOutside)="showUnfollowConfirm = false">
-            <img [src]="userInfo.avatarUrl || ''" class="w-16 h-16 rounded-full object-cover mb-4" alt="avatar" />
-            <div class="font-semibold mb-2 text-center">Bỏ theo dõi {{ userInfo.username }}?</div>
-            <div class="w-full h-px bg-gray-200 my-3"></div>
-            <div class="flex w-full">
-                <button type="button" class="flex-1 rounded-bl-2xl text-sm cursor-pointer transition"
-                    (click)="showUnfollowConfirm = false">
-                    Hủy
-                </button>
-                <div class="w-px bg-gray-200"></div>
-                <button type="button"
-                    class="flex-1 rounded-br-2xl text-red-600 font-semibold text-sm cursor-pointer transition"
-                    (click)="confirmUnfollow()">
-                    Bỏ theo dõi
-                </button>
-            </div>
-        </div>
-    </div>
-</ng-container>
-
+<!-- add follow list modal -->
 <ng-container *ngIf="showFollowModal">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-0 flex flex-col animate-modal-fade-in"
@@ -312,7 +291,7 @@
                         <ng-container
                             *ngFor="let user of (followTab === 'followers' ? followersList : followingList); let last = last">
                             <app-user-list-item [user]="user" [currentUserId]="currentUserId" (follow)="onFollow(user)"
-                                (unfollow)="selectedUserToUnfollow = user">
+                                (unfollow)="selectedUserToUnfollow = user; showUnfollowConfirm = true">
                             </app-user-list-item>
                             <hr *ngIf="!last" class="my-4 border-gray-300" />
                         </ng-container>
@@ -326,29 +305,16 @@
     </div>
 </ng-container>
 
-<ng-container *ngIf="selectedUserToUnfollow">
-    <div class="fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center">
-        <div
-            class="bg-white rounded-2xl shadow-xl w-full max-w-[260px] p-3 flex flex-col items-center animate-modal-fade-in">
-            <img [src]="selectedUserToUnfollow.avatarUrl || ''" class="w-16 h-16 rounded-full object-cover mb-4" />
-            <div class="font-semibold mb-2 text-center">Bỏ theo dõi {{ selectedUserToUnfollow.username }}?</div>
-            <div class="w-full h-px bg-gray-200 my-3"></div>
-            <div class="flex w-full">
-                <button type="button" class="flex-1 rounded-bl-2xl text-sm cursor-pointer transition"
-                    (click)="selectedUserToUnfollow = null">
-                    Hủy
-                </button>
-                <div class="w-px bg-gray-200"></div>
-                <button type="button"
-                    class="flex-1 rounded-br-2xl text-red-600 font-semibold text-sm cursor-pointer transition"
-                    (click)="confirmUnfollow(selectedUserToUnfollow)">
-                    Bỏ theo dõi
-                </button>
-            </div>
-        </div>
-    </div>
-</ng-container>
+<!-- confirm unfollow modal -->
+<app-confirm-modal *ngIf="showUnfollowConfirm"
+    [message]="'Bỏ theo dõi ' + (selectedUserToUnfollow ? selectedUserToUnfollow.username : userInfo.username) + '?'"
+    confirmText="Bỏ theo dõi" cancelText="Hủy" confirmColor="text-red-600"
+    [imageUrl]="selectedUserToUnfollow ? selectedUserToUnfollow.avatarUrl : userInfo.avatarUrl"
+    (confirm)="confirmUnfollow(selectedUserToUnfollow); showUnfollowConfirm = false; selectedUserToUnfollow = null"
+    (cancel)="showUnfollowConfirm = false; selectedUserToUnfollow = null">
+</app-confirm-modal>
 
+<!-- introduce modal -->
 <ng-container *ngIf="showIntroduceModal">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[350px] p-6 animate-modal-fade-in relative"
