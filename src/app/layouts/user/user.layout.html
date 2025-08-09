@@ -15,6 +15,7 @@
                 <ul class="space-y-2">
                     <li>
                         <button (click)="onHomePageClick()" [ngClass]="{'bg-gray-200 text-black': router.url === '/'}"
+                            title="Trang chủ"
                             class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-solid fa-house text-2xl"></i>
@@ -22,7 +23,7 @@
                         </button>
                     </li>
                     <li>
-                        <a routerLink="/search" routerLinkActive="bg-gray-200 text-black"
+                        <a routerLink="/search" routerLinkActive="bg-gray-200 text-black" title="Tìm kiếm"
                             class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-solid fa-magnifying-glass text-2xl"></i>
@@ -30,7 +31,7 @@
                         </a>
                     </li>
                     <li>
-                        <button (click)="openPostModal()"
+                        <button (click)="openPostModal()" title="Tạo bài đăng"
                             class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 bg-gray-00 hover:bg-gray-200 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-regular fa-plus text-2xl"></i>
@@ -38,7 +39,7 @@
                         </button>
                     </li>
                     <li>
-                        <a routerLink="/notifications" routerLinkActive="bg-gray-200 text-black"
+                        <a routerLink="/notifications" routerLinkActive="bg-gray-200 text-black" title="Thông báo"
                             class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
                                 <i class="fa-regular fa-heart text-2xl"></i>
@@ -46,7 +47,7 @@
                         </a>
                     </li>
                     <li>
-                        <button (click)="goToProfile()"
+                        <button (click)="goToProfile()" title="Trang cá nhân"
                             [ngClass]="{'bg-gray-200 text-black': router.url === '/@' + userInfo.username}"
                             class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
@@ -129,24 +130,24 @@
 
         <nav
             class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center h-16 md:hidden">
-            <button (click)="onHomePageClick()" [ngClass]="{'text-blue-600': router.url === '/'}"
+            <button (click)="onHomePageClick()" [ngClass]="{'text-blue-600': router.url === '/'}" title="Trang chủ"
                 class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
                 <i class="fa-solid fa-house w-6 h-6 text-2xl"></i>
             </button>
-            <a routerLink="/search" routerLinkActive="text-blue-600"
+            <a routerLink="/search" routerLinkActive="text-blue-600" title="Tìm kiếm"
                 class="flex flex-col items-center justify-center text-gray-500">
                 <i class="fa-solid fa-magnifying-glass w-6 h-6 text-2xl"></i>
             </a>
             <button
                 class="flex flex-col items-center justify-center text-gray-500 cursor-pointer bg-gray-100 rounded-lg hover:bg-gray-200"
-                (click)="openPostModal()">
+                (click)="openPostModal()" title="Tạo bài đăng">
                 <i class="fa-regular fa-plus w-6 h-6 text-2xl"></i>
             </button>
-            <a routerLink="/notifications" routerLinkActive="text-blue-600"
+            <a routerLink="/notifications" routerLinkActive="text-blue-600" title="Thông báo"
                 class="flex flex-col items-center justify-center text-gray-500">
                 <i class="fa-regular fa-heart w-6 h-6 text-2xl"></i>
             </a>
-            <button (click)="goToProfile()"
+            <button (click)="goToProfile()" title="Trang cá nhân"
                 class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
                 <i class="fa-regular fa-user w-6 h-6 text-2xl"></i>
             </button>
