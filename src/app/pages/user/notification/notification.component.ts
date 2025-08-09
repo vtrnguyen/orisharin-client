@@ -41,6 +41,13 @@ export class NotificationComponent implements OnInit {
   }
 
   markAllAsRead() {
+    let isAllRead = this.notifications.every(n => n.isRead);
+
+    if (isAllRead) {
+      this.alertService.show('success', 'Bạn không có thông báo mới nào!');
+      return;
+    }
+
     this.notificationService.markAllAsRead().subscribe({
       next: () => {
         this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
