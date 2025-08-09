@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<app-confirm-modal *ngIf="showConfirmDeleteAll" message="Bạn có chắc muốn xóa toàn bộ thông báo?" confirmText="Xóa"
-    cancelText="Hủy" confirmColor="text-red-600" (confirm)="deleteAll(); showConfirmDeleteAll = false"
+<app-confirm-modal *ngIf="showConfirmDeleteAll" title="Xác nhận" message="Bạn có chắc muốn xóa toàn bộ thông báo?"
+    confirmText="Xóa" cancelText="Hủy" confirmColor="text-red-600" (confirm)="deleteAll(); showConfirmDeleteAll = false"
     (cancel)="showConfirmDeleteAll = false">
 </app-confirm-modal>
