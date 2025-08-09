@@ -1,30 +1,46 @@
 <app-loading *ngIf="isLoading"></app-loading>
 
 <div *ngIf="!isLoading" class="max-w-2xl mx-auto py-8 px-2">
-    <div class="max-w-xl mx-auto py-6 px-2 relative pt-12">
-        <div *ngIf="notifications.length > 0" class="absolute top-2 right-2 z-10" (clickOutside)="closeMenu()">
-            <button (click)="openMenu()" class="p-2 cursor-pointer">
-                <i class="fa-solid fa-ellipsis text-xl"></i>
-            </button>
-            <div *ngIf="showMenu"
-                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-20">
-                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 cursor-pointer"
-                    (click)="markAllAsRead(); closeMenu();">
-                    <i class="fa-regular fa-circle-check mr-2 text-green-500"></i> Đánh dấu tất cả là đã đọc
+    <div class="bg-white rounded-2xl shadow p-4">
+        <div class="mb-3 flex items-center gap-2 justify-end">
+            <div *ngIf="notifications.length > 0" class="relative">
+                <button
+                    class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition cursor-pointer"
+                    (click)="openMenu()">
+                    <i class="fa-solid fa-ellipsis-vertical text-xl text-gray-600"></i>
                 </button>
-                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-500 cursor-pointer"
-                    (click)="deleteAll(); closeMenu();">
-                    <i class="fa-regular fa-trash-can mr-2"></i> Xóa tất cả
-                </button>
+                <div *ngIf="showMenu"
+                    class="absolute right-0 top-12 w-60 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in px-2 border-gray-300"
+                    (click)="$event.stopPropagation()" (clickOutside)="closeMenu()">
+                    <ul class="py-2">
+                        <li>
+                            <button
+                                class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer"
+                                (click)="markAllAsRead(); closeMenu()">
+                                <span class="font-semibold">Đánh dấu là đã đọc</span>
+                                <i class="fa-solid fa-circle-check text-gray-500"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer text-red-500"
+                                (click)="deleteAll(); closeMenu()">
+                                <span class="font-semibold">Xóa tất cả</span>
+                                <i class="fa-solid fa-trash text-red-500"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-
-        <div *ngIf="notifications.length === 0" class="text-gray-400 text-center py-10">
-            Không có thông báo nào.
+        <div>
+            <ng-container *ngFor="let notification of notifications; let last = last">
+                <app-notification-item [noti]="notification"></app-notification-item>
+                <hr *ngIf="!last" class="my-4 border-gray-200" />
+            </ng-container>
+            <div *ngIf="notifications.length === 0" class="text-center text-gray-400 py-8">
+                Không có thông báo nào.
+            </div>
         </div>
-        <ng-container *ngFor="let noti of notifications; let last = last">
-            <app-notification-item [noti]="noti" [last]="last"
-                (markAsRead)="handleMarkAsRead($event)"></app-notification-item>
-        </ng-container>
     </div>
 </div>
