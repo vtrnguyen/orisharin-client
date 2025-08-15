@@ -154,11 +154,11 @@ export class PostComponent implements OnInit, OnChanges {
     }
 
     get likes() {
-        return this.post.post?.likesCount || 0;
+        return this.post?.likesCount || this.post?.post?.likesCount || 0;
     }
 
     get comments() {
-        return this.post.post?.commentsCount || 0;
+        return this.post?.commentsCount || this.post?.post?.commentsCount || 0;
     }
 
     get reposts() {
