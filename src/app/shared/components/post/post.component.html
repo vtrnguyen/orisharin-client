@@ -1,4 +1,4 @@
-<div class="bg-white rounded-2xl shadow p-4 flex gap-4 mb-3 cursor-pointer" (click)="navigateToPostDetail($event)">
+<div class="bg-white rounded-2xl p-4 flex gap-4 mb-3 cursor-pointer" (click)="navigateToPostDetail($event)">
     <img (click)="navigateToProfile(router, author.username)"
         [src]="author.avatarUrl || 'https://ui-avatars.com/api/?name=' + (author.fullName || author.username)"
         class="no-post-detail w-8 h-8 rounded-full object-cover cursor-pointer" alt="avatar" />

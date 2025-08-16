@@ -94,7 +94,7 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow px-4 py-2 mb-6">
-        <div *ngIf="isOwner" class="flex items-center justify-between gap-3 p-4 rounded-t-2xl border-b border-gray-300">
+        <div *ngIf="isOwner" class="flex items-center justify-between gap-3 p-4 rounded-t-2xl mb-4">
             <div class="flex items-center flex-1">
                 <img [src]="userInfo.avatarUrl || ''" class="w-10 h-10 rounded-full object-cover" alt="avatar" />
                 <button class="flex-1 text-left text-gray-500 px-4 py-2 transition outline-none cursor-text"
@@ -110,7 +110,10 @@
             <app-loading *ngIf="isLoading"></app-loading>
 
             <ng-container *ngIf="(posts?.length && !isLoading); else noPostsTemplate">
-                <div *ngFor="let post of posts" class="mb-4 last:mb-0">
+                <div *ngFor="let post of posts; let first = first; let last = last" class="pb-2" [ngClass]="{
+        'border-t border-gray-300': first,
+        'border-b border-gray-300': !last
+     }">
                     <app-post [post]="post"></app-post>
                 </div>
             </ng-container>
