@@ -5,6 +5,7 @@ import { PostComponent } from '../../../shared/components/post/post.component';
 import { CreateCommentComponent } from '../../../shared/components/create-comment/create-comment.component';
 import { CommentItemComponent } from '../../../shared/components/comment-item/comment-item.component';
 import { PostService } from '../../../core/services/post.service';
+import { CommentEventService } from '../../../shared/state-managements/comment-event.service';
 
 @Component({
     selector: 'app-post-detail',
@@ -23,30 +24,55 @@ export class PostDetailComponent implements OnInit {
     comments: any[] = [];
     showCommentModal = false;
     selectedParent: any = null;
+    isReplyMode = false;
 
     constructor(
         private route: ActivatedRoute,
         private postService: PostService,
+        private commentEventService: CommentEventService
     ) { }
 
     ngOnInit() {
         this.loadPostDetail();
-    }
-
-    loadComments(postId: string) {
-
+        this.commentEventService.commentCreated$.subscribe(newComment => {
+            if (newComment.postId === (this.post?.id || this.post?._id)) {
+                if (newComment.parentCommentId) {
+                    const parent = this.comments.find(cmt => cmt._id === newComment.parentCommentId || cmt.id === newComment.parentCommentId);
+                    if (parent) {
+                        parent.replies = parent.replies || [];
+                        parent.replies.push(newComment);
+                    }
+                } else {
+                    newComment.replies = [];
+                    this.comments.push(newComment);
+                }
+                if (this.post?.commentsCount !== undefined) this.post.commentsCount++;
+            }
+        });
     }
 
     openReplyModal(parent: any) {
         this.selectedParent = parent;
+        this.isReplyMode = true;
         this.showCommentModal = true;
     }
 
-    onCommentCreated() {
+    onCommentCreated(newComment: any) {
         if (this.post?.commentsCount !== undefined) this.post.commentsCount++;
-        this.loadComments(this.post.id || this.post._id);
+
+        if (newComment.parentCommentId) {
+            const parent = this.comments.find(cmt => cmt._id === newComment.parentCommentId || cmt.id === newComment.parentCommentId);
+            if (parent) {
+                parent.replies = parent.replies || [];
+                parent.replies.push(newComment);
+            }
+        } else {
+            this.comments.unshift(newComment);
+        }
+
         this.showCommentModal = false;
         this.selectedParent = null;
+        this.isReplyMode = false;
     }
 
     private loadPostDetail() {
@@ -57,6 +83,8 @@ export class PostDetailComponent implements OnInit {
                     this.post = res.data.post;
                     this.comments = res.data.comments || [];
                 }
+
+                console.log(this.post)
             });
         }
     }

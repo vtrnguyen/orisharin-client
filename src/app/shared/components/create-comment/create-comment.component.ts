@@ -11,6 +11,7 @@ import { isImage, isVideo } from '../../functions/media-type.util';
 import { formatTime } from '../../functions/format-time.util';
 import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { Router } from '@angular/router';
+import { CommentEventService } from '../../state-managements/comment-event.service';
 
 @Component({
   selector: 'app-create-comment',
@@ -21,8 +22,8 @@ import { Router } from '@angular/router';
 })
 export class CreateCommentComponent implements OnInit, OnDestroy {
   @Input() parent: any;
+  @Input() isReplyMode: boolean = false;
   @Output() close = new EventEmitter<void>();
-  @Output() commentCreated = new EventEmitter<any>();
 
   content = '';
   images: string[] = [];
@@ -41,7 +42,8 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
     private commentService: CommentService,
     private authService: AuthService,
     private alertService: AlertService,
-    public router: Router
+    public router: Router,
+    private commentEventService: CommentEventService
   ) {
     this.userInfo = this.userService.getCurrentUserInfo();
   }
@@ -83,9 +85,9 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
     let postId = '';
     let parentCommentId: string | undefined = undefined;
 
-    if (this.parent && (this.parent.postId || this.parent.post)) {
+    if (this.isReplyMode) {
       // reply comment
-      postId = this.parent.postId || this.parent.post?._id || this.parent.post?.id;
+      postId = this.parent.postId;
       parentCommentId = this.parent._id || this.parent.id;
     } else {
       // comment on post
@@ -104,12 +106,12 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response: any) => {
         this.isLoading = false;
-        this.commentCreated.emit(response.data);
+        this.commentEventService.emitCommentCreated(response.data);
         this.close.emit();
-        this.content = "";
-        this.images = [];
-        this.files = [];
-        this.alertService.show("success", "Đã gửi bình luận!");
+        this.resetForm();
+
+        const message = this.isReplyMode ? 'Đã gửi trả lời bình luận!' : 'Đã gửi bình luận!';
+        this.alertService.show("success", message);
       },
       error: (error: any) => {
         this.isLoading = false;
@@ -143,5 +145,11 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
   }
   get parentAuthor() {
     return this.parent?.author || this.parent?.authorId || this.parent?.post?.author || this.parent?.post?.authorId || {};
+  }
+
+  private resetForm() {
+    this.content = "";
+    this.images = [];
+    this.files = [];
   }
 }

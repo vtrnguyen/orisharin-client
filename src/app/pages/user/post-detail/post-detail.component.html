@@ -21,8 +21,8 @@
     </div>
 
     <div *ngIf="comments.length === 0" class="text-gray-400 text-center py-8">Chưa có bình luận nào.</div>
-
-    <app-create-comment *ngIf="showCommentModal" [parent]="selectedParent" (close)="showCommentModal = false"
-        (commentCreated)="onCommentCreated()">
-    </app-create-comment>
 </div>
+
+<app-create-comment *ngIf="showCommentModal" [parent]="selectedParent" [isReplyMode]="isReplyMode"
+    (close)="showCommentModal = false">
+</app-create-comment>

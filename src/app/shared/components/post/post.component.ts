@@ -60,7 +60,6 @@ export class PostComponent implements OnInit, OnChanges {
     ) { }
 
     ngOnInit() {
-        console.log(">>> check post", this.post);
         this.currentUserName = this.userService.getCurrentUserInfo().username;
         this.postUserName = this.post.author.username;
         this.loadLikeInfo();
