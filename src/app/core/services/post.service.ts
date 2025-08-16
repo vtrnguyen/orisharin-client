@@ -44,7 +44,7 @@ export class PostService {
         return this.http.get<any>(`${this.apiUrl}/${id}`);
     }
 
-    getPostByUsername(username: string): Observable<Post[]> {
-        return this.http.get<Post[]>(`${this.apiUrl}/user/${username}`);
+    getPostByUsername(username: string, page: number = 1, limit: number = 10): Observable<Post[]> {
+        return this.http.get<Post[]>(`${this.apiUrl}/user/${username}?page=${page}&limit=${limit}`);
     }
 }

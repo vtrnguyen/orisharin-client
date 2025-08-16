@@ -33,15 +33,13 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-delete
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   userInfo: UserProfileDto = {} as UserProfileDto;
   followings: FollowingUserDto[] = [];
   isOwner: boolean = false;
-  posts: any[] = [];
   showPostModal: boolean = false;
   showAvatarViewer = false;
   currentUsername: string = '';
-  isLoading = true;
   showProfileMenu = false;
   showEditProfileModal = false;
   showAddWebsiteModal = false;
@@ -56,6 +54,13 @@ export class ProfileComponent implements OnInit {
   currentUserId: string = "";
   showUnfollowConfirm = false;
   editBio: string = '';
+
+  // load posts properties
+  posts: any[] = [];
+  isLoading: boolean = false;
+  page: number = 1;
+  limit: number = 10;
+  hasMore: boolean = true;
 
   // folows modal properties
   showFollowModal = false;
@@ -91,7 +96,17 @@ export class ProfileComponent implements OnInit {
     this.isOwner = urlFullname === currentUser.username;
 
     this.loadUserProfile(this.currentUsername);
-    this.loadPosts();
+
+    this.page = 1;
+    this.posts = [];
+    this.hasMore = true;
+    this.loadPosts(true);
+
+    window.addEventListener('scroll', this.onScroll, true);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('scroll', this.onScroll, true);
   }
 
   openPostModal(): void {
@@ -386,11 +401,16 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  private loadPosts(): void {
+  private loadPosts(initial: boolean = false): void {
+    if (this.isLoading || (!this.hasMore && !initial)) return;
     this.isLoading = true;
-    this.postService.getPostByUsername(this.currentUsername).subscribe({
-      next: (posts) => {
-        this.posts = posts;
+    this.postService.getPostByUsername(this.currentUsername, this.page, this.limit).subscribe({
+      next: (res: any) => {
+        if (res && res.success && res.data) {
+          this.posts = [...this.posts, ...res.data.data];
+          this.hasMore = res.data.hasMore;
+          this.page++;
+        }
         this.isLoading = false;
       },
       error: (error) => {
@@ -399,6 +419,14 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
+
+  onScroll = () => {
+    const scrollPosition = window.innerHeight + window.scrollY;
+    const threshold = document.body.offsetHeight - 600;
+    if (scrollPosition >= threshold) {
+      this.loadPosts();
+    }
+  };
 
   private checkIsFollowing(): void {
     this.followService.checkFollow(this.currentUserId, this.userInfo.id).subscribe({
