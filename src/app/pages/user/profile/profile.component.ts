@@ -404,6 +404,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private loadPosts(initial: boolean = false): void {
     if (this.isLoading || (!this.hasMore && !initial)) return;
     this.isLoading = true;
+
     this.postService.getPostByUsername(this.currentUsername, this.page, this.limit).subscribe({
       next: (res: any) => {
         if (res && res.success && res.data) {
