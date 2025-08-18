@@ -262,3 +262,19 @@ button {
 .break-all {
     word-break: break-all;
 }
+
+.profile-avatar {
+    width: 7rem;
+    height: 7rem;
+    object-fit: cover;
+    flex: 0 0 auto;
+    min-width: 7rem;
+    min-height: 7rem;
+}
+
+.profile-bio {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    max-width: 100%;
+}
