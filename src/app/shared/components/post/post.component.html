@@ -96,3 +96,7 @@
 <app-create-comment *ngIf="showCommentModal" [parent]="post" (close)="showCommentModal = false"
     (commentCreated)="onCommentCreated()">
 </app-create-comment>
+
+<app-confirm-modal *ngIf="showDeleteConfirm" [message]="'Bạn có chắc muốn xóa bài viết này?'" confirmText="Xóa"
+    cancelText="Hủy" confirmColor="text-red-600" (confirm)="confirmDelete()" (cancel)="showDeleteConfirm = false">
+</app-confirm-modal>

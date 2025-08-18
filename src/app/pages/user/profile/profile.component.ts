@@ -497,4 +497,12 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
       });
     }
   }
+
+  // remove post from local list when child emits deleted
+  onPostDeleted(postId: string) {
+    this.posts = this.posts.filter(p => {
+      const pid = p.id || p._id || (p.post && (p.post._id || p.post.id));
+      return pid !== postId;
+    });
+  }
 }

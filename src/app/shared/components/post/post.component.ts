@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
@@ -12,6 +12,8 @@ import { isOwner } from '../../functions/is-owner';
 import { UserService } from '../../../core/services/user.service';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { AlertService } from '../../state-managements/alert.service';
+import { PostService } from '../../../core/services/post.service';
+import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.component';
 
 @Component({
     selector: 'app-post',
@@ -21,12 +23,14 @@ import { AlertService } from '../../state-managements/alert.service';
         MediaViewerComponent,
         CreateCommentComponent,
         ClickOutsideModule,
+        ConfirmModalComponent,
     ],
     templateUrl: './post.component.html',
     styleUrls: ['./post.component.scss']
 })
 export class PostComponent implements OnInit, OnChanges {
     @Input() post: any;
+    @Output() deleted = new EventEmitter<string>(); // optional: optional
 
     showViewer = false;
     viewerIndex = 0;
@@ -52,11 +56,17 @@ export class PostComponent implements OnInit, OnChanges {
 
     showPostMenu: boolean = false;
 
+    // delete post properties
+    showDeleteConfirm = false;
+    isDeleteLoading = false;
+    isDeleted = false;
+
     constructor(
         private likeService: LikeService,
         private userService: UserService,
         public router: Router,
-        private alertService: AlertService
+        private alertService: AlertService,
+        private postService: PostService,
     ) { }
 
     ngOnInit() {
@@ -117,7 +127,27 @@ export class PostComponent implements OnInit, OnChanges {
     }
 
     onDeletePost() {
-        this.closePostMenu();
+        this.showDeleteConfirm = true;
+    }
+
+    confirmDelete(): void {
+        if (!this.post?.id && !this.post?.post.id) return;
+        this.isDeleteLoading = true;
+        this.postService.deletePost(this.post?.post.id ?? this.post?.id).subscribe({
+            next: (res: any) => {
+                this.isDeleteLoading = false;
+                this.showDeleteConfirm = false;
+                this.isDeleted = true; // hide component immediately
+                this.deleted.emit(this.post?.post.id ?? this.post?.id); // optional: notify parent to remove from array
+                this.alertService.show('success', 'Xóa bài viết thành công', 3000);
+            },
+            error: (err) => {
+                this.isDeleteLoading = false;
+                this.showDeleteConfirm = false;
+                console.error('Delete post error', err);
+                this.alertService.show('error', 'Xóa bài viết thất bại', 4000);
+            }
+        });
     }
 
     onCopyPostUrl() {

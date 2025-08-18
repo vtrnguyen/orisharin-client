@@ -32,6 +32,10 @@ export class PostService {
         return this.http.post<any>(`${this.apiUrl}`, formData);
     }
 
+    deletePost(postId: string): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/${postId}`);
+    }
+
     getAllPosts(): Observable<any> {
         return this.http.get<Post>(`${this.apiUrl}`);
     }
