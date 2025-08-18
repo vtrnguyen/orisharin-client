@@ -1,5 +1,7 @@
 <div class="max-w-2xl mx-auto py-8 px-4">
-    <app-post *ngIf="post" [post]="post"></app-post>
+    <div class="border-b border-gray-300 pb-2 mb-6">
+        <app-post *ngIf="post" [post]="post"></app-post>
+    </div>
 
     <div *ngIf="comments.length > 0">
         <div *ngFor="let cmt of comments; let last = last" class="mb-4">
@@ -20,7 +22,7 @@
         </div>
     </div>
 
-    <div *ngIf="comments.length === 0" class="text-gray-400 text-center py-8">Chưa có bình luận nào.</div>
+    <div *ngIf="comments.length === 0" class="text-gray-400 text-center py-4">Chưa có bình luận nào.</div>
 </div>
 
 <app-create-comment *ngIf="showCommentModal" [parent]="selectedParent" [isReplyMode]="isReplyMode"

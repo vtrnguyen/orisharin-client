@@ -145,7 +145,7 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     }, {
       root: null,
       rootMargin: '0px',
-      threshold: 1.0 // change to 1.0 if you want fully visible
+      threshold: 1.0
     });
 
     this.intersectionObserver.observe(lastEl);
