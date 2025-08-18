@@ -83,25 +83,31 @@ export class PostDetailComponent implements OnInit {
     }
 
     private loadPostDetail() {
-        const postId = this.route.snapshot.paramMap.get('id');
-        if (postId) {
-            this.postService.getPostById(postId).subscribe({
-                next: (response: any) => {
-                    if (response.success && response?.data) {
-                        this.post = response.data.post;
-                        this.comments = response.data.comments || [];
-                        this.postAuthor = response.data.author;
-                    } else {
-                        this.alertService.show('error', 'Bài viết không tồn tại');
-                        this.router.navigate(['/not-found']);
-                    }
-                },
-                error: (err) => {
-                    this.alertService.show('error', 'Lỗi khi tải bài viết');
-                    this.router.navigate(['/']);
-                }
-            });
+        const postId = this.route.snapshot.paramMap.get('id') ?? '';
+        let username = this.route.snapshot.paramMap.get('username') ?? '';
+
+        if (!postId) return;
+
+        if (username.startsWith("@")) {
+            username = username.substring(1);
         }
+
+        this.postService.getPostDetail(username, postId).subscribe({
+            next: (response: any) => {
+                if (response.success && response?.data) {
+                    this.post = response.data.post;
+                    this.comments = response.data.comments || [];
+                    this.postAuthor = response.data.author;
+                } else {
+                    this.alertService.show('error', 'Bài viết không tồn tại');
+                    this.router.navigate(['/not-found']);
+                }
+            },
+            error: (err) => {
+                this.alertService.show('error', 'Lỗi khi tải bài viết');
+                this.router.navigate(['/']);
+            }
+        });
     }
 
     onPostDeleted(postId: string) {
