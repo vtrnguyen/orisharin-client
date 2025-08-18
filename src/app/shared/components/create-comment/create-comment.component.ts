@@ -49,6 +49,7 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    console.log(this.parent);
     document.body.style.overflow = 'hidden';
   }
 
@@ -91,7 +92,7 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
       parentCommentId = this.parent._id || this.parent.id;
     } else {
       // comment on post
-      postId = this.parent?._id || this.parent?.id;
+      postId = this.parent?._id || this.parent?.id || this.parent?.post?._id || this.parent?.post?.id;
       parentCommentId = undefined;
     }
 
