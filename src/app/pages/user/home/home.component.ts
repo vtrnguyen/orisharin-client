@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostComponent } from '../../../shared/components/post/post.component';
 import { FormsModule } from '@angular/forms';
@@ -24,7 +24,7 @@ import { navigateToProfile } from '../../../shared/functions/navigate-to-profile
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   userInfo: any;
   posts: any[] = [];
   showPostModal = false;
@@ -36,6 +36,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   hasMore = true;
 
   navigateToProfile = navigateToProfile;
+
+  // IntersectionObserver setup
+  @ViewChildren('postItem', { read: ElementRef }) postItems!: QueryList<ElementRef>;
+  private intersectionObserver: IntersectionObserver | null = null;
 
   constructor(
     private authService: AuthService,
@@ -52,20 +56,50 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.postEventService.postCreated$.subscribe(() => {
       this.resetAndReload();
     });
-    window.addEventListener('scroll', this.onScroll, true);
+    // removed window scroll listener in favor of IntersectionObserver
+  }
+
+  ngAfterViewInit() {
+    // Re-observe when list changes
+    this.postItems.changes.subscribe(() => {
+      this.observeLastPost();
+    });
+    this.observeLastPost();
   }
 
   ngOnDestroy() {
-    window.removeEventListener('scroll', this.onScroll, true);
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
   }
 
-  onScroll = () => {
-    const scrollPosition = window.innerHeight + window.scrollY;
-    const threshold = document.body.offsetHeight - 600;
-    if (scrollPosition >= threshold) {
-      this.loadPosts();
+  private observeLastPost(): void {
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
     }
-  };
+
+    const items = this.postItems?.toArray() || [];
+    if (!items.length) return;
+
+    const lastEl = items[items.length - 1].nativeElement;
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!this.isLoading && this.hasMore) {
+            this.loadPosts();
+          }
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 1
+    });
+
+    this.intersectionObserver.observe(lastEl);
+  }
 
   loadPosts(initial = false) {
     if (this.isLoading || (!this.hasMore && !initial)) return;

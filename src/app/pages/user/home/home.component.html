@@ -15,10 +15,13 @@
 
         <app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatar" (close)="closePostModal()"></app-post-modal>
 
-        <div *ngFor="let post of posts; let last = last" class="pb-2" [ngClass]="{'border-b border-gray-300': !last}">
+        <div *ngFor="let post of posts; let last = last; let i = index" #postItem class="pb-2"
+            [ngClass]="{'border-b border-gray-300': !last}">
             <app-post [post]="post"></app-post>
         </div>
 
-        <app-loading *ngIf="isLoading"></app-loading>
+        <div class="py-2 flex justify-center" *ngIf="isLoading">
+            <app-loading></app-loading>
+        </div>
     </div>
 </div>

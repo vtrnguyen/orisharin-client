@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnChanges, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostModalComponent } from '../../../shared/components/post-modal/post-modal.component';
 import { PostComponent } from '../../../shared/components/post/post.component';
@@ -33,7 +33,7 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-delete
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
 })
-export class ProfileComponent implements OnInit, OnDestroy {
+export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
   userInfo: UserProfileDto = {} as UserProfileDto;
   followings: FollowingUserDto[] = [];
   isOwner: boolean = false;
@@ -75,6 +75,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   introduceInfo: any = null;
   isLoadingIntroduce = false;
 
+  @ViewChildren('postItem', { read: ElementRef }) postItems!: QueryList<ElementRef>;
+  private intersectionObserver: IntersectionObserver | null = null;
+
   constructor(
     private authService: AuthService,
     private postService: PostService,
@@ -101,12 +104,51 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.posts = [];
     this.hasMore = true;
     this.loadPosts(true);
-
-    window.addEventListener('scroll', this.onScroll, true);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('scroll', this.onScroll, true);
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    // Re-observe when the list changes (new posts appended)
+    this.postItems.changes.subscribe(() => {
+      this.observeLastPost();
+    });
+    // Initial observe
+    this.observeLastPost();
+  }
+
+  private observeLastPost(): void {
+    // disconnect previous observer
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
+
+    const items = this.postItems?.toArray() || [];
+    if (!items.length) return;
+
+    const lastEl = items[items.length - 1].nativeElement;
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // only load if not already loading and hasMore
+          if (!this.isLoading && this.hasMore) {
+            this.loadPosts();
+          }
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '0px',
+      threshold: 1.0 // change to 1.0 if you want fully visible
+    });
+
+    this.intersectionObserver.observe(lastEl);
   }
 
   openPostModal(): void {
