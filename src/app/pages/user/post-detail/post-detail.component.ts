@@ -7,6 +7,7 @@ import { CommentItemComponent } from '../../../shared/components/comment-item/co
 import { PostService } from '../../../core/services/post.service';
 import { CommentEventService } from '../../../shared/state-managements/comment-event.service';
 import { navigateToProfile } from '../../../shared/functions/navigate-to-profile';
+import { AlertService } from '../../../shared/state-managements/alert.service';
 
 @Component({
     selector: 'app-post-detail',
@@ -34,7 +35,8 @@ export class PostDetailComponent implements OnInit {
         private route: ActivatedRoute,
         private postService: PostService,
         private commentEventService: CommentEventService,
-        private router: Router
+        private router: Router,
+        private alertService: AlertService
     ) { }
 
     ngOnInit() {
@@ -83,11 +85,20 @@ export class PostDetailComponent implements OnInit {
     private loadPostDetail() {
         const postId = this.route.snapshot.paramMap.get('id');
         if (postId) {
-            this.postService.getPostById(postId).subscribe(res => {
-                if (res?.data) {
-                    this.post = res.data.post;
-                    this.comments = res.data.comments || [];
-                    this.postAuthor = res.data.author;
+            this.postService.getPostById(postId).subscribe({
+                next: (response: any) => {
+                    if (response.success && response?.data) {
+                        this.post = response.data.post;
+                        this.comments = response.data.comments || [];
+                        this.postAuthor = response.data.author;
+                    } else {
+                        this.alertService.show('error', 'Bài viết không tồn tại');
+                        this.router.navigate(['/not-found']);
+                    }
+                },
+                error: (err) => {
+                    this.alertService.show('error', 'Lỗi khi tải bài viết');
+                    this.router.navigate(['/']);
                 }
             });
         }
