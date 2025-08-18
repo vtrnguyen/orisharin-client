@@ -8,7 +8,7 @@
         <div class="text-gray-500 text-sm">
             {{ user.fullName }}
         </div>
-        <div *ngIf="user.description" class="text-gray-400 text-sm">{{ user.description }}</div>
+        <div *ngIf="user.bio" class="text-gray-400 text-sm mt-2">{{ user.bio }}</div>
     </div>
     <ng-container *ngIf="showFollowButton && user.id !== currentUserId">
         <button *ngIf="!user.isFollowed"
