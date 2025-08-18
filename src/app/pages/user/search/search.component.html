@@ -12,15 +12,36 @@
         </div>
 
         <div>
-            <ng-container *ngFor="let user of filteredSuggestions; let last = last">
-                <app-user-list-item [user]="user" [showFollowButton]="true" (follow)="toggleFollow(user)"
-                    (unfollow)="toggleFollow(user)">
-                </app-user-list-item>
-                <hr *ngIf="!last" class="my-4 border-gray-200" />
+            <ng-container *ngIf="suggestions.length; else emptyTemplate">
+                <ng-container *ngFor="let user of suggestions; let last = last; let i = index">
+                    <div #userItem>
+                        <app-user-list-item [user]="user" [showFollowButton]="true" (follow)="toggleFollow(user)"
+                            (unfollow)="toggleFollow(user)">
+                        </app-user-list-item>
+                    </div>
+                    <hr *ngIf="!last" class="my-4 border-gray-200" />
+                </ng-container>
+
+                <div class="py-2 flex justify-center" *ngIf="isLoading">
+                    <app-loading></app-loading>
+                </div>
             </ng-container>
-            <div *ngIf="filteredSuggestions.length === 0" class="text-center text-gray-400 py-8">
-                Không tìm thấy kết quả phù hợp.
-            </div>
+
+            <ng-template #emptyTemplate>
+                <div *ngIf="isLoading" class="py-8">
+                    <app-loading></app-loading>
+                </div>
+                <div *ngIf="!isLoading" class="text-center text-gray-400 py-8">
+                    Không tìm thấy kết quả phù hợp.
+                </div>
+            </ng-template>
         </div>
     </div>
 </div>
+
+<app-confirm-modal *ngIf="showUnfollowConfirm"
+    [message]="'Bỏ theo dõi ' + (selectedUserToUnfollow ? selectedUserToUnfollow.username : '') + '?'"
+    confirmText="Bỏ theo dõi" cancelText="Hủy" confirmColor="text-red-600"
+    [imageUrl]="selectedUserToUnfollow ? selectedUserToUnfollow.avatarUrl : undefined"
+    (confirm)="confirmUnfollow(selectedUserToUnfollow ?? undefined)" (cancel)="cancelUnfollow()">
+</app-confirm-modal>
