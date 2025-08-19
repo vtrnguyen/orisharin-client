@@ -6,6 +6,9 @@ import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
 import { formatTime } from '../../functions/format-time.util';
 import { MentionHighlightPipe } from '../../pipes/mention-hightlight/mention-hightlight.pipe';
+import { LikeService } from '../../../core/services/like.service';
+import { LikeTargetType } from '../../enums/like-target.enums';
+import { AlertService } from '../../state-managements/alert.service';
 
 @Component({
     selector: 'app-comment-item',
@@ -24,6 +27,7 @@ export class CommentItemComponent {
 
     liked = false;
     likesCount = 0;
+    loadingLike = false;
 
     // media viewer properties
     showViewer = false;
@@ -35,16 +39,60 @@ export class CommentItemComponent {
     isVideo = isVideo;
     formatTime = formatTime;
 
-    constructor(public router: Router) { }
+    constructor(
+        public router: Router,
+        private likeService: LikeService,
+        private alertService: AlertService
+    ) { }
 
     ngOnInit() {
         this.likesCount = this.comment?.likesCount || 0;
         this.liked = this.comment?.likedByUser || false;
+        const id = this.getCommentId();
+        if (id) {
+            this.likeService.getLikes(id, LikeTargetType.Comment).subscribe({
+                next: (response: any) => {
+                    this.likesCount = response.count ?? this.likesCount;
+                    this.liked = !!response.likedByUser;
+                },
+                error: (error: any) => {
+                    this.alertService.show("error", "Lỗi khi lấy thông tin lượt thích");
+                }
+            });
+        }
     }
 
-    toggleLike() {
-        this.liked = !this.liked;
-        this.likesCount += this.liked ? 1 : -1;
+    toggleLike(event?: MouseEvent) {
+        if (event) event.stopPropagation();
+        const id = this.getCommentId();
+        if (!id || this.loadingLike) return;
+
+        this.loadingLike = true;
+        if (this.liked) {
+            this.likeService.unlike(id, LikeTargetType.Comment).subscribe({
+                next: () => {
+                    this.liked = false;
+                    this.likesCount = Math.max(0, (this.likesCount || 0) - 1);
+                    this.loadingLike = false;
+                },
+                error: (err) => {
+                    console.error('Unlike comment failed', err);
+                    this.loadingLike = false;
+                }
+            });
+        } else {
+            this.likeService.like(id, LikeTargetType.Comment).subscribe({
+                next: () => {
+                    this.liked = true;
+                    this.likesCount = (this.likesCount || 0) + 1;
+                    this.loadingLike = false;
+                },
+                error: (err) => {
+                    console.error('Like comment failed', err);
+                    this.loadingLike = false;
+                }
+            });
+        }
     }
 
     openViewer(index: number) {
@@ -62,5 +110,9 @@ export class CommentItemComponent {
 
     get medias() {
         return this.comment?.mediaUrls || [];
+    }
+
+    private getCommentId(): string | null {
+        return this.comment?._id ?? this.comment?.id ?? this.comment?.comment?._id ?? this.comment?.comment?.id ?? null;
     }
 }
