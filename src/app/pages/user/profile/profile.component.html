@@ -54,6 +54,13 @@
                             <i class="fa-solid fa-user"></i>
                         </button>
                     </li>
+                    <li *ngIf="isOwner">
+                        <button (click)="navigateToTrash(); closeProfileMenu()"
+                            class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer">
+                            <span class="font-semibold">Thùng rác</span>
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </li>
                     <li *ngIf="!isOwner">
                         <button
                             class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer text-red-500">

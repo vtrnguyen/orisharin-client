@@ -471,6 +471,10 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
+  navigateToTrash(): void {
+    this.router.navigate(['/trash']);
+  }
+
   private checkIsFollowing(): void {
     this.followService.checkFollow(this.currentUserId, this.userInfo.id).subscribe({
       next: (response: any) => {

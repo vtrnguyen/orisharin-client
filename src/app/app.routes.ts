@@ -74,6 +74,11 @@ export const routes: Routes = [
                 title: "OriSharin - Thông báo"
             },
             {
+                path: 'trash',
+                loadComponent: () => import('./pages/user/trash/trash.component').then(m => m.TrashComponent),
+                title: "OriSharin - Thùng rác"
+            },
+            {
                 path: 'not-found',
                 loadComponent: () => import('./pages/error/page-not-found/page-not-found.component').then(m => m.PageNotFoundComponent),
                 title: "Không tìm thấy trang"

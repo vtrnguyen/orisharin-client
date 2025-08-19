@@ -48,6 +48,10 @@ export class PostService {
         return this.http.get<any>(`${this.apiUrl}/user/${userName}/post/${postId}`);
     }
 
+    getDeletedByUsername(username: string, page: number = 1, limit: number = 10): Observable<Post[]> {
+        return this.http.get<any>(`${this.apiUrl}/user/${username}/deleted?page=${page}&limit=${limit}`);
+    }
+
     getPostByUsername(username: string, page: number = 1, limit: number = 10): Observable<Post[]> {
         return this.http.get<Post[]>(`${this.apiUrl}/user/${username}?page=${page}&limit=${limit}`);
     }
