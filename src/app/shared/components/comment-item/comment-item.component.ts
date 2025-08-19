@@ -5,6 +5,7 @@ import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
 import { formatTime } from '../../functions/format-time.util';
+import { MentionHighlightPipe } from '../../pipes/mention-hightlight/mention-hightlight.pipe';
 
 @Component({
     selector: 'app-comment-item',
@@ -12,6 +13,7 @@ import { formatTime } from '../../functions/format-time.util';
     imports: [
         CommonModule,
         MediaViewerComponent,
+        MentionHighlightPipe,
     ],
     templateUrl: './comment-item.component.html',
     styleUrls: ['./comment-item.component.scss']
