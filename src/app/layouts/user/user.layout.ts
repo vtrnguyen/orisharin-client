@@ -8,6 +8,7 @@ import { AlertService } from '../../shared/state-managements/alert.service';
 import { AlertComponent } from '../../shared/components/alert/alert.component';
 import { AlertState } from '../../shared/interfaces/alert.interface';
 import { UserService } from '../../core/services/user.service';
+import { navigateToProfile } from '../../shared/functions/navigate-to-profile';
 
 @Component({
     selector: 'app-user-layout',
@@ -33,6 +34,8 @@ export class UserLayoutComponent {
     newPostContent = '';
 
     showUserMenu = false;
+
+    navigateToProfile = navigateToProfile;
 
     constructor(
         private authService: AuthService,
@@ -69,14 +72,8 @@ export class UserLayoutComponent {
         this.authService.logout();
     }
 
-    goToProfile() {
-        const url = '/@' + this.userInfo.username;
-        if (this.router.url === url) {
-            this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-                this.router.navigate([url]);
-            });
-        } else {
-            this.router.navigate([url]);
-        }
+    navigateToTrash() {
+        this.router.navigate(['/trash']);
+        this.toggleUserMenu();
     }
 }

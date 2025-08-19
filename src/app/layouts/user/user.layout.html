@@ -47,7 +47,7 @@
                         </a>
                     </li>
                     <li>
-                        <button (click)="goToProfile()" title="Trang cá nhân"
+                        <button (click)="navigateToProfile(router, userInfo.username)" title="Trang cá nhân"
                             [ngClass]="{'bg-gray-200 text-black': router.url === '/@' + userInfo.username}"
                             class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
                             <div class="w-7 h-7 flex items-center justify-center">
@@ -90,6 +90,13 @@
                             <button
                                 class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
                                 Đã thích
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer"
+                                (click)="navigateToTrash()">
+                                Thùng rác
                             </button>
                         </li>
                         <li>
@@ -147,7 +154,7 @@
                 class="flex flex-col items-center justify-center text-gray-500">
                 <i class="fa-regular fa-heart w-6 h-6 text-2xl"></i>
             </a>
-            <button (click)="goToProfile()" title="Trang cá nhân"
+            <button (click)="navigateToProfile(router, userInfo.username)" title="Trang cá nhân"
                 class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
                 <i class="fa-regular fa-user w-6 h-6 text-2xl"></i>
             </button>
