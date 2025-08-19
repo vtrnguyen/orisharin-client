@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AlertService } from '../../../shared/state-managements/alert.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { navigateToProfile } from '../../../shared/functions/navigate-to-profile';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-delete-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-trash',
@@ -15,6 +16,7 @@ import { navigateToProfile } from '../../../shared/functions/navigate-to-profile
     CommonModule,
     PostComponent,
     LoadingComponent,
+    ConfirmModalComponent,
   ],
   templateUrl: './trash.component.html',
   styleUrls: ['./trash.component.scss']
@@ -27,6 +29,13 @@ export class TrashComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoading = false;
   username: string = '';
   currentUser: any = null;
+
+  // confirm modal state
+  showRestoreConfirm = false;
+  restoreTarget: any = null;
+
+  showPermanentConfirm = false;
+  permanentTarget: any = null;
 
   navigateToProfile = navigateToProfile;
 
@@ -49,7 +58,7 @@ export class TrashComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (usernameParam?.startsWith('@')) usernameParam = usernameParam.substring(1);
     this.username = usernameParam;
-    this.loadDeletedPosts(true);
+    this.loadPosts(true);
   }
 
   ngAfterViewInit(): void {
@@ -80,7 +89,7 @@ export class TrashComponent implements OnInit, AfterViewInit, OnDestroy {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           if (!this.isLoading && this.hasMore) {
-            this.loadDeletedPosts();
+            this.loadPosts();
           }
         }
       });
@@ -93,7 +102,7 @@ export class TrashComponent implements OnInit, AfterViewInit, OnDestroy {
     this.intersectionObserver.observe(lastEl);
   }
 
-  loadDeletedPosts(initial = false) {
+  loadPosts(initial = false) {
     if (this.isLoading || (!this.hasMore && !initial)) return;
     if (!this.username) return;
     this.isLoading = true;
@@ -116,53 +125,83 @@ export class TrashComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // helper to normalize id shapes
   private getPostId(item: any): string | null {
     return item?.post?.id ?? item?.post?._id ?? item?.id ?? item?._id ?? null;
   }
 
-  restore(item: any, event?: MouseEvent) {
+  openRestoreConfirm(item: any, event?: MouseEvent) {
     if (event) event.stopPropagation();
-    const id = this.getPostId(item);
-    if (!id) return;
-    // this.postService.restorePost(id).subscribe({
-    //   next: (res) => {
-    //     this.posts = this.posts.filter(p => this.getPostId(p) !== id);
-    //     this.alertService.show('success', 'Khôi phục bài viết thành công', 3000);
-    //   },
-    //   error: (err) => {
-    //     console.error('Restore failed', err);
-    //     this.alertService.show('error', 'Khôi phục thất bại');
-    //   }
-    // });
+    this.restoreTarget = item;
+    this.showRestoreConfirm = true;
   }
 
-  permanentlyDelete(item: any, event?: MouseEvent) {
+  openPermanentConfirm(item: any, event?: MouseEvent) {
     if (event) event.stopPropagation();
-    const confirmDelete = confirm('Xóa vĩnh viễn bài viết này? Hành động không thể hoàn tác.');
-    if (!confirmDelete) return;
-
-    const id = this.getPostId(item);
-    if (!id) return;
-    // this.postService.permanentlyDeletePost(id).subscribe({
-    //   next: () => {
-    //     this.posts = this.posts.filter(p => this.getPostId(p) !== id);
-    //     this.alertService.show('success', 'Đã xóa vĩnh viễn', 3000);
-    //   },
-    //   error: (err) => {
-    //     console.error('Permanent delete failed', err);
-    //     this.alertService.show('error', 'Xóa vĩnh viễn thất bại');
-    //   }
-    // });
+    this.permanentTarget = item;
+    this.showPermanentConfirm = true;
   }
 
-  // optional: open post detail (navigate)
-  openPostDetail(item: any, event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    const username = item?.author?.username || item?.post?.author?.username;
-    const id = this.getPostId(item);
-    if (username && id) {
-      this.router.navigate([`@${username}`, 'post', id]);
+  confirmRestore() {
+    const id = this.getPostId(this.restoreTarget);
+    if (!id) {
+      this.showRestoreConfirm = false;
+      this.restoreTarget = null;
+      return;
     }
+    this.postService.restorePost(id).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.posts = this.posts.filter(p => this.getPostId(p) !== id);
+          this.alertService.show('success', 'Đã khôi phục bài viết');
+        } else {
+          this.alertService.show('error', res?.message || 'Đã xảy ra lỗi khi khôi phục bài viết');
+        }
+        this.showRestoreConfirm = false;
+        this.restoreTarget = null;
+      },
+      error: (err) => {
+        console.error('Restore failed', err);
+        this.alertService.show('error', 'Đã xảy ra lỗi khi khôi phục bài viết');
+        this.showRestoreConfirm = false;
+        this.restoreTarget = null;
+      }
+    });
+  }
+
+  cancelRestore() {
+    this.showRestoreConfirm = false;
+    this.restoreTarget = null;
+  }
+
+  confirmPermanentDelete() {
+    const id = this.getPostId(this.permanentTarget);
+    if (!id) {
+      this.showPermanentConfirm = false;
+      this.permanentTarget = null;
+      return;
+    }
+    this.postService.permanentlyDeletePost(id).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.posts = this.posts.filter(p => this.getPostId(p) !== id);
+          this.alertService.show('success', 'Đã xóa bài viết');
+        } else {
+          this.alertService.show('error', res?.message || 'Đã xảy ra lỗi khi xóa bài viết');
+        }
+        this.showPermanentConfirm = false;
+        this.permanentTarget = null;
+      },
+      error: (err) => {
+        console.error('Permanent delete failed', err);
+        this.alertService.show('error', 'Đã xảy ra lỗi khi xóa bài viết');
+        this.showPermanentConfirm = false;
+        this.permanentTarget = null;
+      }
+    });
+  }
+
+  cancelPermanentDelete() {
+    this.showPermanentConfirm = false;
+    this.permanentTarget = null;
   }
 }

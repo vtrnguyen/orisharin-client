@@ -11,21 +11,19 @@
     <div *ngFor="let post of posts; let last = last" #postItem class="pb-2"
         [ngClass]="{'border-b border-gray-300': !last}">
         <div class="relative">
-            <div (click)="openPostDetail(post)" class="cursor-pointer">
-                <app-post [post]="post" (deleted)="permanentlyDelete(post)"></app-post>
-            </div>
+            <app-post [post]="post" (deleted)="openPermanentConfirm(post)"></app-post>
 
             <div class="trash-actions absolute right-3 top-3 flex items-center gap-2">
                 <button
                     class="text-xs flex items-center gap-2 bg-green-600 text-white px-2 py-1 rounded-md shadow-sm cursor-pointer"
-                    (click)="restore(post, $event)">
+                    (click)="openRestoreConfirm(post, $event)">
                     <i class="fa-solid fa-rotate-left"></i>
                     <span>Khôi phục</span>
                 </button>
 
                 <button
                     class="text-xs flex items-center gap-2 bg-red-600 text-white px-2 py-1 rounded-md shadow-sm cursor-pointer"
-                    (click)="permanentlyDelete(post, $event)">
+                    (click)="openPermanentConfirm(post, $event)">
                     <i class="fa-solid fa-trash-can"></i>
                     <span>Xóa</span>
                 </button>
@@ -36,4 +34,15 @@
     <div class="py-2 flex justify-center" *ngIf="isLoading">
         <app-loading></app-loading>
     </div>
+
+    <app-confirm-modal *ngIf="showRestoreConfirm" [message]="'Bạn có chắc muốn khôi phục bài viết này?'"
+        confirmText="Khôi phục" cancelText="Hủy" confirmColor="text-green-600" (confirm)="confirmRestore()"
+        (cancel)="cancelRestore()">
+    </app-confirm-modal>
+
+    <app-confirm-modal *ngIf="showPermanentConfirm"
+        [message]="'Xóa vĩnh viễn bài viết này? Hành động không thể hoàn tác.'" confirmText="Xóa vĩnh viễn"
+        cancelText="Hủy" confirmColor="text-red-600" (confirm)="confirmPermanentDelete()"
+        (cancel)="cancelPermanentDelete()">
+    </app-confirm-modal>
 </div>

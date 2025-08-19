@@ -55,4 +55,12 @@ export class PostService {
     getPostByUsername(username: string, page: number = 1, limit: number = 10): Observable<Post[]> {
         return this.http.get<Post[]>(`${this.apiUrl}/user/${username}?page=${page}&limit=${limit}`);
     }
+
+    restorePost(postId: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/${postId}/restore`, {});
+    }
+
+    permanentlyDeletePost(postId: string): Observable<any> {
+        return this.http.delete<any>(`${this.apiUrl}/${postId}/permanent`);
+    }
 }
