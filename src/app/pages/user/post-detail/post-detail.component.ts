@@ -48,6 +48,7 @@ export class PostDetailComponent implements OnInit {
                     if (parent) {
                         parent.replies = parent.replies || [];
                         parent.replies.push(newComment);
+                        parent.commentsCount = (parent.commentsCount || 0) + 1;
                     }
                 } else {
                     newComment.replies = [];

@@ -23,17 +23,19 @@
             </ng-container>
         </div>
         <div class="flex gap-4 mt-2 text-gray-500 text-sm">
-            <button class="flex items-center gap-1 cursor-pointer hover:text-red-500" (click)="toggleLike()">
+            <button class="flex items-center gap-1 cursor-pointer rounded transition-colors duration-150"
+                [class.opacity-50]="loadingLike" (click)="toggleLike($event)" [disabled]="loadingLike">
                 <i [ngClass]="liked ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart'"></i>
                 <span>{{ likesCount }}</span>
             </button>
-            <button class="flex items-center gap-1 cursor-pointer hover:text-blue-500" (click)="reply.emit()">
+
+            <button class="flex items-center gap-1 cursor-pointer hover:text-blue-500" (click)="reply.emit(comment)">
                 <i class="fa-regular fa-comment-dots"></i>
+                <span *ngIf="isTopLevel">{{ commentsCount }}</span>
             </button>
         </div>
     </div>
 </div>
 
-<!-- Media Viewer -->
 <app-media-viewer *ngIf="showViewer" [medias]="medias" [startIndex]="viewerIndex" [onClose]="closeViewer.bind(this)">
 </app-media-viewer>

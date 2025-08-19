@@ -8,7 +8,6 @@ import { formatTime } from '../../functions/format-time.util';
 import { MentionHighlightPipe } from '../../pipes/mention-hightlight/mention-hightlight.pipe';
 import { LikeService } from '../../../core/services/like.service';
 import { LikeTargetType } from '../../enums/like-target.enums';
-import { AlertService } from '../../state-managements/alert.service';
 
 @Component({
     selector: 'app-comment-item',
@@ -23,7 +22,7 @@ import { AlertService } from '../../state-managements/alert.service';
 })
 export class CommentItemComponent {
     @Input() comment: any;
-    @Output() reply = new EventEmitter<void>();
+    @Output() reply = new EventEmitter<any>();
 
     liked = false;
     likesCount = 0;
@@ -39,11 +38,7 @@ export class CommentItemComponent {
     isVideo = isVideo;
     formatTime = formatTime;
 
-    constructor(
-        public router: Router,
-        private likeService: LikeService,
-        private alertService: AlertService
-    ) { }
+    constructor(public router: Router, private likeService: LikeService) { }
 
     ngOnInit() {
         this.likesCount = this.comment?.likesCount || 0;
@@ -51,12 +46,12 @@ export class CommentItemComponent {
         const id = this.getCommentId();
         if (id) {
             this.likeService.getLikes(id, LikeTargetType.Comment).subscribe({
-                next: (response: any) => {
-                    this.likesCount = response.count ?? this.likesCount;
-                    this.liked = !!response.likedByUser;
+                next: (res) => {
+                    this.likesCount = res.count ?? this.likesCount;
+                    this.liked = !!res.likedByUser;
                 },
-                error: (error: any) => {
-                    this.alertService.show("error", "Lỗi khi lấy thông tin lượt thích");
+                error: (err) => {
+                    console.error('Get likes failed', err);
                 }
             });
         }
@@ -110,6 +105,14 @@ export class CommentItemComponent {
 
     get medias() {
         return this.comment?.mediaUrls || [];
+    }
+
+    get isTopLevel(): boolean {
+        return !this.comment?.parentCommentId;
+    }
+
+    get commentsCount(): number {
+        return this.comment?.commentsCount || 0;
     }
 
     private getCommentId(): string | null {
