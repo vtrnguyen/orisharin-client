@@ -64,9 +64,19 @@ export const routes: Routes = [
                 title: "OriSharin - Tìm kiếm"
             },
             {
-                path: 'message',
-                loadComponent: () => import('./pages/user/message/message.component').then(m => m.MessageComponent),
-                title: "OriSharin - Tin nhắn"
+                path: 'inbox',
+                loadComponent: () => import('./pages/user/inbox/inbox.component').then(m => m.InboxComponent),
+                title: "OriSharin - Hộp thư",
+                children: [
+                    {
+                        path: '',
+                        loadComponent: () => import('./shared/components/inbox-empty/inbox-empty.component').then(m => m.InboxEmptyComponent),
+                    },
+                    {
+                        path: ':roomId',
+                        loadComponent: () => import('./shared/components/chat-room/chat-room.component').then(m => m.ChatRoomComponent),
+                    }
+                ]
             },
             {
                 path: 'notification',
