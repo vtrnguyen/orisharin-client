@@ -166,5 +166,6 @@
     (close)="closePostModal()"></app-post-modal>
 
 <app-alert *ngIf="alertState.show" [type]="alertState.type" [message]="alertState.message"
-    [duration]="alertState.duration ?? 2500" (closed)="alertService.hide()">
+    [duration]="alertState.duration ?? 2500" [actionLabel]="alertState.actionLabel"
+    [actionRoute]="alertState.actionRoute" (closed)="alertService.hide()">
 </app-alert>

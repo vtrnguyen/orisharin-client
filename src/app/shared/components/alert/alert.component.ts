@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-alert',
@@ -15,9 +16,13 @@ export class AlertComponent implements OnChanges {
     @Input() message = '';
     @Input() show = true;
     @Input() duration = 2000;
+    @Input() actionLabel?: string;
+    @Input() actionRoute?: string;
     @Output() closed = new EventEmitter<void>();
 
     timeout: any;
+
+    constructor(private router: Router) { }
 
     get alertClass() {
         return {
@@ -47,5 +52,15 @@ export class AlertComponent implements OnChanges {
         this.show = false;
         this.closed.emit();
         clearTimeout(this.timeout);
+    }
+
+    onAction() {
+        if (!this.actionRoute) {
+            this.close();
+            return;
+        }
+        // navigate and close alert
+        this.router.navigateByUrl(this.actionRoute).catch(() => { });
+        this.close();
     }
 }

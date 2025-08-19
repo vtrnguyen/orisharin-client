@@ -4,4 +4,6 @@ export interface AlertState {
     type: 'success' | 'error' | 'warning';
     message: string;
     duration?: number;
+    actionLabel?: string;
+    actionRoute?: string;
 }

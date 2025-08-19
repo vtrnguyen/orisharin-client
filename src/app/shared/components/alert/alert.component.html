@@ -1,8 +1,18 @@
 <div *ngIf="show" [ngClass]="alertClass"
-    class="fixed left-4 bottom-6 z-[9999] min-w-[260px] max-w-xs flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-fade-in border">
-    <i [ngClass]="iconClass" class="text-xl"></i>
-    <span class="flex-1">{{ message }}</span>
-    <button (click)="close()" class="ml-2 text-lg text-gray-400 hover:text-gray-600 cursor-pointer">
-        <i class=" fa-solid fa-xmark"></i>
-    </button>
+    class="fixed left-4 bottom-6 z-[9999] min-w-[260px] max-w-xs px-4 py-3 rounded-lg shadow-lg animate-fade-in border">
+    <div class="flex items-center gap-3"> <!-- changed to items-center -->
+        <i [ngClass]="iconClass" class="text-xl"></i>
+
+        <div class="flex-1 text-sm">
+            <span class="alert-message">{{ message }}</span>
+            <button *ngIf="actionLabel" (click)="onAction()"
+                class="ml-2 inline-action text-sm font-medium text-blue-600 hover:underline">
+                {{ actionLabel }}
+            </button>
+        </div>
+
+        <button (click)="close()" class="ml-3 text-lg text-gray-400 hover:text-gray-600 cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
 </div>
