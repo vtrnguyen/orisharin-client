@@ -37,6 +37,10 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
   formatTime = formatTime;
   navigateToProfile = navigateToProfile;
 
+  // prefill tracking
+  autoPrefillUsernameRaw: string | null = null;
+  userEditedPrefill = false;
+
   constructor(
     private userService: UserService,
     private commentService: CommentService,
@@ -49,8 +53,34 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log(this.parent);
     document.body.style.overflow = 'hidden';
+
+    try {
+      // only prefill when replying to a reply (level-2) and content empty
+      if (this.isReplyMode && this.parent?.parentCommentId && !this.content.trim()) {
+        const replyAuthor = this.parentAuthor || {};
+        const replyAuthorUsername = replyAuthor?.username || replyAuthor?.userName;
+        const currentUser = this.authService.getCurrentUser();
+        const currentUsername = currentUser?.username || this.userInfo?.username;
+
+        if (replyAuthorUsername && currentUsername && replyAuthorUsername !== currentUsername) {
+          this.autoPrefillUsernameRaw = `@${replyAuthorUsername}`;
+          this.content = `${this.autoPrefillUsernameRaw} `;
+          this.userEditedPrefill = false;
+
+          setTimeout(() => {
+            const textarea = document.querySelector('textarea');
+            if (textarea) {
+              const el = textarea as HTMLTextAreaElement;
+              el.selectionStart = el.selectionEnd = el.value.length;
+              el.focus();
+            }
+          }, 0);
+        }
+      }
+    } catch (e) {
+      console.warn('Prefill reply username failed', e);
+    }
   }
 
   ngOnDestroy() {
@@ -79,21 +109,70 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
     if (!this.content.trim() && this.files.length === 0) return;
     this.isLoading = true;
 
-    // get current user id
     const currentUser = this.authService.getCurrentUser();
     const authorId = currentUser?.id || this.userInfo?.id;
 
+    const resolveTopLevelCommentId = (p: any): string | undefined => {
+      if (!p) return undefined;
+      if (p.parentCommentId) return p.parentCommentId;
+      return p._id || p.id;
+    };
+
+    const resolvePostId = (p: any): string | undefined => {
+      if (!p) return undefined;
+      if (p.postId) return p.postId;
+      if (p.post && (p.post._id || p.post.id)) return p.post._id || p.post.id;
+      if (p._id && p.author == null) return p._id;
+      return undefined;
+    };
+
     let postId = '';
     let parentCommentId: string | undefined = undefined;
+    let finalContent = this.content?.trim() || '';
 
     if (this.isReplyMode) {
-      // reply comment
-      postId = this.parent.postId;
-      parentCommentId = this.parent._id || this.parent.id;
+      parentCommentId = resolveTopLevelCommentId(this.parent);
+      postId = resolvePostId(this.parent) || this.parent?.post?.postId || '';
+
+      if (!postId) {
+        console.warn('create-comment: cannot resolve postId from parent', this.parent);
+      }
+      if (!parentCommentId) {
+        console.warn('create-comment: cannot resolve parentCommentId from parent', this.parent);
+      }
+
+      const isReplyToReply = !!(this.parent && this.parent.parentCommentId);
+
+      if (isReplyToReply) {
+        const replyAuthor = this.parentAuthor;
+        const replyAuthorUsername = replyAuthor?.username || replyAuthor?.userName;
+        const currentUsername = currentUser?.username || this.userInfo?.username;
+
+        // Only auto-add prefix when we set autoPrefill and user did NOT edit it.
+        if (replyAuthorUsername && currentUsername && replyAuthorUsername !== currentUsername) {
+          if (this.autoPrefillUsernameRaw && !this.userEditedPrefill) {
+            // ensure prefix exists (add if user somehow focused away without editing)
+            if (!finalContent.startsWith(this.autoPrefillUsernameRaw)) {
+              finalContent = `${this.autoPrefillUsernameRaw} ${finalContent}`;
+            }
+          } else {
+            // user edited prefill (deleted it) -> do NOT re-add
+            // also if userEditedPrefill is true but content still accidentally contains @username at start, keep user's intent
+          }
+        }
+      }
     } else {
-      // comment on post
-      postId = this.parent?._id || this.parent?.id || this.parent?.post?._id || this.parent?.post?.id;
+      postId = this.parent?._id || this.parent?.id || this.parent?.post?._id || this.parent?.post?.id || '';
       parentCommentId = undefined;
+      if (!postId) {
+        console.warn('create-comment: cannot resolve postId for top-level comment', this.parent);
+      }
+    }
+
+    if (!postId) {
+      this.isLoading = false;
+      this.alertService.show('error', 'Không xác định được bài viết để bình luận', 3000);
+      return;
     }
 
     this.commentService.createComment(
@@ -101,7 +180,7 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
         postId,
         parentCommentId,
         authorId,
-        content: this.content,
+        content: finalContent,
       },
       this.files
     ).subscribe({
@@ -110,7 +189,6 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
         this.commentEventService.emitCommentCreated(response.data);
         this.close.emit();
         this.resetForm();
-
         const message = this.isReplyMode ? 'Đã gửi trả lời bình luận!' : 'Đã gửi bình luận!';
         this.alertService.show("success", message);
       },
@@ -118,7 +196,18 @@ export class CreateCommentComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.alertService.show("error", "Đã có lỗi xảy ra khi gửi bình luận. Vui lòng thử lại sau.");
       }
-    })
+    });
+  }
+
+  onContentChange(value: string) {
+    if (this.autoPrefillUsernameRaw) {
+      // consider unprefixed or modified as edited
+      if (!value.startsWith(this.autoPrefillUsernameRaw)) {
+        this.userEditedPrefill = true;
+      } else {
+        this.userEditedPrefill = false;
+      }
+    }
   }
 
   autoResize(event: Event) {
