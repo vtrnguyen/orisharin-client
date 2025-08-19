@@ -139,13 +139,13 @@ export class PostComponent implements OnInit, OnChanges {
                 this.showDeleteConfirm = false;
                 this.isDeleted = true; // hide component immediately
                 this.deleted.emit(this.post?.post.id ?? this.post?.id); // optional: notify parent to remove from array
-                this.alertService.show('success', 'Đã chuyển bài viết vào thùng rác', 3000);
+                this.alertService.show('success', 'Đã chuyển bài viết vào thùng rác', 3500, 'Đi đến thùng rác', "trash");
             },
             error: (err) => {
                 this.isDeleteLoading = false;
                 this.showDeleteConfirm = false;
                 console.error('Delete post error', err);
-                this.alertService.show('error', 'Xóa bài viết thất bại', 4000);
+                this.alertService.show('error', 'Xóa bài viết thất bại');
             }
         });
     }
