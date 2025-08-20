@@ -11,17 +11,54 @@
         </div>
     </div>
 
-    <div class="messages">
-        <div class="text-sm text-gray-500 text-center py-8">Nội dung cuộc trò chuyện cho <strong>{{ roomId }}</strong>
-            sẽ
-            hiển thị tại đây.</div>
+    <div class="messages flex-1 overflow-auto p-4">
+        <div class="text-sm text-gray-500 text-center py-8">
+            Nội dung cuộc trò chuyện cho <strong>{{ roomId }}</strong> sẽ hiển thị tại đây.
+        </div>
     </div>
 
     <div class="composer">
-        <form class="flex items-center gap-3" (submit)="$event.preventDefault(); send()">
-            <input [(ngModel)]="text" name="text" placeholder="Nhập tin nhắn..."
-                class="flex-1 rounded-full border px-4 py-2 text-sm focus:outline-none" />
-            <button class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-full">Gửi</button>
-        </form>
+        <div class="composer-inner">
+            <div class="left">
+                <button class="icon-btn" (click)="toggleEmojiPicker()" aria-label="Emoji">
+                    <i class="fa-regular fa-face-smile"></i>
+                </button>
+
+                <div (clickOutside)="showEmojiPicker = false" class="emoji-panel" *ngIf="showEmojiPicker">
+                    <emoji-mart (emojiSelect)="addEmoji($event)" [style.width.px]="320"
+                        [style.height.px]="260"></emoji-mart>
+                </div>
+            </div>
+
+            <div class="center">
+                <textarea [(ngModel)]="text" name="text" rows="1" placeholder="Nhập tin nhắn..." class="message-input"
+                    (input)="autoResize($event)"></textarea>
+            </div>
+
+            <div class="right">
+                <ng-container *ngIf="!text?.trim(); else hasText">
+                    <button class="icon-btn" (click)="startVoiceRecording()" title="Ghi âm">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+
+                    <button class="icon-btn" (click)="openFilePicker()" title="Ảnh / Video">
+                        <i class="fa-solid fa-image"></i>
+                    </button>
+                    <input #fileInput type="file" accept="image/*,video/*" (change)="onFileSelected($event)" hidden />
+
+                    <button class="icon-btn" (click)="openStickerPicker()" title="Sticker">
+                        <i class="fa-regular fa-face-smile-wink"></i>
+                    </button>
+
+                    <button class="icon-btn" (click)="quickHeart()" title="Gửi trái tym">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
+                </ng-container>
+
+                <ng-template #hasText>
+                    <button class="send-btn" (click)="send()">Gửi</button>
+                </ng-template>
+            </div>
+        </div>
     </div>
 </div>
