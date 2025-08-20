@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { StartChatService } from '../../state-managements/start-chat.service';
 
 @Component({
     selector: 'app-inbox-empty',
@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
     styleUrl: './inbox-empty.component.scss',
 })
 export class InboxEmptyComponent {
-    constructor(private router: Router) { }
-    startNew() { this.router.navigate(['/messages/compose']); }
+    constructor(private startChat: StartChatService) { }
+    startNew() {
+        this.startChat.open();
+    }
 }

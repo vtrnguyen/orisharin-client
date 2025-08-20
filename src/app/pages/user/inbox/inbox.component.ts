@@ -5,6 +5,8 @@ import { formatTime } from '../../../shared/functions/format-time.util';
 import { Router, ActivatedRoute, NavigationEnd, RouterOutlet } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { UserService } from '../../../core/services/user.service';
+import { StartChatModalComponent } from '../../../shared/components/start-chat-modal/start-chat-modal.component';
+import { StartChatService } from '../../../shared/state-managements/start-chat.service';
 
 @Component({
   selector: 'app-inbox',
@@ -13,6 +15,7 @@ import { UserService } from '../../../core/services/user.service';
     CommonModule,
     FormsModule,
     RouterOutlet,
+    StartChatModalComponent,
   ],
   templateUrl: './inbox.component.html',
   styleUrls: ['./inbox.component.scss']
@@ -40,10 +43,15 @@ export class InboxComponent implements OnInit, OnDestroy {
   selected: any = null;
   private sub?: Subscription;
 
+  showStartChatModal = false;
+  private startSub?: Subscription;
+  private startSelectSub?: Subscription;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private userService: UserService
+    private userService: UserService,
+    private startChatService: StartChatService
   ) { }
 
   ngOnInit(): void {
@@ -53,10 +61,17 @@ export class InboxComponent implements OnInit, OnDestroy {
     this.sub = this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
       this.updateSelectedFromRoute();
     });
+
+    this.startSub = this.startChatService.show$.subscribe(v => this.showStartChatModal = v);
+    this.startSelectSub = this.startChatService.selected$.subscribe(user => {
+      const id = user?.id ?? user?._id ?? user?.username;
+      if (id) this.router.navigate(['/inbox', id]);
+    });
   }
 
   ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+    this.startSub?.unsubscribe();
+    this.startSelectSub?.unsubscribe();
   }
 
   filteredConversations() {
@@ -74,7 +89,7 @@ export class InboxComponent implements OnInit, OnDestroy {
   }
 
   startNewMessage() {
-    this.router.navigate(['/messages/compose']);
+    this.startChatService.open();
   }
 
   formatTime = formatTime;
@@ -95,5 +110,13 @@ export class InboxComponent implements OnInit, OnDestroy {
   get hasSelected(): boolean {
     const url = this.router.url || '';
     return /^\/inbox\/[^\/]+/.test(url);
+  }
+
+  onStartConversation(user: any) {
+    this.showStartChatModal = false;
+    const id = user?.id ?? user?._id ?? user?.username;
+    if (id) {
+      this.router.navigate(['/inbox', id]);
+    }
   }
 }

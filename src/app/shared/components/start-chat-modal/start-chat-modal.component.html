@@ -1,0 +1,37 @@
+<div class="fixed inset-0 z-[99] flex items-center justify-center bg-black/60">
+    <div class="modal-box bg-white rounded-2xl shadow-xl w-full" (clickOutside)="onClose()">
+        <div class="flex items-center justify-between border-b border-gray-300 px-6 py-4">
+            <button class="font-semibold px-2 py-1 cursor-pointer" (click)="onClose()">Hủy</button>
+            <span class="font-bold text-lg text-gray-800">Tin nhắn mới</span>
+            <span class="w-12"></span>
+        </div>
+
+        <div class="modal-body">
+            <!-- Phần search cố định -->
+            <div class="search-section">
+                <div class="flex gap-3 items-center">
+                    <span class="font-bold">Tới:</span>
+                    <input [(ngModel)]="query" (input)="applySearch()" placeholder="Tìm kiếm..."
+                        class="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none" />
+                </div>
+            </div>
+
+            <!-- Phần list có thể scroll -->
+            <div *ngIf="!loading && filtered.length > 0" class="modal-list grid gap-2">
+                <button *ngFor="let u of filtered"
+                    class="user-row flex items-center gap-3 p-2 rounded hover:bg-gray-50 text-left cursor-pointer"
+                    (click)="selectUser(u)">
+                    <img [src]="u.avatarUrl || ('https://ui-avatars.com/api/?name=' + (u.fullName || u.username))"
+                        class="w-12 h-12 rounded-full object-cover" alt="avatar" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium truncate">{{ u.fullName || u.username }}</div>
+                        <div class="text-xs text-gray-500 truncate">{{ '@' + (u.username || '') }}</div>
+                    </div>
+                    <div class="text-gray-400" [title]="'Gửi tin nhắn cho ' + (u.fullName || u.username)">
+                        <i class="fa-brands fa-facebook-messenger"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
