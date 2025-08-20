@@ -1,5 +1,6 @@
 <div class="fixed inset-0 z-[99] flex items-center justify-center bg-black/60">
-    <div class="modal-box bg-white rounded-2xl shadow-xl w-full" (clickOutside)="onClose()">
+    <div class="modal-box bg-white rounded-2xl shadow-xl w-full relative transition-all duration-300 ease-out opacity-0 scale-95 animate-modal-fade-in"
+        (clickOutside)="onClose()">
         <div class="flex items-center justify-between border-b border-gray-300 px-6 py-4">
             <button class="font-semibold px-2 py-1 cursor-pointer" (click)="onClose()">Hủy</button>
             <span class="font-bold text-lg text-gray-800">Tin nhắn mới</span>
@@ -15,7 +16,7 @@
                 </div>
             </div>
 
-            <div *ngIf="!loading && filtered.length > 0; else noResults" class="modal-list grid gap-2">
+            <div *ngIf="!loading && filtered.length > 0" class="modal-list grid gap-2">
                 <button *ngFor="let u of filtered"
                     class="user-row flex items-center gap-3 p-2 rounded hover:bg-gray-50 text-left cursor-pointer"
                     (click)="selectUser(u)">
@@ -30,10 +31,6 @@
                     </div>
                 </button>
             </div>
-
-            <ng-template #noResults>
-                <div class="p-4 text-gray-500 text-center">Không tìm thấy tài khoản.</div>
-            </ng-template>
         </div>
     </div>
 </div>
