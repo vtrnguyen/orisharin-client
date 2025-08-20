@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { formatTime } from '../../../shared/functions/format-time.util';
 import { Router, ActivatedRoute, NavigationEnd, RouterOutlet } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-inbox',
@@ -34,15 +35,21 @@ export class InboxComponent implements OnInit, OnDestroy {
       unread: 0
     }
   ];
+  userInfo: any;
 
   selected: any = null;
   private sub?: Subscription;
 
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private userService: UserService
+  ) { }
 
   ngOnInit(): void {
     this.updateSelectedFromRoute();
 
+    this.userInfo = this.userService.getCurrentUserInfo();
     this.sub = this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
       this.updateSelectedFromRoute();
     });

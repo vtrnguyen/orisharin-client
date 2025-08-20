@@ -135,8 +135,8 @@
             </svg>
         </button>
 
-        <nav
-            class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center h-16 md:hidden">
+        <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center h-16 md:hidden"
+            [class.hidden]="router.url.startsWith('/inbox')">
             <button (click)="onHomePageClick()" [ngClass]="{'text-blue-600': router.url === '/'}" title="Trang chủ"
                 class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
                 <i class="fa-solid fa-house w-6 h-6 text-2xl"></i>

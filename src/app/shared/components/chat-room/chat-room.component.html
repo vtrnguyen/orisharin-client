@@ -1,23 +1,27 @@
-<div class="header flex items-center gap-3 px-4 py-3 border-b">
-    <button class="md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100" (click)="back()">
-        <i class="fa-solid fa-arrow-left"></i>
-    </button>
+<div class="h-full flex flex-col">
+    <div class="header flex items-center gap-3 px-4 py-3 border-b">
+        <button class="md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
+            (click)="back()">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
 
-    <div>
-        <div class="font-semibold">Chat: {{ roomId }}</div>
-        <div class="text-xs text-gray-400">Cuộc trò chuyện đang mở</div>
+        <div>
+            <div class="font-semibold">Chat: {{ roomId }}</div>
+            <div class="text-xs text-gray-400">Cuộc trò chuyện đang mở</div>
+        </div>
     </div>
-</div>
 
-<div class="messages">
-    <div class="text-sm text-gray-500 text-center py-8">Nội dung cuộc trò chuyện cho <strong>{{ roomId }}</strong> sẽ
-        hiển thị tại đây.</div>
-</div>
+    <div class="messages">
+        <div class="text-sm text-gray-500 text-center py-8">Nội dung cuộc trò chuyện cho <strong>{{ roomId }}</strong>
+            sẽ
+            hiển thị tại đây.</div>
+    </div>
 
-<div class="composer">
-    <form class="flex items-center gap-3" (submit)="$event.preventDefault(); send()">
-        <input [(ngModel)]="text" name="text" placeholder="Nhập tin nhắn..."
-            class="flex-1 rounded-full border px-4 py-2 text-sm focus:outline-none" />
-        <button class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-full">Gửi</button>
-    </form>
+    <div class="composer">
+        <form class="flex items-center gap-3" (submit)="$event.preventDefault(); send()">
+            <input [(ngModel)]="text" name="text" placeholder="Nhập tin nhắn..."
+                class="flex-1 rounded-full border px-4 py-2 text-sm focus:outline-none" />
+            <button class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-full">Gửi</button>
+        </form>
+    </div>
 </div>

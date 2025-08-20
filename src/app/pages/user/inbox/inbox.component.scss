@@ -1,5 +1,5 @@
 .inbox-page {
-    height: 100vh;
+    height: 100%;
     background: #f8fafc;
 }
 
@@ -46,12 +46,6 @@
         display: block !important;
         grid-column: 1 / -1;
         height: 100%;
-    }
-
-    .inbox-page.has-selected section>* {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
     }
 }
 
