@@ -1,13 +1,30 @@
 <div class="h-full flex flex-col">
-    <div class="header flex items-center gap-3 px-4 py-3 border-b">
-        <button class="md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
+    <div class="header flex items-center gap-3 px-4 py-3 border-b border-gray-200">
+        <button class=" md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
             (click)="back()">
             <i class="fa-solid fa-arrow-left"></i>
         </button>
 
-        <div>
-            <div class="font-semibold">Chat: {{ roomId }}</div>
-            <div class="text-xs text-gray-400">Cuộc trò chuyện đang mở</div>
+        <div class="flex items-center gap-3">
+            <img [src]="displayAvatar" alt="avatar" class="w-10 h-10 rounded-full object-cover" />
+            <div>
+                <div class="font-semibold truncate" style="max-width: 220px;">{{ displayName }}</div>
+                <div *ngIf="!isGroup" class="text-xs text-gray-400">{{ "@" + username }}</div>
+            </div>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2 header-actions">
+            <button class="icon-btn" title="Gọi thoại" (click)="callPhone()">
+                <i class="fa-solid fa-phone text-gray-600"></i>
+            </button>
+
+            <button class="icon-btn" title="Gọi video" (click)="callVideo()">
+                <i class="fa-solid fa-video text-gray-600"></i>
+            </button>
+
+            <button class="icon-btn" title="Thông tin về cuộc trò chuyện" (click)="openConversationInfo()">
+                <i class="fa-solid fa-circle-info text-gray-600"></i>
+            </button>
         </div>
     </div>
 

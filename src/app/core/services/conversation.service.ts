@@ -22,4 +22,8 @@ export class ConversationService {
 
         return this.http.get<any>(`${this.apiUrl}/user/${userId}`, { params });
     }
+
+    getById(conversationId: string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/${conversationId}`);
+    }
 }
