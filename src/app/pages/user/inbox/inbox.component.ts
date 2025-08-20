@@ -7,6 +7,7 @@ import { filter, Subscription } from 'rxjs';
 import { UserService } from '../../../core/services/user.service';
 import { StartChatModalComponent } from '../../../shared/components/start-chat-modal/start-chat-modal.component';
 import { StartChatService } from '../../../shared/state-managements/start-chat.service';
+import { ConversationsListComponent } from '../../../shared/components/conversations-list/conversations-list.component';
 
 @Component({
   selector: 'app-inbox',
@@ -16,6 +17,7 @@ import { StartChatService } from '../../../shared/state-managements/start-chat.s
     FormsModule,
     RouterOutlet,
     StartChatModalComponent,
+    ConversationsListComponent,
   ],
   templateUrl: './inbox.component.html',
   styleUrls: ['./inbox.component.scss']
