@@ -127,7 +127,7 @@
             <router-outlet></router-outlet>
         </main>
 
-        <button
+        <button *ngIf="!router.url.startsWith('/inbox')"
             class="fixed bottom-8 right-8 z-50 bg-white hover:bg-gray-100 text-black rounded-2xl shadow-2xl w-20 h-16 flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer hidden md:flex"
             aria-label="Tạo mới">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
