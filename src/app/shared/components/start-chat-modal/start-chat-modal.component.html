@@ -17,7 +17,7 @@
                 </div>
             </div>
 
-            <div class="modal-list" *ngIf="!loading">
+            <div class="modal-list" *ngIf="!isloading">
                 <div *ngIf="filtered.length === 0" class="text-center text-gray-400 py-6">Không tìm thấy người theo dõi.
                 </div>
 
@@ -38,13 +38,16 @@
                 </div>
             </div>
 
-            <div *ngIf="loading" class="text-center text-gray-500 py-6">Đang tải...</div>
+            <div *ngIf="isloading" class="text-center text-gray-500 py-6">Đang tải...</div>
         </div>
 
         <div class="modal-footer">
             <div class="p-4 flex justify-end">
-                <button class="btn-start" [disabled]="selectedUsers.length === 0" (click)="startChat()">
-                    Nhắn tin ({{ selectedUsers.length }})
+                <button class="btn-start" [disabled]="selectedUsers.length === 0 || isCreating" (click)="startChat()">
+                    <ng-container *ngIf="isCreating; else btnText">
+                        <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang tạo
+                    </ng-container>
+                    <ng-template #btnText>Nhắn tin ({{ selectedUsers.length }})</ng-template>
                 </button>
             </div>
         </div>

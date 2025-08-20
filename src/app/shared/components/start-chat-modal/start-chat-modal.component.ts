@@ -5,17 +5,25 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { FollowService } from '../../../core/services/follow.service';
 import { UserService } from '../../../core/services/user.service';
 import { StartChatService } from '../../state-managements/start-chat.service';
+import { ConversationService } from '../../../core/services/conversation.service';
+import { Router } from '@angular/router';
+import { AlertService } from '../../state-managements/alert.service';
 
 @Component({
     selector: 'app-start-chat-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, ClickOutsideModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ClickOutsideModule
+    ],
     templateUrl: './start-chat-modal.component.html',
     styleUrls: ['./start-chat-modal.component.scss']
 })
 export class StartChatModalComponent implements OnInit {
-    loading = false;
-    query = '';
+    isloading: boolean = false;
+    isCreating: boolean = false;
+    query: string = '';
     following: any[] = [];
     filtered: any[] = [];
     selectedUsers: any[] = [];
@@ -23,7 +31,10 @@ export class StartChatModalComponent implements OnInit {
     constructor(
         private followService: FollowService,
         private userService: UserService,
-        private startChatService: StartChatService
+        private startChatService: StartChatService,
+        private conversationService: ConversationService,
+        private router: Router,
+        private alertService: AlertService,
     ) { }
 
     ngOnInit(): void {
@@ -31,17 +42,17 @@ export class StartChatModalComponent implements OnInit {
         const userId = (user.id ?? user._id ?? user.username) as string;
         if (!userId) return;
 
-        this.loading = true;
+        this.isloading = true;
         this.followService.getFollowing(userId).subscribe({
             next: (res: any) => {
                 this.following = Array.isArray(res) ? res : (res?.data ?? res?.results ?? []);
                 this.filtered = this.following;
-                this.loading = false;
+                this.isloading = false;
             },
             error: () => {
                 this.following = [];
                 this.filtered = [];
-                this.loading = false;
+                this.isloading = false;
             }
         });
     }
@@ -75,7 +86,35 @@ export class StartChatModalComponent implements OnInit {
 
     startChat() {
         if (this.selectedUsers.length === 0) return;
-        this.startChatService.selectMultiple(this.selectedUsers.slice());
+
+        const currentUserInfo = this.userService.getCurrentUserInfo() || {};
+        const currentUserId = (currentUserInfo.id ?? currentUserInfo._id) as string;
+
+        const participantIds = [
+            ...new Set([
+                ...this.selectedUsers.map(s => s?.id ?? s?._id).filter(Boolean),
+                currentUserId,
+            ]),
+        ];
+
+        const isGroup = this.selectedUsers.length > 1;
+        const name = isGroup ? `${currentUserInfo.fullName || currentUserInfo.username} và ${this.selectedUsers.length} người khác` : undefined;
+
+        this.isCreating = true;
+        this.conversationService.create({ participantIds, isGroup, name }).subscribe({
+            next: (response: any) => {
+                this.isCreating = false;
+                const conv = response?.data ?? response;
+                const convId = conv?._id ?? conv?.id ?? null;
+                this.startChatService.close();
+                if (convId) this.router.navigate(['/inbox', convId]);
+                else this.alertService.show("error", "Lỗi khi tạo mới cuộc trò chuyện");
+            },
+            error: (response: any) => {
+                this.alertService.show("error", "Lỗi khi tạo mới cuộc trò chuyện");
+                this.isCreating = false;
+            }
+        })
     }
 
     onClose() {
