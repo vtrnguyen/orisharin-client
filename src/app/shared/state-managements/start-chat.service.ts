@@ -16,4 +16,9 @@ export class StartChatService {
         this._selected$.next(user);
         this.close();
     }
+
+    selectMultiple(users: any[]) {
+        this._selected$.next(users);
+        this.close();
+    }
 }

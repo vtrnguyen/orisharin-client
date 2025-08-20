@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
@@ -14,13 +14,11 @@ import { StartChatService } from '../../state-managements/start-chat.service';
     styleUrls: ['./start-chat-modal.component.scss']
 })
 export class StartChatModalComponent implements OnInit {
-    @Output() close = new EventEmitter<void>();
-    @Output() startConversation = new EventEmitter<any>();
-
     loading = false;
     query = '';
     following: any[] = [];
     filtered: any[] = [];
+    selectedUsers: any[] = [];
 
     constructor(
         private followService: FollowService,
@@ -36,7 +34,6 @@ export class StartChatModalComponent implements OnInit {
         this.loading = true;
         this.followService.getFollowing(userId).subscribe({
             next: (res: any) => {
-                console.log('Following users:', res);
                 this.following = Array.isArray(res) ? res : (res?.data ?? res?.results ?? []);
                 this.filtered = this.following;
                 this.loading = false;
@@ -60,8 +57,25 @@ export class StartChatModalComponent implements OnInit {
         );
     }
 
-    selectUser(u: any) {
-        this.startChatService.select(u);
+    isSelected(u: any) {
+        const id = u?.id ?? u?._id ?? u?.username;
+        return this.selectedUsers.some(s => (s?.id ?? s?._id ?? s?.username) === id);
+    }
+
+    toggleSelection(u: any, evt?: Event) {
+        if (evt) evt.stopPropagation();
+        const id = u?.id ?? u?._id ?? u?.username;
+        const idx = this.selectedUsers.findIndex(s => (s?.id ?? s?._id ?? s?.username) === id);
+        if (idx >= 0) {
+            this.selectedUsers.splice(idx, 1);
+        } else {
+            this.selectedUsers.push(u);
+        }
+    }
+
+    startChat() {
+        if (this.selectedUsers.length === 0) return;
+        this.startChatService.selectMultiple(this.selectedUsers.slice());
     }
 
     onClose() {
