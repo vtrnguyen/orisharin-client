@@ -7,6 +7,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { ConversationService } from '../../../core/services/conversation.service';
 import { UserService } from '../../../core/services/user.service';
+import { MessageSocketService } from '../../../core/services/message-socket.service';
 
 @Component({
     selector: 'app-chat-room',
@@ -35,20 +36,43 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     displayAvatar = '';
     isGroup = false;
 
+    // message socket properties
+    messages: any[] = [];
+    private socketSub?: Subscription;
+    private socketErrSub?: Subscription;
+    @ViewChild('messagesContainer', { static: false }) messagesContainer?: ElementRef;
+
     @ViewChild('fileInput', { static: false }) fileInput?: ElementRef<HTMLInputElement>;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private conversationService: ConversationService,
-        private userService: UserService
+        private userService: UserService,
+        private messageSocketService: MessageSocketService
     ) { }
 
     ngOnInit() {
         this.sub = this.route.paramMap.subscribe(pm => {
+
             this.roomId = pm.get('roomId');
             if (this.roomId) {
                 this.loadConversation(this.roomId);
+
+                // connect socket and subcribe to messages
+                this.messageSocketService.connect();
+
+                // subcribe new messages
+                this.socketSub = this.messageSocketService.onMessageCreated().subscribe((msg: any) => {
+                    if (msg?.conversationId && String(msg.conversationId) === String(this.roomId)) {
+                        this.messages.push(msg);
+                        setTimeout(() => this.scrollMessagesToBottom(), 50);
+                    }
+                });
+
+                this.socketErrSub = this.messageSocketService.onError().subscribe(err => {
+                    console.log("Socket error", err);
+                });
             } else {
                 this.conversation = null;
                 this.participants = [];
@@ -60,6 +84,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.sub?.unsubscribe();
+        this.socketSub?.unsubscribe();
+        this.socketErrSub?.unsubscribe();
+
+        this.messageSocketService.disconnect();
     }
 
     private loadConversation(id: string) {
@@ -97,6 +125,15 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 this.displayAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(this.displayName)}`;
             }
         });
+    }
+
+    private scrollMessagesToBottom() {
+        try {
+            const el = this.messagesContainer?.nativeElement;
+            if (el) el.scrollTop = el.scrollHeight;
+        } catch (e) {
+
+        }
     }
 
     toggleEmojiPicker() {
@@ -141,9 +178,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     send() {
         const payload = (this.text || '').trim();
-        if (!payload) return;
-        console.log('Send message', { roomId: this.roomId, text: payload });
+        if (!payload || !this.roomId) return;
+
+        const tempMsg = {
+            conversationId: this.roomId,
+            content: payload,
+            senderId: this.userService.getCurrentUserInfo()?.id,
+            sentAt: new Date().toISOString(),
+            _id: 'temp-' + Date.now()
+        };
+        this.messages.push(tempMsg);
         this.text = '';
+
+        // emit to gateway
+        this.messageSocketService.sendMessage({ conversationId: this.roomId, content: payload });
+        setTimeout(() => this.scrollMessagesToBottom(), 50);
     }
 
     back() {
