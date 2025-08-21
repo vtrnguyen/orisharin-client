@@ -44,11 +44,7 @@
                 alt="avatar" />
 
             <div class="max-w-xs lg:max-w-md">
-                <div *ngIf="isGroup && !isMessageFromCurrentUser(m.senderId)" class="text-xs text-gray-600 mb-1">
-                    {{ getSenderName(m.senderId) }}
-                </div>
-
-                <div class="p-2 rounded-lg text-sm relative" [title]="formatTime(m.sentAt)"
+                <div class="p-2 rounded-lg text-sm relative" [title]="'Đã gửi ' + formatTime(m.sentAt)"
                     [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId)"
                     [class.text-white]="isMessageFromCurrentUser(m.senderId)"
                     [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId)"
@@ -56,11 +52,6 @@
                     {{ m.content }}
 
                     <i *ngIf="m.isTemp" class="fa-solid fa-clock text-xs absolute -bottom-1 -right-1 opacity-70"></i>
-                </div>
-
-                <div class="text-xs text-gray-400 mt-1 message-time"
-                    [class.text-right]="isMessageFromCurrentUser(m.senderId)">
-                    {{ formatTime(m.sentAt) }}
                 </div>
             </div>
         </div>
