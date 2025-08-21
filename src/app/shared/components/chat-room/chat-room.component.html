@@ -1,6 +1,6 @@
 <div class="h-full flex flex-col">
     <div class="header flex items-center gap-3 px-4 py-3 border-b border-gray-200">
-        <button class="md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
+        <button class=" md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
             (click)="back()">
             <i class="fa-solid fa-arrow-left"></i>
         </button>
@@ -40,33 +40,54 @@
             <app-loading></app-loading>
         </div>
 
-        <div *ngFor="let m of messages; trackBy: trackByMessageId; let i = index" class="message-row"
-            [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)"
-            [style.margin-bottom]="getMessageMarginBottom(i)">
+        <div *ngFor="let m of messages; let i = index; trackBy: trackByMessageId" class="message-row"
+            [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)">
+            <ng-container *ngIf="!isMessageFromCurrentUser(m.senderId ?? m.sender); else noAvatar">
+                <app-tooltip *ngIf="shouldShowAvatar(i)" [text]="getSenderName(m.senderId ?? m.sender)">
+                    <img (click)="navigateToProfile(router, username)"
+                        class="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer"
+                        [src]="getSenderAvatar(m.senderId)" alt="avatar" />
+                </app-tooltip>
+                <div *ngIf="!shouldShowAvatar(i)" class="w-8 h-8 flex-shrink-0"></div>
+            </ng-container>
+            <ng-template #noAvatar></ng-template>
 
-            <app-tooltip *ngIf="!isMessageFromCurrentUser(m.senderId ?? m.sender)"
-                [text]="getSenderName(m.senderId ?? m.sender)">
-                <img (click)="navigateToProfile(router, username)"
-                    class="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer"
-                    [src]="getSenderAvatar(m.senderId)" alt="avatar" />
-            </app-tooltip>
-
-            <div class="max-w-xs lg:max-w-md">
-                <div *ngIf="shouldShowSenderName(i) && isGroup" class="text-xs text-gray-500 mb-1 px-2"
-                    [class.text-right]="isMessageFromCurrentUser(m.senderId)">
-                    {{ getSenderName(m.senderId) }}
-                </div>
-
-                <div class="p-2 rounded-lg text-sm relative" [title]="'Đã gửi ' + formatTime(m.sentAt)"
+            <div class="max-w-xs lg:max-w-md message-bubble-wrapper" [style.margin-bottom]="getMessageMarginBottom(i)">
+                <div class="p-2 rounded-lg text-sm relative message-bubble" [title]="'Đã gửi ' + formatTime(m.sentAt)"
                     [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId)"
                     [class.text-white]="isMessageFromCurrentUser(m.senderId)"
                     [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId)"
                     [class.text-gray-800]="!isMessageFromCurrentUser(m.senderId)" [class.opacity-50]="m.isTemp"
-                    [class.rounded-bl-sm]="!isMessageFromCurrentUser(m.senderId) && !shouldShowAvatar(i) && i < messages.length - 1"
-                    [class.rounded-br-sm]="isMessageFromCurrentUser(m.senderId) && i < messages.length - 1 && shouldHaveGroupedCorner(i)">
-                    {{ m.content }}
+                    [class.grouped-corner]="shouldHaveGroupedCorner(i)">
+                    <div *ngIf="shouldShowSenderName(i)" class="text-xs text-gray-500 mb-1">
+                        {{ getSenderName(m.senderId ?? m.sender) }}
+                    </div>
+
+                    <div class="whitespace-pre-wrap break-words">
+                        {{ m.content }}
+                    </div>
 
                     <i *ngIf="m.isTemp" class="fa-solid fa-clock text-xs absolute -bottom-1 -right-1 opacity-70"></i>
+                </div>
+
+                <div class="message-actions" [class.reverse]="isMessageFromCurrentUser(m.senderId)">
+                    <app-tooltip text="Bày tỏ cảm xúc">
+                        <button class="action" aria-label="react">
+                            <i class="fa-regular fa-face-smile"></i>
+                        </button>
+                    </app-tooltip>
+
+                    <app-tooltip text="Trả lời">
+                        <button class="action" aria-label="reply">
+                            <i class="fa-solid fa-reply"></i>
+                        </button>
+                    </app-tooltip>
+
+                    <app-tooltip text="Xem thêm">
+                        <button class="action" aria-label="more">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                    </app-tooltip>
                 </div>
             </div>
         </div>
@@ -109,7 +130,7 @@
 
             <div class="center">
                 <textarea [(ngModel)]="text" name="text" rows="1" placeholder="Nhập tin nhắn..." class="message-input"
-                    (input)="autoResize($event)" (keydown.enter)="$event.preventDefault(); send()"></textarea>
+                    (input)="autoResize($event)" (keydown.enter)="$event.preventDefault();"></textarea>
             </div>
 
             <div class="right">
