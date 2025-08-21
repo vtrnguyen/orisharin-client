@@ -1,29 +1,33 @@
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { PickerComponent } from '@ctrl/ngx-emoji-mart';
-import { ClickOutsideModule } from 'ng-click-outside';
-import { ConversationService } from '../../../core/services/conversation.service';
-import { UserService } from '../../../core/services/user.service';
-import { MessageSocketService } from '../../../core/services/message-socket.service';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ActivatedRoute, Router } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { Subscription } from "rxjs";
+import { PickerComponent } from "@ctrl/ngx-emoji-mart";
+import { ClickOutsideModule } from "ng-click-outside";
+import { ConversationService } from "../../../core/services/conversation.service";
+import { UserService } from "../../../core/services/user.service";
+import { MessageSocketService } from "../../../core/services/message-socket.service";
+import { MessageService } from "../../../core/services/message.service";
+import { LoadingComponent } from "../loading/loading.component";
+import { formatTime } from "../../functions/format-time.util";
 
 @Component({
-    selector: 'app-chat-room',
+    selector: "app-chat-room",
     standalone: true,
     imports: [
         CommonModule,
         FormsModule,
         PickerComponent,
         ClickOutsideModule,
+        LoadingComponent,
     ],
-    templateUrl: './chat-room.component.html',
-    styleUrls: ['./chat-room.component.scss'],
+    templateUrl: "./chat-room.component.html",
+    styleUrls: ["./chat-room.component.scss"],
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
     roomId: string | null = null;
-    text = '';
+    text = "";
     showEmojiPicker = false;
     showStickerPicker = false;
     private sub?: Subscription;
@@ -31,53 +35,46 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     // conversation detail
     conversation: any = null;
     participants: any[] = [];
-    displayName = '';
+    displayName = "";
     username = "";
-    displayAvatar = '';
+    displayAvatar = "";
     isGroup = false;
 
-    // message socket properties
+    // message properties
     messages: any[] = [];
     private socketSub?: Subscription;
     private socketErrSub?: Subscription;
-    @ViewChild('messagesContainer', { static: false }) messagesContainer?: ElementRef;
+    formatTime = formatTime;
+    currentUserId: string | null = null;
 
-    @ViewChild('fileInput', { static: false }) fileInput?: ElementRef<HTMLInputElement>;
+    // pagination properties
+    currentPage = 1;
+    pageSize = 20;
+    hasMoreMessages = true;
+    isLoadingMessages = false;
+
+    @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
+    @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private conversationService: ConversationService,
-        private userService: UserService,
-        private messageSocketService: MessageSocketService
+        public userService: UserService,
+        private messageSocketService: MessageSocketService,
+        private messageService: MessageService
     ) { }
 
     ngOnInit() {
+        const currentUserInfo = this.userService.getCurrentUserInfo();
+        this.currentUserId = currentUserInfo?.id ?? null;
+
         this.sub = this.route.paramMap.subscribe(pm => {
-
-            this.roomId = pm.get('roomId');
+            this.roomId = pm.get("roomId");
             if (this.roomId) {
-                this.loadConversation(this.roomId);
-
-                // connect socket and subcribe to messages
-                this.messageSocketService.connect();
-
-                // subcribe new messages
-                this.socketSub = this.messageSocketService.onMessageCreated().subscribe((msg: any) => {
-                    if (msg?.conversationId && String(msg.conversationId) === String(this.roomId)) {
-                        this.messages.push(msg);
-                        setTimeout(() => this.scrollMessagesToBottom(), 50);
-                    }
-                });
-
-                this.socketErrSub = this.messageSocketService.onError().subscribe(err => {
-                    console.log("Socket error", err);
-                });
+                this.initializeRoom(this.roomId);
             } else {
-                this.conversation = null;
-                this.participants = [];
-                this.displayName = '';
-                this.displayAvatar = '';
+                this.resetRoom();
             }
         });
     }
@@ -86,8 +83,46 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.sub?.unsubscribe();
         this.socketSub?.unsubscribe();
         this.socketErrSub?.unsubscribe();
-
         this.messageSocketService.disconnect();
+    }
+
+    private initializeRoom(roomId: string) {
+        this.resetPagination();
+        this.loadConversation(roomId);
+        this.loadMessages(roomId, 1, true);
+        this.setupSocket();
+    }
+
+    private resetRoom() {
+        this.conversation = null;
+        this.participants = [];
+        this.displayName = "";
+        this.displayAvatar = "";
+        this.messages = [];
+        this.resetPagination();
+    }
+
+    private resetPagination() {
+        this.currentPage = 1;
+        this.hasMoreMessages = true;
+        this.isLoadingMessages = false;
+        this.messages = [];
+    }
+
+    private setupSocket() {
+        this.messageSocketService.connect();
+
+        this.socketSub = this.messageSocketService.onMessageCreated().subscribe((msg: any) => {
+            if (msg?.conversationId && String(msg.conversationId) === String(this.roomId)) {
+                this.removeTempMessage(msg.content);
+                this.messages.push(msg);
+                setTimeout(() => this.scrollMessagesToBottom(), 50);
+            }
+        });
+
+        this.socketErrSub = this.messageSocketService.onError().subscribe(err => {
+            console.error("Socket error", err);
+        });
     }
 
     private loadConversation(id: string) {
@@ -106,34 +141,118 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 const currentId = currentUser?.id ?? currentUser?._id ?? currentUser?.userId;
 
                 if (conv?.isGroup) {
-                    this.displayName = conv?.name || (participants.map((p: any) => p.fullName || p.username).join(', ') || 'Nhóm');
+                    this.displayName = conv?.name || (participants.map((p: any) => p.fullName || p.username).join(", ") || "Nhom");
                     this.displayAvatar = conv?.avatarUrl?.trim()
                         ? conv.avatarUrl
                         : (participants[0]?.avatarUrl?.trim() ? participants[0].avatarUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(this.displayName)}`);
                 } else {
                     const other = participants.find((p: any) => String(p.id ?? p._id) !== String(currentId)) ?? participants[0] ?? null;
-                    this.displayName = other?.fullName || other?.username || 'Người dùng';
-                    this.username = other?.username || 'Người dùng';
+                    this.displayName = other?.fullName || other?.username;
+                    this.username = other?.username;
                     this.displayAvatar = other?.avatarUrl?.trim() ? other.avatarUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(this.displayName)}`;
                 }
             },
             error: (err) => {
-                console.error('Failed to load conversation', err);
                 this.conversation = null;
                 this.participants = [];
-                this.displayName = this.roomId ?? '';
+                this.displayName = this.roomId ?? "";
                 this.displayAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(this.displayName)}`;
             }
         });
+    }
+
+    private loadMessages(conversationId: string, page: number = 1, isInitial: boolean = false) {
+        if (this.isLoadingMessages) return;
+
+        this.isLoadingMessages = true;
+
+        this.messageService.getByConversationPaginated(conversationId, page, this.pageSize).subscribe({
+            next: (response: any) => {
+                const result = response?.data;
+                if (result?.messages) {
+                    if (isInitial) {
+                        this.messages = result.messages;
+                        setTimeout(() => this.scrollMessagesToBottom(), 100);
+                    } else {
+                        this.messages = [...result.messages, ...this.messages];
+                        setTimeout(() => this.maintainScrollPosition(), 50);
+                    }
+
+                    this.hasMoreMessages = result.hasMore;
+                    this.currentPage = page;
+                }
+                this.isLoadingMessages = false;
+            },
+            error: (err) => {
+                console.error("Failed to load messages", err);
+                this.isLoadingMessages = false;
+            }
+        });
+    }
+
+    loadMoreMessages() {
+        if (this.hasMoreMessages && !this.isLoadingMessages && this.roomId) {
+            this.loadMessages(this.roomId, this.currentPage + 1, false);
+        }
+    }
+
+    onScroll(event: Event) {
+        const element = event.target as HTMLElement;
+        if (element.scrollTop === 0 && this.hasMoreMessages && !this.isLoadingMessages) {
+            this.loadMoreMessages();
+        }
+    }
+
+    private maintainScrollPosition() {
+        const el = this.messagesContainer?.nativeElement;
+        if (el) {
+            const currentScrollHeight = el.scrollHeight;
+            const currentScrollTop = el.scrollTop;
+            setTimeout(() => {
+                const newScrollHeight = el.scrollHeight;
+                el.scrollTop = currentScrollTop + (newScrollHeight - currentScrollHeight);
+            }, 0);
+        }
     }
 
     private scrollMessagesToBottom() {
         try {
             const el = this.messagesContainer?.nativeElement;
             if (el) el.scrollTop = el.scrollHeight;
-        } catch (e) {
+        } catch (e) { }
+    }
 
-        }
+    private removeTempMessage(content: string) {
+        const currentUserId = this.userService.getCurrentUserInfo()?.id;
+        this.messages = this.messages.filter(msg =>
+            !(msg._id?.startsWith("temp-") && msg.content === content && String(msg.senderId) === String(currentUserId))
+        );
+    }
+
+    send() {
+        const payload = (this.text || "").trim();
+        if (!payload || !this.roomId) return;
+
+        const currentUser = this.userService.getCurrentUserInfo();
+        const tempId = "temp-" + Date.now();
+
+        const tempMsg = {
+            _id: tempId,
+            conversationId: this.roomId,
+            content: payload,
+            senderId: currentUser?.id || currentUser?._id || currentUser?.userId,
+            sentAt: new Date().toISOString(),
+            isTemp: true
+        };
+
+        this.messages.push(tempMsg);
+        this.text = "";
+        setTimeout(() => this.scrollMessagesToBottom(), 50);
+
+        this.messageSocketService.sendMessage({
+            conversationId: this.roomId,
+            content: payload
+        });
     }
 
     toggleEmojiPicker() {
@@ -142,7 +261,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     addEmoji(event: any) {
         const em = event?.emoji?.native || event?.emoji || event;
-        this.text = (this.text || '') + em;
+        this.text = (this.text || "") + em;
         this.showEmojiPicker = false;
     }
 
@@ -154,17 +273,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         const input = e.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
         const file = input.files[0];
-        console.log('Selected file (TODO send):', file);
-        input.value = '';
-    }
-
-    onStickerSelected(url: string) {
-        this.showStickerPicker = false;
-        this.text = url;
+        console.log("Selected file (TODO send):", file);
+        input.value = "";
     }
 
     startVoiceRecording() {
-        console.log('Start voice recording (TODO)');
+        console.log("Start voice recording (TODO)");
     }
 
     openStickerPicker() {
@@ -172,51 +286,69 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     quickHeart() {
-        this.text = '❤️';
+        this.text = "";
         this.send();
     }
 
-    send() {
-        const payload = (this.text || '').trim();
-        if (!payload || !this.roomId) return;
-
-        const tempMsg = {
-            conversationId: this.roomId,
-            content: payload,
-            senderId: this.userService.getCurrentUserInfo()?.id,
-            sentAt: new Date().toISOString(),
-            _id: 'temp-' + Date.now()
-        };
-        this.messages.push(tempMsg);
-        this.text = '';
-
-        // emit to gateway
-        this.messageSocketService.sendMessage({ conversationId: this.roomId, content: payload });
-        setTimeout(() => this.scrollMessagesToBottom(), 50);
-    }
-
     back() {
-        this.router.navigate(['/inbox']);
+        this.router.navigate(["/inbox"]);
     }
 
     autoResize(e: Event) {
         const ta = e.target as HTMLTextAreaElement;
         const MAX_HEIGHT = 160;
-        ta.style.height = 'auto';
+        ta.style.height = "auto";
         const newHeight = Math.min(ta.scrollHeight, MAX_HEIGHT);
-        ta.style.height = newHeight + 'px';
-        ta.style.overflowY = ta.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
+        ta.style.height = newHeight + "px";
+        ta.style.overflowY = ta.scrollHeight > MAX_HEIGHT ? "auto" : "hidden";
     }
 
     callPhone() {
-        console.log('Call phone clicked for room', this.roomId);
+        console.log("Call phone clicked for room", this.roomId);
     }
 
     callVideo() {
-        console.log('Video call clicked for room', this.roomId);
+        console.log("Video call clicked for room", this.roomId);
     }
 
     openConversationInfo() {
-        console.log('Open conversation info clicked for room', this.roomId);
+        console.log("Open conversation info clicked for room", this.roomId);
+    }
+
+    getSenderAvatar(sender: any): string {
+        if (!sender) {
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent('User')}`;
+        }
+        if (typeof sender === 'string') {
+            const p = this.participants.find((x: any) => String(x.id ?? x._id) === String(sender));
+            const name = p?.fullName || p?.username || 'User';
+            return (p?.avatarUrl && p?.avatarUrl.trim()) ? p.avatarUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+        }
+        const name = sender.fullName || sender.username || 'User';
+        return (sender.avatarUrl && String(sender.avatarUrl).trim()) ? sender.avatarUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+    }
+
+    trackByMessageId(index: number, message: any): string {
+        return message._id || message.id || index;
+    }
+
+    onEnterKey(event: KeyboardEvent): void {
+        event.preventDefault();
+        this.send();
+    }
+
+    isMessageFromCurrentUser(sender: any): boolean {
+        if (!sender) return false;
+        const sid = typeof sender === 'string' ? sender : (sender._id ?? sender.id ?? sender);
+        return String(sid) === String(this.currentUserId);
+    }
+
+    getSenderName(sender: any): string {
+        if (!sender) return 'Người dùng';
+        if (typeof sender === 'string') {
+            const p = this.participants.find((x: any) => String(x.id ?? x._id) === String(sender));
+            return p?.fullName || p?.username || 'Người dùng';
+        }
+        return sender.fullName || sender.username || 'Người dùng';
     }
 }

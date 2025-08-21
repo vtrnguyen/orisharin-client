@@ -21,13 +21,13 @@ export class MessageSocketService {
         if (this.socket && this.socket.connected) return;
 
         const token = this.auth.getToken();
-        const bearerToken = `Bearer ${token}`;
         const url = environment.socketUrl;
 
         this.socket = io(url, {
-            auth: { bearerToken },
+            auth: { token },
+            query: { token },
             transports: ['websocket', 'polling'],
-            path: '/socket.io'
+            withCredentials: true
         });
 
         this.socket.on('connect', () => {

@@ -94,3 +94,24 @@
     justify-content: center;
     z-index: 80;
 }
+
+.message-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.message-row.flex-row-reverse {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+.message-row .max-w-xs {
+    max-width: calc(100% - 48px);
+}
+
+@media (min-width: 1024px) {
+    .message-row .max-w-xs.lg\\:max-w-md {
+        max-width: 520px;
+    }
+}
