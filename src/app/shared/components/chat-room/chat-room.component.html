@@ -44,7 +44,7 @@
         <div *ngFor="let m of messages; trackBy: trackByMessageId" class="mb-4 message-row"
             [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)">
 
-            <img (click)="navigateToProfile(router, username)"
+            <img *ngIf="!isMessageFromCurrentUser(m.senderId ?? m.sender)" (click)="navigateToProfile(router, username)"
                 class="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer"
                 [src]="getSenderAvatar(m.senderId)" alt="avatar" />
 
