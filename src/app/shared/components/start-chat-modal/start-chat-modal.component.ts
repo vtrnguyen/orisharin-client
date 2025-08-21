@@ -104,11 +104,16 @@ export class StartChatModalComponent implements OnInit {
         this.conversationService.create({ participantIds, isGroup, name }).subscribe({
             next: (response: any) => {
                 this.isCreating = false;
-                const conv = response?.data ?? response;
-                const convId = conv?._id ?? conv?.id ?? null;
-                this.startChatService.close();
-                if (convId) this.router.navigate(['/inbox', convId]);
-                else this.alertService.show("error", "Lỗi khi tạo mới cuộc trò chuyện");
+                const payload = response?.data ?? response;
+                const createdConv = payload?.conversation ?? payload?.data ?? payload;
+                if (response?.success === true || payload?.success === true || createdConv) {
+                    this.startChatService.notifyCreated(payload);
+                    this.router.navigate(['/inbox', (createdConv?.id ?? createdConv?._id)]);
+                    this.onClose();
+                } else {
+                    this.alertService.show("error", "Không thể tạo cuộc trò chuyện mới");
+                    this.onClose();
+                }
             },
             error: (response: any) => {
                 this.alertService.show("error", "Lỗi khi tạo mới cuộc trò chuyện");

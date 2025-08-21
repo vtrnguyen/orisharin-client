@@ -9,6 +9,9 @@ export class StartChatService {
     private _selected$ = new Subject<any>();
     selected$ = this._selected$.asObservable();
 
+    private _created$ = new Subject<any>();
+    created$ = this._created$.asObservable();
+
     open() { this._show$.next(true); }
     close() { this._show$.next(false); }
 
@@ -20,5 +23,9 @@ export class StartChatService {
     selectMultiple(users: any[]) {
         this._selected$.next(users);
         this.close();
+    }
+
+    notifyCreated(conversation: any) {
+        this._created$.next(conversation);
     }
 }

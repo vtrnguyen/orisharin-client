@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { formatTime } from '../../functions/format-time.util';
+import { StartChatService } from '../../state-managements/start-chat.service';
 
 interface ConversationRow {
     conversation: any;
@@ -47,11 +48,29 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
 
     private onScrollBound = this.onScroll.bind(this);
 
-    constructor(private conversationService: ConversationService) { }
+    private startChatSub?: Subscription;
+
+    constructor(
+        private conversationService: ConversationService,
+        private startChatService: StartChatService
+    ) { }
 
     ngOnInit(): void {
         if (!this.userId) return;
         this.loadPage(this.page);
+
+        this.startChatSub = this.startChatService.created$.subscribe((payload: any) => {
+            const row = this.mapToRow(payload);
+            if (!row || !row.id) return;
+
+            // remove existing if present
+            const existingIndex = this.conversations.findIndex(c => String(c.id) === String(row.id));
+            if (existingIndex !== -1) {
+                this.conversations.splice(existingIndex, 1);
+            }
+            // prepend
+            this.conversations = [row, ...this.conversations];
+        });
     }
 
     ngAfterViewInit(): void {
@@ -78,6 +97,7 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
 
         this.convItemsSub?.unsubscribe();
         this.sub?.unsubscribe();
+        this.startChatSub?.unsubscribe();
     }
 
     private observeLastItem() {
@@ -131,6 +151,38 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
         }
     }
 
+    private mapToRow(it: any): ConversationRow {
+        const conv = it?.conversation ?? it ?? {};
+        let participants: any[] = it?.participants ?? conv?.participants ?? [];
+        if ((!participants || participants.length === 0) && Array.isArray(conv?.participantIds)) {
+            participants = conv.participantIds.map((id: any) => ({ id }));
+        }
+
+        const other = (participants || []).find((p: any) => String(p.id || p._id) !== String(this.userId));
+        const isGroup = !!conv?.isGroup;
+        const title = isGroup
+            ? (conv?.name || (participants || []).map((p: any) => p.fullName || p.username || String(p.id || p._id)).join(', '))
+            : (other?.fullName || other?.username || (other?.id ? ('@' + String(other.id).slice(0, 8)) : 'Người dùng'));
+
+        const avatarCandidate = (conv?.avatarUrl && conv.avatarUrl.trim())
+            ? conv.avatarUrl
+            : (other?.avatarUrl && other.avatarUrl.trim())
+                ? other.avatarUrl
+                : (`https://ui-avatars.com/api/?name=${encodeURIComponent(other?.fullName || other?.username || title)}`);
+
+        return {
+            conversation: conv,
+            participants,
+            id: conv?.id ?? conv?._id,
+            isGroup,
+            title,
+            avatarUrl: avatarCandidate,
+            lastMessage: conv?.lastMessage ?? '',
+            updatedAt: conv?.updatedAt ?? conv?.createdAt ?? new Date().toISOString(),
+            unread: conv?.unread ?? 0
+        } as ConversationRow;
+    }
+
     loadPage(page: number) {
         if (!this.userId) return;
         if (this.loading) return;
@@ -142,27 +194,7 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
                     const payloadData = payload?.data ?? payload;
                     const items: any[] = Array.isArray(payloadData) ? payloadData : (payloadData?.data ?? []);
                     const metaHasMore = (payload?.hasMore ?? payload?.data?.hasMore) ?? (items.length === this.limit);
-
-                    const mapped = items.map(it => {
-                        const conv = it.conversation ?? it;
-                        const participants = it.participants ?? it.participantIds ?? [];
-                        const other = (participants || []).find((p: any) => String(p.id || p._id) !== String(this.userId));
-                        const isGroup = conv.isGroup;
-                        const title = isGroup ? (conv.name || participants.map((p: any) => p.fullName || p.username).join(', ')) : (other?.fullName || other?.username || 'Người dùng');
-                        const avatarCandidate = (conv.avatarUrl && conv.avatarUrl.trim()) ? conv.avatarUrl : (other?.avatarUrl && other?.avatarUrl.trim() ? other.avatarUrl : (`https://ui-avatars.com/api/?name=${encodeURIComponent(title)}`));
-
-                        return {
-                            conversation: conv,
-                            participants,
-                            id: conv.id ?? conv._id,
-                            isGroup,
-                            title,
-                            avatarUrl: avatarCandidate,
-                            lastMessage: conv.lastMessage ?? '',
-                            updatedAt: conv.updatedAt,
-                            unread: conv.unread ?? 0
-                        } as ConversationRow;
-                    });
+                    const mapped = items.map(it => this.mapToRow(it));
 
                     this.conversations = [...this.conversations, ...mapped];
                     this.hasMore = metaHasMore;
