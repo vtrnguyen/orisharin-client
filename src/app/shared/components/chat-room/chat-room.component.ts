@@ -12,6 +12,7 @@ import { MessageService } from "../../../core/services/message.service";
 import { LoadingComponent } from "../loading/loading.component";
 import { formatTime } from "../../functions/format-time.util";
 import { navigateToProfile } from "../../functions/navigate-to-profile";
+import { TooltipComponent } from '../tooltip/tooltip.component';
 
 @Component({
     selector: "app-chat-room",
@@ -22,6 +23,7 @@ import { navigateToProfile } from "../../functions/navigate-to-profile";
         PickerComponent,
         ClickOutsideModule,
         LoadingComponent,
+        TooltipComponent,
     ],
     templateUrl: "./chat-room.component.html",
     styleUrls: ["./chat-room.component.scss"],
