@@ -353,4 +353,116 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         }
         return sender.fullName || sender.username || 'Người dùng';
     }
+
+    shouldShowAvatar(messageIndex: number): boolean {
+        if (messageIndex >= this.messages.length - 1) {
+            return true;
+        }
+
+        const currentMessage = this.messages[messageIndex];
+        const nextMessage = this.messages[messageIndex + 1];
+
+        if (this.isMessageFromCurrentUser(currentMessage.senderId)) {
+            return false;
+        }
+
+        if (!nextMessage ||
+            this.isMessageFromCurrentUser(nextMessage.senderId) ||
+            String(currentMessage.senderId) !== String(nextMessage.senderId)) {
+            return true;
+        }
+
+        const currentTime = new Date(currentMessage.sentAt).getTime();
+        const nextTime = new Date(nextMessage.sentAt).getTime();
+        const timeDiff = Math.abs(nextTime - currentTime);
+
+        if (timeDiff > 5 * 60 * 1000) {
+            return true;
+        }
+
+        return false;
+    }
+
+    shouldShowSenderName(messageIndex: number): boolean {
+        if (!this.isGroup) {
+            return false;
+        }
+
+        if (messageIndex <= 0) {
+            return true;
+        }
+
+        const currentMessage = this.messages[messageIndex];
+        const prevMessage = this.messages[messageIndex - 1];
+
+        if (this.isMessageFromCurrentUser(currentMessage.senderId)) {
+            return false;
+        }
+
+        if (!prevMessage ||
+            this.isMessageFromCurrentUser(prevMessage.senderId) ||
+            String(currentMessage.senderId) !== String(prevMessage.senderId)) {
+            return true;
+        }
+
+        // check time difference
+        const currentTime = new Date(currentMessage.sentAt).getTime();
+        const prevTime = new Date(prevMessage.sentAt).getTime();
+        const timeDiff = Math.abs(currentTime - prevTime);
+
+        if (timeDiff > 5 * 60 * 1000) { // in 5 minutes
+            return true;
+        }
+
+        return false;
+    }
+
+    getMessageMarginBottom(messageIndex: number): string {
+        if (messageIndex >= this.messages.length - 1) {
+            return '8px'; // last message
+        }
+
+        const currentMessage = this.messages[messageIndex];
+        const nextMessage = this.messages[messageIndex + 1];
+
+        // if nextMessage is from the same user and within a short time
+        if (nextMessage &&
+            String(currentMessage.senderId) === String(nextMessage.senderId) &&
+            this.isMessageFromCurrentUser(currentMessage.senderId) === this.isMessageFromCurrentUser(nextMessage.senderId)) {
+
+            const currentTime = new Date(currentMessage.sentAt).getTime();
+            const nextTime = new Date(nextMessage.sentAt).getTime();
+            const timeDiff = Math.abs(nextTime - currentTime);
+
+            if (timeDiff <= 5 * 60 * 1000) { // in 5 minutes
+                return '4px'; // consecutive messages from the same user
+            }
+        }
+
+        return '8px'; // normal distance
+    }
+
+    shouldHaveGroupedCorner(messageIndex: number): boolean {
+        if (messageIndex >= this.messages.length - 1) {
+            return false;
+        }
+
+        const currentMessage = this.messages[messageIndex];
+        const nextMessage = this.messages[messageIndex + 1];
+
+        // check if next message is from the same user
+        if (nextMessage &&
+            String(currentMessage.senderId) === String(nextMessage.senderId) &&
+            this.isMessageFromCurrentUser(currentMessage.senderId) === this.isMessageFromCurrentUser(nextMessage.senderId)) {
+
+            const currentTime = new Date(currentMessage.sentAt).getTime();
+            const nextTime = new Date(nextMessage.sentAt).getTime();
+            const timeDiff = Math.abs(nextTime - currentTime);
+
+            // if after 5 minutes then show normal corner
+            return timeDiff <= 5 * 60 * 1000;
+        }
+
+        return false;
+    }
 }
