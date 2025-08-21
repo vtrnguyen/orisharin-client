@@ -153,21 +153,21 @@
 
             <div class="right">
                 <ng-container *ngIf="!text?.trim(); else hasText">
-                    <button class="icon-btn" (click)="startVoiceRecording()" title="Ghi âm">
+                    <button class="icon-btn" (click)="startVoiceRecording()" title="Clip âm thanh">
                         <i class="fa-solid fa-microphone"></i>
                     </button>
 
-                    <button class="icon-btn" (click)="openFilePicker()" title="Ảnh / Video">
+                    <button class="icon-btn" (click)="openFilePicker()" title="Thêm ảnh hoặc video">
                         <i class="fa-solid fa-image"></i>
                     </button>
                     <input #fileInput type="file" accept="image/*,video/*" multiple (change)="onFileSelected($event)"
                         hidden />
 
-                    <button class="icon-btn" (click)="openStickerPicker()" title="Sticker">
-                        <i class="fa-regular fa-face-smile-wink"></i>
+                    <button class="icon-btn" (click)="openStickerPicker()" title="Chọn một ảnh GIF hoặc nhãn dán">
+                        <i class="fa-solid fa-icons"></i>
                     </button>
 
-                    <button class="icon-btn" (click)="quickHeart()" title="Gửi trái tim">
+                    <button class="icon-btn" (click)="quickHeart()" title="Thích">
                         <i class="fa-solid fa-heart"></i>
                     </button>
                 </ng-container>
