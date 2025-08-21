@@ -11,6 +11,7 @@ import { MessageSocketService } from "../../../core/services/message-socket.serv
 import { MessageService } from "../../../core/services/message.service";
 import { LoadingComponent } from "../loading/loading.component";
 import { formatTime } from "../../functions/format-time.util";
+import { navigateToProfile } from "../../functions/navigate-to-profile";
 
 @Component({
     selector: "app-chat-room",
@@ -45,6 +46,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private socketSub?: Subscription;
     private socketErrSub?: Subscription;
     formatTime = formatTime;
+    navigateToProfile = navigateToProfile;
     currentUserId: string | null = null;
 
     // pagination properties
@@ -58,7 +60,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     constructor(
         private route: ActivatedRoute,
-        private router: Router,
+        public router: Router,
         private conversationService: ConversationService,
         public userService: UserService,
         private messageSocketService: MessageSocketService,

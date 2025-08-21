@@ -65,8 +65,26 @@
             </div>
         </div>
 
-        <div *ngIf="messages.length === 0 && !isLoadingMessages" class="text-sm text-gray-500 text-center py-8">
-            Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!
+        <div *ngIf="messages.length === 0 && !isLoadingMessages" class="py-8">
+            <div *ngIf="messages.length === 0 && !isLoadingMessages" class="py-8">
+                <ng-container *ngIf="isGroup; else singleEmpty">
+                    <div class="text-sm text-gray-500 text-center">
+                        Chưa có tin nhắn trong nhóm này. Hãy bắt đầu cuộc trò chuyện!
+                    </div>
+                </ng-container>
+
+                <ng-template #singleEmpty>
+                    <div class="flex flex-col items-center justify-center text-center text-gray-500">
+                        <img [src]="displayAvatar" alt="avatar" class="w-24 h-24 rounded-full object-cover mb-2" />
+                        <div class="text-lg font-semibold">{{ displayName }}</div>
+                        <div class="text-sm text-gray-500 mb-4">{{ '@' + username || '' }}</div>
+                        <button class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
+                            (click)="navigateToProfile(router, username)">
+                            Xem trang cá nhân
+                        </button>
+                    </div>
+                </ng-template>
+            </div>
         </div>
     </div>
 
