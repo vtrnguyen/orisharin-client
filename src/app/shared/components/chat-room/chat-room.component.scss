@@ -15,6 +15,35 @@
     padding: 1rem;
 }
 
+.attachments-preview {
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    background: #f9fafb;
+    padding-top: 0.5rem;
+}
+
+.attachment-item {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: visible;
+}
+
+.remove-att-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 0.2px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    z-index: 80;
+    font-size: 0.75rem;
+}
+
 .composer {
     flex: 0 0 auto;
     padding: 0.5rem;
@@ -132,7 +161,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity .12s ease, transform .12s ease;
-    z-index: 40;
+    z-index: 50;
     padding: 4px;
 }
 
@@ -181,5 +210,20 @@
     .message-actions .action {
         width: 28px;
         height: 28px;
+    }
+
+    .attachment-item img,
+    .attachment-item video {
+        width: 96px;
+        height: 64px;
+    }
+
+    .remove-att-btn {
+        top: -6px;
+        right: -6px;
+        width: 22px;
+        height: 22px;
+        font-size: 0.65rem;
+        border: 1.5px solid rgba(255, 255, 255, 0.95);
     }
 }

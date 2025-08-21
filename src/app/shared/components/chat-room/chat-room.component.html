@@ -116,6 +116,24 @@
     </div>
 
     <div class="composer">
+        <div *ngIf="selectedAttachments.length" class="attachments-preview px-2 pb-2">
+            <div class="flex gap-2 overflow-auto py-1">
+                <div *ngFor="let att of selectedAttachments; let idx = index" class="attachment-item relative">
+                    <button type="button" class="remove-att-btn" (click)="removeAttachment(idx)" aria-label="Xóa">
+                        <app-tooltip text="Gỡ file đính kèm">
+                            <i class="fa-solid fa-xmark"></i>
+                        </app-tooltip>
+                    </button>
+
+                    <ng-container [ngSwitch]="att.type">
+                        <img *ngSwitchCase="'image'" [src]="att.url" alt="preview"
+                            class="w-28 h-20 object-cover rounded" />
+                        <video *ngSwitchCase="'video'" [src]="att.url" class="w-28 h-20 object-cover rounded"
+                            muted></video>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
         <div class="composer-inner">
             <div class="left">
                 <button class="icon-btn" (click)="toggleEmojiPicker()" aria-label="Emoji">
@@ -142,7 +160,8 @@
                     <button class="icon-btn" (click)="openFilePicker()" title="Ảnh / Video">
                         <i class="fa-solid fa-image"></i>
                     </button>
-                    <input #fileInput type="file" accept="image/*,video/*" (change)="onFileSelected($event)" hidden />
+                    <input #fileInput type="file" accept="image/*,video/*" multiple (change)="onFileSelected($event)"
+                        hidden />
 
                     <button class="icon-btn" (click)="openStickerPicker()" title="Sticker">
                         <i class="fa-regular fa-face-smile-wink"></i>

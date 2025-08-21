@@ -57,6 +57,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     hasMoreMessages = true;
     isLoadingMessages = false;
 
+    // preview media to send
+    selectedAttachments: Array<{ file: File; url: string; type: 'image' | 'video' }> = [];
+
     @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
     @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
 
@@ -88,6 +91,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.socketSub?.unsubscribe();
         this.socketErrSub?.unsubscribe();
         this.messageSocketService.disconnect();
+
+        this.selectedAttachments.forEach(a => {
+            try { URL.revokeObjectURL(a.url); } catch (e) { }
+        });
+        this.selectedAttachments = [];
     }
 
     private initializeRoom(roomId: string) {
@@ -257,6 +265,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             conversationId: this.roomId,
             content: payload
         });
+
+        this.selectedAttachments.forEach(a => { try { URL.revokeObjectURL(a.url); } catch (e) { } });
+        this.selectedAttachments = [];
     }
 
     toggleEmojiPicker() {
@@ -276,9 +287,25 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     onFileSelected(e: Event) {
         const input = e.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
-        const file = input.files[0];
-        console.log("Selected file (TODO send):", file);
-        input.value = "";
+
+        Array.from(input.files).forEach(file => {
+            try {
+                const url = URL.createObjectURL(file);
+                const type = file.type && file.type.startsWith('video') ? 'video' : 'image';
+                this.selectedAttachments.push({ file, url, type });
+            } catch (err) {
+                console.warn('Failed to create preview for file', err);
+            }
+        });
+
+        input.value = '';
+    }
+
+    removeAttachment(index: number) {
+        const att = this.selectedAttachments[index];
+        if (!att) return;
+        try { URL.revokeObjectURL(att.url); } catch (e) { }
+        this.selectedAttachments.splice(index, 1);
     }
 
     startVoiceRecording() {
