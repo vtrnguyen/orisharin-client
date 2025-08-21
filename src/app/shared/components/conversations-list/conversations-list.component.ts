@@ -153,6 +153,7 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
 
     private mapToRow(it: any): ConversationRow {
         const conv = it?.conversation ?? it ?? {};
+
         let participants: any[] = it?.participants ?? conv?.participants ?? [];
         if ((!participants || participants.length === 0) && Array.isArray(conv?.participantIds)) {
             participants = conv.participantIds.map((id: any) => ({ id }));

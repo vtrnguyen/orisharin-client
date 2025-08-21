@@ -151,7 +151,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                     const other = participants.find((p: any) => String(p.id ?? p._id) !== String(currentId)) ?? participants[0] ?? null;
                     this.displayName = other?.fullName || other?.username;
                     this.username = other?.username;
-                    this.displayAvatar = other?.avatarUrl?.trim() ? other.avatarUrl : `https://ui-avatars.com/api/?name=${encodeURIComponent(this.displayName)}`;
+                    this.displayAvatar = other?.avatarUrl;
                 }
             },
             error: (err) => {
