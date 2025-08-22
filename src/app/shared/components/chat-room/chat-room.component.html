@@ -44,10 +44,10 @@
             [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)"
             [style.margin-bottom]="getMessageMarginBottom(i)">
 
-            <div *ngIf="!isMessageFromCurrentUser(m.senderId ?? m.sender)" class="avatar-container"
-                [style.width.px]="32" [style.height.px]="32">
-                <app-tooltip *ngIf="shouldShowAvatar(i)" [text]="getSenderName(m.senderId ?? m.sender)">
-                    <img (click)="navigateToProfile(router, username)"
+            <div *ngIf="!isMessageFromCurrentUser(m.senderId)" class="avatar-container" [style.width.px]="32"
+                [style.height.px]="32">
+                <app-tooltip *ngIf="shouldShowAvatar(i)" [text]="getSenderName(m.senderId)">
+                    <img (click)="navigateToProfile(router, m.senderId.username)"
                         class="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer"
                         [src]="getSenderAvatar(m.senderId)" alt="avatar" />
                 </app-tooltip>
