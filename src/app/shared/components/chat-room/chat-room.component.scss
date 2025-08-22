@@ -196,6 +196,13 @@
     background: rgba(0, 0, 0, 0.06);
 }
 
+.message-bubble-wrapper.actions-open>.message-actions {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+    pointer-events: auto;
+}
+
 @media (max-width: 640px) {
     .message-actions {
         right: -120px;

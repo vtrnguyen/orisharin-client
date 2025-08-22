@@ -31,7 +31,8 @@
         </div>
     </div>
 
-    <div class="messages flex-1 overflow-auto p-4" #messagesContainer (scroll)="onScroll($event)">
+    <div class="messages flex-1 overflow-auto p-4" #messagesContainer (scroll)="onScroll($event)"
+        (click)="activeActionId = null">
         <div *ngIf="isLoadingMessages && messages.length === 0" class="py-8">
             <app-loading></app-loading>
         </div>
@@ -55,7 +56,9 @@
             </div>
 
             <div class="max-w-xs lg:max-w-md">
-                <div class="message-bubble-wrapper p-0 relative">
+                <div class="message-bubble-wrapper p-0 relative" (click)="onBubbleClick(m, i, $event)"
+                    [class.actions-open]="isActiveAction(m, i)">
+
                     <div class="p-2 rounded-lg text-sm relative message-bubble"
                         [title]="'Đã gửi ' + formatTime(m.sentAt)"
                         [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId)"
@@ -63,11 +66,9 @@
                         [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId)"
                         [class.text-gray-800]="!isMessageFromCurrentUser(m.senderId)" [class.opacity-50]="m.isTemp"
                         [class.grouped-corner]="shouldHaveGroupedCorner(i)">
-
                         <div class="whitespace-pre-wrap break-words">
                             {{ m.content }}
                         </div>
-
                         <i *ngIf="m.isTemp"
                             class="fa-solid fa-clock text-xs absolute -bottom-1 -right-1 opacity-70"></i>
                     </div>

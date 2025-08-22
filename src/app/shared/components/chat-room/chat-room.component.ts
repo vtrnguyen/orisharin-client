@@ -50,6 +50,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     formatTime = formatTime;
     navigateToProfile = navigateToProfile;
     currentUserId: string | null = null;
+    activeActionId: string | null = null;
 
     // pagination properties
     currentPage = 1;
@@ -493,5 +494,19 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         }
 
         return false;
+    }
+
+    private getMessageActionId(m: any, index: number): string {
+        return String(m?._id ?? m?.id ?? index);
+    }
+
+    isActiveAction(m: any, index: number): boolean {
+        return this.activeActionId === this.getMessageActionId(m, index);
+    }
+
+    onBubbleClick(m: any, index: number, ev?: Event) {
+        if (ev) ev.stopPropagation();
+        const id = this.getMessageActionId(m, index);
+        this.activeActionId = this.activeActionId === id ? null : id;
     }
 }
