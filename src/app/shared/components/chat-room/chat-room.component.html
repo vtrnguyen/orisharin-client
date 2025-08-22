@@ -69,8 +69,18 @@
                         <div class="whitespace-pre-wrap break-words">
                             {{ m.content }}
                         </div>
-                        <i *ngIf="m.isTemp"
-                            class="fa-solid fa-clock text-xs absolute -bottom-1 -right-1 opacity-70"></i>
+                        <div *ngIf="m.mediaUrls?.length" class="mt-2 flex gap-2 flex-wrap">
+                            <ng-container *ngFor="let url of m.mediaUrls; let j = index">
+                                <ng-container *ngIf="isVideo(url); else imageBlock">
+                                    <video [src]="url" class="w-56 h-36 object-cover rounded cursor-pointer"
+                                        controls></video>
+                                </ng-container>
+                                <ng-template #imageBlock>
+                                    <img [src]="url" alt="media"
+                                        class="w-56 h-36 object-cover rounded cursor-pointer" />
+                                </ng-template>
+                            </ng-container>
+                        </div>
                     </div>
 
                     <div class="message-actions" [class.reverse]="isMessageFromCurrentUser(m.senderId)">
@@ -133,6 +143,7 @@
                 </div>
             </div>
         </div>
+        <div *ngIf="isUploading" class="text-sm text-gray-500 px-2 py-1">Đang gửi...</div>
         <div class="composer-inner">
             <div class="left">
                 <button class="icon-btn" (click)="toggleEmojiPicker()" aria-label="Emoji">
@@ -151,7 +162,7 @@
             </div>
 
             <div class="right">
-                <ng-container *ngIf="!text?.trim(); else hasText">
+                <ng-container *ngIf="!(text?.trim() || selectedAttachments.length); else hasText">
                     <button class="icon-btn" (click)="startVoiceRecording()" title="Clip âm thanh">
                         <i class="fa-solid fa-microphone"></i>
                     </button>
@@ -172,7 +183,7 @@
                 </ng-container>
 
                 <ng-template #hasText>
-                    <button class="send-btn" (click)="send()">Gửi</button>
+                    <button class="send-btn" (click)="send()" [disabled]="isUploading">Gửi</button>
                 </ng-template>
             </div>
         </div>

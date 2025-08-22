@@ -13,6 +13,8 @@ import { LoadingComponent } from "../loading/loading.component";
 import { formatTime } from "../../functions/format-time.util";
 import { navigateToProfile } from "../../functions/navigate-to-profile";
 import { TooltipComponent } from '../tooltip/tooltip.component';
+import { AlertService } from "../../state-managements/alert.service";
+import { isImage, isVideo } from "../../functions/media-type.util";
 
 @Component({
     selector: "app-chat-room",
@@ -51,6 +53,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     navigateToProfile = navigateToProfile;
     currentUserId: string | null = null;
     activeActionId: string | null = null;
+    isUploading = false;
+    isImage = isImage;
+    isVideo = isVideo;
 
     // pagination properties
     currentPage = 1;
@@ -70,7 +75,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         private conversationService: ConversationService,
         public userService: UserService,
         private messageSocketService: MessageSocketService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private alertService: AlertService,
     ) { }
 
     ngOnInit() {
@@ -127,6 +133,14 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
         this.socketSub = this.messageSocketService.onMessageCreated().subscribe((msg: any) => {
             if (msg?.conversationId && String(msg.conversationId) === String(this.roomId)) {
+                // avoid duplicates
+                if (this.hasMessageId(msg._id)) {
+                    // still remove any temp message that matches same sender+content if present
+                    this.removeTempMessage(msg.content);
+                    return;
+                }
+
+                // remove temp by matching content+sender (fallback) and push real msg
                 this.removeTempMessage(msg.content);
                 this.messages.push(msg);
                 setTimeout(() => this.scrollMessagesToBottom(), 50);
@@ -244,31 +258,77 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     send() {
         const payload = (this.text || "").trim();
-        if (!payload || !this.roomId) return;
+        if ((!payload && this.selectedAttachments.length === 0) || !this.roomId) return;
 
         const currentUser = this.userService.getCurrentUserInfo();
         const tempId = "temp-" + Date.now();
 
-        const tempMsg = {
+        const filesToUpload = this.selectedAttachments.map(a => a.file);
+        const previewUrls = this.selectedAttachments.map(a => a.url);
+        const previewTypes = this.selectedAttachments.map(a => a.type);
+
+        const tempMsg: any = {
             _id: tempId,
             conversationId: this.roomId,
             content: payload,
             senderId: currentUser?.id || currentUser?._id || currentUser?.userId,
             sentAt: new Date().toISOString(),
-            isTemp: true
+            isTemp: true,
+            mediaUrls: previewUrls,
+            mediaTypes: previewTypes
         };
 
         this.messages.push(tempMsg);
+
+        this.selectedAttachments = [];
+        if (this.fileInput?.nativeElement) this.fileInput.nativeElement.value = '';
+
         this.text = "";
         setTimeout(() => this.scrollMessagesToBottom(), 50);
+
+        if (filesToUpload.length > 0) {
+            this.isUploading = true;
+
+            this.messageService.uploadFiles(this.roomId, filesToUpload, payload).subscribe({
+                next: (response: any) => {
+                    this.isUploading = false;
+                    const payloadData = response?.data ?? response;
+                    const created = payloadData?.data ?? payloadData;
+                    const msg = created?.message ?? created;
+
+                    try {
+                        previewUrls.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) { } });
+                    } catch (e) { }
+
+                    if (msg) {
+                        this.removeTempMessageById(tempId);
+
+                        if (!this.hasMessageId(msg._id)) {
+                            this.messages.push(msg);
+                        }
+                        setTimeout(() => this.scrollMessagesToBottom(), 50);
+                    } else {
+                        this.removeTempMessageById(tempId);
+                    }
+                },
+                error: (err) => {
+                    this.isUploading = false;
+                    try {
+                        previewUrls.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) { } });
+                    } catch (e) { }
+
+                    this.removeTempMessageById(tempId);
+                    this.alertService.show("error", "Failed to upload files");
+                }
+            });
+
+            return;
+        }
 
         this.messageSocketService.sendMessage({
             conversationId: this.roomId,
             content: payload
         });
-
-        this.selectedAttachments.forEach(a => { try { URL.revokeObjectURL(a.url); } catch (e) { } });
-        this.selectedAttachments = [];
     }
 
     toggleEmojiPicker() {
@@ -508,5 +568,15 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         if (ev) ev.stopPropagation();
         const id = this.getMessageActionId(m, index);
         this.activeActionId = this.activeActionId === id ? null : id;
+    }
+
+    private hasMessageId(id: any): boolean {
+        if (!id) return false;
+        return this.messages.some(m => String(m._id ?? m.id) === String(id));
+    }
+
+    private removeTempMessageById(tempId: string) {
+        if (!tempId) return;
+        this.messages = this.messages.filter(m => !(String(m._id).startsWith('temp-') && String(m._id) === String(tempId)));
     }
 }
