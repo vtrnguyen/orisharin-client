@@ -15,6 +15,7 @@ import { navigateToProfile } from "../../functions/navigate-to-profile";
 import { TooltipComponent } from '../tooltip/tooltip.component';
 import { AlertService } from "../../state-managements/alert.service";
 import { isImage, isVideo } from "../../functions/media-type.util";
+import { MediaViewerComponent } from "../media-viewer/media-viewer.component";
 
 @Component({
     selector: "app-chat-room",
@@ -26,6 +27,7 @@ import { isImage, isVideo } from "../../functions/media-type.util";
         ClickOutsideModule,
         LoadingComponent,
         TooltipComponent,
+        MediaViewerComponent,
     ],
     templateUrl: "./chat-room.component.html",
     styleUrls: ["./chat-room.component.scss"],
@@ -65,6 +67,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     // preview media to send
     selectedAttachments: Array<{ file: File; url: string; type: 'image' | 'video' }> = [];
+
+    // media viewer state
+    showMediaViewer = false;
+    viewerMedias: string[] = [];
+    viewerStart = 0;
 
     @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
     @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
@@ -578,5 +585,18 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private removeTempMessageById(tempId: string) {
         if (!tempId) return;
         this.messages = this.messages.filter(m => !(String(m._id).startsWith('temp-') && String(m._id) === String(tempId)));
+    }
+
+    openMediaViewer(medias: string[] = [], startIndex: number = 0) {
+        if (!medias || medias.length === 0) return;
+        this.viewerMedias = medias;
+        this.viewerStart = startIndex || 0;
+        this.showMediaViewer = true;
+    }
+
+    closeMediaViewer = () => {
+        this.showMediaViewer = false;
+        this.viewerMedias = [];
+        this.viewerStart = 0;
     }
 }

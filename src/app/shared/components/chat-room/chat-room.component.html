@@ -72,12 +72,12 @@
                         <div *ngIf="m.mediaUrls?.length" class="mt-2 flex gap-2 flex-wrap">
                             <ng-container *ngFor="let url of m.mediaUrls; let j = index">
                                 <ng-container *ngIf="isVideo(url); else imageBlock">
-                                    <video [src]="url" class="w-56 h-36 object-cover rounded cursor-pointer"
-                                        controls></video>
+                                    <video [src]="url" class="w-56 h-36 object-cover rounded cursor-pointer" controls
+                                        (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
                                 </ng-container>
                                 <ng-template #imageBlock>
-                                    <img [src]="url" alt="media"
-                                        class="w-56 h-36 object-cover rounded cursor-pointer" />
+                                    <img [src]="url" alt="media" class="w-56 h-36 object-cover rounded cursor-pointer"
+                                        (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
                                 </ng-template>
                             </ng-container>
                         </div>
@@ -189,3 +189,7 @@
         </div>
     </div>
 </div>
+
+<app-media-viewer *ngIf="showMediaViewer" [medias]="viewerMedias" [startIndex]="viewerStart"
+    [onClose]="closeMediaViewer">
+</app-media-viewer>
