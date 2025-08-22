@@ -464,11 +464,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             const timeDiff = Math.abs(nextTime - currentTime);
 
             if (timeDiff <= 5 * 60 * 1000) { // in 5 minutes
-                return '4px'; // consecutive messages from the same user
+                return '4px';
             }
         }
 
-        return '8px'; // normal distance
+        return '8px';
     }
 
     shouldHaveGroupedCorner(messageIndex: number): boolean {

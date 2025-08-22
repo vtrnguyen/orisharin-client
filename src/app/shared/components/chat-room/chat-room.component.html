@@ -6,12 +6,12 @@
         </button>
 
         <div class="flex items-center gap-3">
-            <img (click)="navigateToProfile(router, username)" [src]="displayAvatar" alt="avatar"
+            <img (click)="!isGroup ? navigateToProfile(router, username) : null" [src]="displayAvatar" alt="avatar"
                 class="w-10 h-10 rounded-full object-cover cursor-pointer" />
             <div>
-                <div (click)="navigateToProfile(router, username)" class="font-semibold truncate cursor-pointer"
-                    style="max-width: 220px;">{{ displayName }}</div>
-                <div (click)="navigateToProfile(router, username)" *ngIf="!isGroup"
+                <div (click)="!isGroup ? navigateToProfile(router, username) : null"
+                    class="font-semibold truncate cursor-pointer" style="max-width: 220px;">{{ displayName }}</div>
+                <div (click)="!isGroup ? navigateToProfile(router, username) : null" *ngIf="!isGroup"
                     class="text-xs text-gray-400 cursor-pointer">{{ "@" + username }}</div>
             </div>
         </div>
