@@ -60,27 +60,26 @@
                     [class.actions-open]="isActiveAction(m, i)">
 
                     <div class="p-2 rounded-lg text-sm relative message-bubble"
-                        [title]="'Đã gửi ' + formatTime(m.sentAt)"
                         [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId)"
                         [class.text-white]="isMessageFromCurrentUser(m.senderId)"
                         [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId)"
                         [class.text-gray-800]="!isMessageFromCurrentUser(m.senderId)" [class.opacity-50]="m.isTemp"
                         [class.grouped-corner]="shouldHaveGroupedCorner(i)">
-                        <div class="whitespace-pre-wrap break-words">
+                        <div [class]="(m.content && m.content.trim()) ? 'whitespace-pre-wrap break-words' : ''">
                             {{ m.content }}
                         </div>
-                        <div *ngIf="m.mediaUrls?.length" class="mt-2">
+                        <div *ngIf="m.mediaUrls?.length" [class]="(m.content && m.content.trim()) ? 'mt-2' : ''">
                             <ng-container *ngIf="m.mediaUrls.length <= 2; else manyMedias">
-                                <div class="flex gap-2 flex-wrap">
+                                <div [class]="m.mediaUrls.length === 2 ? 'grid grid-cols-2 gap-2' : ''">
                                     <ng-container *ngFor="let url of m.mediaUrls; let j = index">
                                         <ng-container *ngIf="isVideo(url); else imageBlockSmall">
-                                            <video [src]="url" class="w-56 h-36 object-cover rounded cursor-pointer"
+                                            <video [src]="url" class="w-full h-36 object-cover rounded cursor-pointer"
                                                 controls
                                                 (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
                                         </ng-container>
                                         <ng-template #imageBlockSmall>
                                             <img [src]="url" alt="media"
-                                                class="w-56 h-36 object-cover rounded cursor-pointer"
+                                                class="w-full h-36 object-cover rounded cursor-pointer"
                                                 (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
                                         </ng-template>
                                     </ng-container>
