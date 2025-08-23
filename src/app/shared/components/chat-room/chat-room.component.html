@@ -69,17 +69,47 @@
                         <div class="whitespace-pre-wrap break-words">
                             {{ m.content }}
                         </div>
-                        <div *ngIf="m.mediaUrls?.length" class="mt-2 flex gap-2 flex-wrap">
-                            <ng-container *ngFor="let url of m.mediaUrls; let j = index">
-                                <ng-container *ngIf="isVideo(url); else imageBlock">
-                                    <video [src]="url" class="w-56 h-36 object-cover rounded cursor-pointer" controls
-                                        (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
-                                </ng-container>
-                                <ng-template #imageBlock>
-                                    <img [src]="url" alt="media" class="w-56 h-36 object-cover rounded cursor-pointer"
-                                        (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
-                                </ng-template>
+                        <div *ngIf="m.mediaUrls?.length" class="mt-2">
+                            <ng-container *ngIf="m.mediaUrls.length <= 2; else manyMedias">
+                                <div class="flex gap-2 flex-wrap">
+                                    <ng-container *ngFor="let url of m.mediaUrls; let j = index">
+                                        <ng-container *ngIf="isVideo(url); else imageBlockSmall">
+                                            <video [src]="url" class="w-56 h-36 object-cover rounded cursor-pointer"
+                                                controls
+                                                (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
+                                        </ng-container>
+                                        <ng-template #imageBlockSmall>
+                                            <img [src]="url" alt="media"
+                                                class="w-56 h-36 object-cover rounded cursor-pointer"
+                                                (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
+                                        </ng-template>
+                                    </ng-container>
+                                </div>
                             </ng-container>
+
+                            <ng-template #manyMedias>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <ng-container *ngFor="let url of m.mediaUrls.slice(0,2); let j = index">
+                                        <div class="media-tile">
+                                            <ng-container *ngIf="isVideo(url); else imgBlock">
+                                                <video [src]="url"
+                                                    class="w-full h-36 object-cover rounded cursor-pointer" controls
+                                                    (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
+                                            </ng-container>
+                                            <ng-template #imgBlock>
+                                                <img [src]="url" alt="media"
+                                                    class="w-full h-36 object-cover rounded cursor-pointer"
+                                                    (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
+                                            </ng-template>
+
+                                            <div *ngIf="j === 1 && m.mediaUrls.length > 2" class="media-overlay"
+                                                (click)="openMediaViewer(m.mediaUrls, 1); $event.stopPropagation()">
+                                                +{{ m.mediaUrls.length - 2 }}
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </ng-template>
                         </div>
                     </div>
 

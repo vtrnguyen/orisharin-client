@@ -24,7 +24,6 @@ export class MediaViewerComponent implements OnInit, OnDestroy {
     isVideo = isVideo;
 
     ngOnInit() {
-        console.log('MediaViewerComponent initialized with medias:', this.medias);
         this.current = this.startIndex || 0;
         document.body.style.overflow = 'hidden';
         window.addEventListener('keydown', this.handleKeyDown);
