@@ -123,9 +123,44 @@
                         </app-tooltip>
 
                         <app-tooltip text="Xem thêm">
-                            <button class="action" aria-label="more"><i
-                                    class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <button class="action" title="Xem thêm" (click)="toggleMoreMenu(m, i, $event)">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
                         </app-tooltip>
+                    </div>
+
+                    <div *ngIf="activeMoreMenuId === getMessageActionId(m, i) || activeMoreMenuId === (m._id || m.id)"
+                        class="message-more-menu" [ngClass]="{ 'reverse': isMessageFromCurrentUser(m.senderId) }"
+                        (click)="$event.stopPropagation()" (clickOutside)="closeMoreMenu()">
+
+                        <div class="menu-item time">
+                            <div class="time-label">
+                                <div class="time-value">{{ formatExactSentAt(m) }}</div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="menu-row">
+                            <button class="menu-action" (click)="onForwardMessage(m)">
+                                Chuyển tiếp <i class="fa-solid fa-paper-plane mr-2"></i>
+                            </button>
+                            <button class="menu-action" (click)="onCopyMessage(m)">
+                                Sao chép <i class="fa-regular fa-copy mr-2"></i>
+                            </button>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <button *ngIf="isMessageFromCurrentUser(m.senderId)" class="menu-action danger"
+                            (click)="onRevokeMessage(m)">
+                            Thu hồi <i class="fa-solid fa-trash-can mr-2"></i>
+                        </button>
+
+                        <button *ngIf="!isMessageFromCurrentUser(m.senderId)" class="menu-action danger"
+                            (click)="onReportMessage(m)">
+                            Báo cáo <i class="fa-solid fa-flag mr-2"></i>
+                        </button>
                     </div>
                 </div>
             </div>

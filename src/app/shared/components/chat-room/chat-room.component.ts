@@ -58,6 +58,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     isUploading = false;
     isImage = isImage;
     isVideo = isVideo;
+    activeMoreMenuId: string | null = null;
 
     // pagination properties
     currentPage = 1;
@@ -575,7 +576,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return false;
     }
 
-    private getMessageActionId(m: any, index: number): string {
+    getMessageActionId(m: any, index: number): string {
         return String(m?._id ?? m?.id ?? index);
     }
 
@@ -610,5 +611,86 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.showMediaViewer = false;
         this.viewerMedias = [];
         this.viewerStart = 0;
+    }
+
+    toggleMoreMenu(m: any, index: number, ev?: Event) {
+        if (ev) ev.stopPropagation();
+        const id = this.getMessageActionId(m, index) || (m._id || m.id);
+        this.activeMoreMenuId = this.activeMoreMenuId === id ? null : id;
+        if (this.activeMoreMenuId) {
+        }
+    }
+
+    closeMoreMenu() {
+        this.activeMoreMenuId = null;
+    }
+
+    onCopyMessage(m: any) {
+        const text = m.content || '';
+        try {
+            navigator.clipboard.writeText(text || '');
+            this.alertService.show('success', 'Đã sao chép');
+        } catch {
+            this.alertService.show('error', 'Không thể sao chép');
+        }
+        this.closeMoreMenu();
+    }
+
+    onForwardMessage(m: any) {
+        this.alertService.show('warning', 'Chuyển tiếp (chưa triển khai)');
+        this.closeMoreMenu();
+    }
+
+    onRevokeMessage(m: any) {
+        if (!confirm('Bạn có chắc muốn thu hồi tin nhắn này?')) return;
+        this.alertService.show('success', 'Đã thu hồi tin nhắn');
+        this.closeMoreMenu();
+    }
+
+    onReportMessage(m: any) {
+        this.alertService.show('success', 'Đã gửi báo cáo');
+        this.closeMoreMenu();
+    }
+
+    formatExactSentAt(m: any): string {
+        try {
+            if (!m?.sentAt) return '';
+            const d = new Date(m.sentAt);
+            if (isNaN(d.getTime())) return '';
+
+            const pad = (n: number) => String(n).padStart(2, '0');
+            const hhmm = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+            const now = new Date();
+            // compute start of current week (Monday)
+            const todayDow = now.getDay(); // 0 = Sun, 1 = Mon, ...
+            const diffToMonday = (todayDow + 6) % 7; // days since Monday
+            const startOfWeek = new Date(now);
+            startOfWeek.setHours(0, 0, 0, 0);
+            startOfWeek.setDate(now.getDate() - diffToMonday);
+
+            if (d >= startOfWeek) {
+                // within current week -> show weekday short VN style
+                const weekdayMap: Record<number, string> = {
+                    1: 'T2', // Monday
+                    2: 'T3',
+                    3: 'T4',
+                    4: 'T5',
+                    5: 'T6',
+                    6: 'T7',
+                    0: 'CN'  // Sunday
+                };
+                const wd = weekdayMap[d.getDay()] || '';
+                return `${hhmm} (${wd})`;
+            } else {
+                // older -> full date with Vietnamese "Tháng"
+                const day = d.getDate();
+                const month = d.getMonth() + 1;
+                const year = d.getFullYear();
+                return `${hhmm} ${day} Tháng ${month}, ${year}`;
+            }
+        } catch {
+            return '';
+        }
     }
 }
