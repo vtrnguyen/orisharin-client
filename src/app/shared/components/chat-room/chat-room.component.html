@@ -158,7 +158,7 @@
 
             <div class="center">
                 <textarea [(ngModel)]="text" name="text" rows="1" placeholder="Nhập tin nhắn..." class="message-input"
-                    (input)="autoResize($event)" (keydown.enter)="$event.preventDefault();"></textarea>
+                    (input)="autoResize($event)" (keydown.enter)="onEnterKey($event)"></textarea>
             </div>
 
             <div class="right">

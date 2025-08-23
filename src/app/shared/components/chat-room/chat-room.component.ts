@@ -431,9 +431,21 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return message._id || message.id || index;
     }
 
-    onEnterKey(event: KeyboardEvent): void {
-        event.preventDefault();
-        this.send();
+    onEnterKey(event: Event): void {
+        const ke = event as KeyboardEvent;
+
+        if (ke.shiftKey) return;
+
+        ke.preventDefault();
+
+        if (this.isUploading) return;
+
+        const hasText = !!(this.text && this.text.trim());
+        const hasAttachments = this.selectedAttachments && this.selectedAttachments.length > 0;
+
+        if (hasText || hasAttachments) {
+            this.send();
+        }
     }
 
     isMessageFromCurrentUser(sender: any): boolean {
