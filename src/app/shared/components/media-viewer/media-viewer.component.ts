@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { isImage, isVideo } from '../../functions/media-type.util';
@@ -26,12 +26,10 @@ export class MediaViewerComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.current = this.startIndex || 0;
         document.body.style.overflow = 'hidden';
-        window.addEventListener('keydown', this.handleKeyDown);
     }
 
     ngOnDestroy() {
         document.body.style.overflow = 'auto';
-        window.removeEventListener('keydown', this.handleKeyDown)
     }
 
     prev(): void {
@@ -46,9 +44,33 @@ export class MediaViewerComponent implements OnInit, OnDestroy {
         this.onClose();
     }
 
-    private handleKeyDown = (event: KeyboardEvent): void => {
-        if (event.key === 'Escape') {
-            this.close();
+    @HostListener('window:keydown', ['$event'])
+    onWindowKeydown(e: KeyboardEvent): void {
+        if (!this.medias || this.medias.length === 0) return;
+
+        const key = e.key;
+
+        switch (key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                if (this.current < this.medias.length - 1) {
+                    this.next();
+                    e.preventDefault();
+                }
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                if (this.current > 0) {
+                    this.prev();
+                    e.preventDefault();
+                }
+                break;
+            case 'Escape':
+                this.close();
+                e.preventDefault();
+                break;
+            default:
+                break;
         }
     }
 }
