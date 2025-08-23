@@ -75,6 +75,9 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
   introduceInfo: any = null;
   isLoadingIntroduce = false;
 
+  // web urls modal properties
+  showWebsiteModal = false;
+
   @ViewChildren('postItem', { read: ElementRef }) postItems!: QueryList<ElementRef>;
   private intersectionObserver: IntersectionObserver | null = null;
 
@@ -508,5 +511,20 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
       const pid = p.id || p._id || (p.post && (p.post._id || p.post.id));
       return pid !== postId;
     });
+  }
+
+  onWebsiteClick(event: MouseEvent): void {
+    if (this.userInfo?.websiteLinks?.length > 1) {
+      event.preventDefault();
+      this.showWebsiteModal = true;
+    }
+  }
+
+  openWebsiteModal(): void {
+    this.showWebsiteModal = true;
+  }
+
+  closeWebsiteModal(): void {
+    this.showWebsiteModal = false;
   }
 }

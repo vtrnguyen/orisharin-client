@@ -18,7 +18,7 @@
     </div>
 
     <div class="flex items-center mb-6 relative">
-        <div class="flex items-center gap-2 flex-1">
+        <div class="flex items-center gap-1 flex-1">
             <div class="flex -space-x-2">
                 <ng-container *ngFor="let following of followings">
                     <img [src]="following.avatarUrl || 'https://randomuser.me/api/portraits/men/1.jpg'"
@@ -30,6 +30,21 @@
                 (click)="openFollowModal('followers')">
                 {{ userInfo.followersCount }} người theo dõi
             </span>
+
+            <ng-container *ngIf="userInfo.websiteLinks?.length">
+                <span class="text-gray-300 mx-1">·</span>
+                <a href="{{ userInfo.websiteLinks[0] }}" target="_blank" rel="noopener noreferrer"
+                    class="text-gray-400 text-sm inline-block max-w-[220px] truncate"
+                    [ngClass]="{ 'hover:underline': userInfo.websiteLinks.length === 1 }"
+                    (click)="onWebsiteClick($event)">
+                    {{ userInfo.websiteLinks[0] }}
+                </a>
+                <span *ngIf="userInfo.websiteLinks.length > 1"
+                    class="text-gray-400 text-sm cursor-pointer ml-2 flex items-center gap-1"
+                    (click)="openWebsiteModal(); $event.stopPropagation()">
+                    +{{ userInfo.websiteLinks.length - 1 }} <i class="fa-solid fa-chevron-down"></i>
+                </span>
+            </ng-container>
         </div>
         <div class="absolute right-0 top-0 flex items-center">
             <button (click)="toggleProfileMenu()"
@@ -351,6 +366,38 @@
             <div *ngIf="!isLoadingIntroduce && !introduceInfo" class="text-center text-gray-400 py-8">
                 Không thể tải thông tin người dùng.
             </div>
+        </div>
+    </div>
+</ng-container>
+
+<!-- website links modal -->
+<ng-container *ngIf="showWebsiteModal">
+    <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-4 animate-modal-fade-in"
+            (clickOutside)="closeWebsiteModal()">
+
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10"></div>
+
+                <h3 class="flex-1 text-center font-bold">Liên kết</h3>
+
+                <button type="button" (click)="closeWebsiteModal()" class="font-semibold px-2 py-1 cursor-pointer"
+                    title="Đóng">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="divide-y divide-gray-200 max-h-72 overflow-y-auto">
+                <ng-container *ngFor="let url of userInfo.websiteLinks; let i = index">
+                    <div class="py-3 px-2">
+                        <a [href]="url" target="_blank" rel="noopener noreferrer"
+                            class="text-gray-400 break-all hover:underline" [title]="url">
+                            {{ url }}
+                        </a>
+                    </div>
+                </ng-container>
+            </div>
+
         </div>
     </div>
 </ng-container>
