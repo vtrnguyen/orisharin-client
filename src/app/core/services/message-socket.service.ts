@@ -10,6 +10,7 @@ import { Observable, Subject } from 'rxjs';
 export class MessageSocketService {
     private socket?: Socket;
     private msgCreated$ = new Subject<any>();
+    private msgDeleted$ = new Subject<any>();
     private error$ = new Subject<any>();
 
     constructor(
@@ -38,6 +39,10 @@ export class MessageSocketService {
             this.ngZone.run(() => this.msgCreated$.next(msg));
         });
 
+        this.socket.on('message:deleted', (msg: any) => {
+            this.ngZone.run(() => this.msgDeleted$.next(msg));
+        });
+
         this.socket.on('message:error', (err: any) => {
             this.ngZone.run(() => this.error$.next(err));
         });
@@ -55,6 +60,10 @@ export class MessageSocketService {
 
     onMessageCreated(): Observable<any> {
         return this.msgCreated$.asObservable();
+    }
+
+    onMessageDeleted(): Observable<{ id: string }> {
+        return this.msgDeleted$.asObservable();
     }
 
     onError(): Observable<any> {

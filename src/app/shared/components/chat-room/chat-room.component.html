@@ -153,8 +153,8 @@
                         <div class="divider"></div>
 
                         <button *ngIf="isMessageFromCurrentUser(m.senderId)" class="menu-action danger"
-                            (click)="onRevokeMessage(m)">
-                            Thu hồi <i class="fa-solid fa-trash-can mr-2"></i>
+                            (click)="requestRevokeMessage(m, $event)">
+                            <i class="fa-solid fa-trash-can mr-2"></i> Thu hồi
                         </button>
 
                         <button *ngIf="!isMessageFromCurrentUser(m.senderId)" class="menu-action danger"
@@ -258,3 +258,9 @@
 <app-media-viewer *ngIf="showMediaViewer" [medias]="viewerMedias" [startIndex]="viewerStart"
     [onClose]="closeMediaViewer">
 </app-media-viewer>
+
+<app-confirm-modal *ngIf="showRevokeConfirm" [message]="'Bạn có chắc muốn thu hồi tin nhắn này?'" confirmText="Thu hồi"
+    cancelText="Hủy" confirmColor="text-red-600"
+    [imageUrl]="selectedMessageToRevoke?.sender?.avatarUrl || selectedMessageToRevoke?.senderAvatarUrl"
+    (confirm)="confirmRevoke()" (cancel)="cancelRevoke()">
+</app-confirm-modal>

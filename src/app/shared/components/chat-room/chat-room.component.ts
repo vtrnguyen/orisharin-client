@@ -16,6 +16,7 @@ import { TooltipComponent } from '../tooltip/tooltip.component';
 import { AlertService } from "../../state-managements/alert.service";
 import { isImage, isVideo } from "../../functions/media-type.util";
 import { MediaViewerComponent } from "../media-viewer/media-viewer.component";
+import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.component";
 
 @Component({
     selector: "app-chat-room",
@@ -28,6 +29,7 @@ import { MediaViewerComponent } from "../media-viewer/media-viewer.component";
         LoadingComponent,
         TooltipComponent,
         MediaViewerComponent,
+        ConfirmModalComponent,
     ],
     templateUrl: "./chat-room.component.html",
     styleUrls: ["./chat-room.component.scss"],
@@ -49,7 +51,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     // message properties
     messages: any[] = [];
-    private socketSub?: Subscription;
+    private socketCreatedSub?: Subscription;
+    private socketDeletedSub?: Subscription;
     private socketErrSub?: Subscription;
     formatTime = formatTime;
     navigateToProfile = navigateToProfile;
@@ -59,6 +62,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     isImage = isImage;
     isVideo = isVideo;
     activeMoreMenuId: string | null = null;
+    showRevokeConfirm = false;
+    selectedMessageToRevoke: any = null;
 
     // pagination properties
     currentPage = 1;
@@ -103,7 +108,8 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.sub?.unsubscribe();
-        this.socketSub?.unsubscribe();
+        this.socketCreatedSub?.unsubscribe();
+        this.socketDeletedSub?.unsubscribe();
         this.socketErrSub?.unsubscribe();
         this.messageSocketService.disconnect();
 
@@ -139,7 +145,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private setupSocket() {
         this.messageSocketService.connect();
 
-        this.socketSub = this.messageSocketService.onMessageCreated().subscribe((msg: any) => {
+        this.socketCreatedSub = this.messageSocketService.onMessageCreated().subscribe((msg: any) => {
             if (msg?.conversationId && String(msg.conversationId) === String(this.roomId)) {
                 // avoid duplicates
                 if (this.hasMessageId(msg._id)) {
@@ -154,6 +160,18 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 setTimeout(() => this.scrollMessagesToBottom(), 50);
             }
         });
+
+        this.socketDeletedSub = this.messageSocketService.onMessageDeleted().subscribe((payload: any) => {
+            const id = payload?.id ?? payload;
+            if (!id) return;
+
+            const before = this.messages.length;
+            this.messages = this.messages.filter(m => String(m._id ?? m.id) !== String(id));
+
+            if (this.messages.length !== before) {
+                this.alertService.show("success", "Người dùng đã thu hồi một tin nhắn.");
+            }
+        })
 
         this.socketErrSub = this.messageSocketService.onError().subscribe(err => {
             console.error("Socket error", err);
@@ -641,12 +659,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.closeMoreMenu();
     }
 
-    onRevokeMessage(m: any) {
-        if (!confirm('Bạn có chắc muốn thu hồi tin nhắn này?')) return;
-        this.alertService.show('success', 'Đã thu hồi tin nhắn');
-        this.closeMoreMenu();
-    }
-
     onReportMessage(m: any) {
         this.alertService.show('success', 'Đã gửi báo cáo');
         this.closeMoreMenu();
@@ -692,5 +704,48 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         } catch {
             return '';
         }
+    }
+
+    requestRevokeMessage(m: any, ev?: Event) {
+        if (ev) ev.stopPropagation();
+        this.selectedMessageToRevoke = m;
+        this.showRevokeConfirm = true;
+    }
+
+    cancelRevoke() {
+        this.showRevokeConfirm = false;
+        this.selectedMessageToRevoke = null;
+    }
+
+    confirmRevoke() {
+        const m = this.selectedMessageToRevoke;
+        if (!m) {
+            this.cancelRevoke();
+            return;
+        }
+        const id = m._id || m.id;
+        if (!id) {
+            this.alertService.show('error', 'Tin nhắn không hợp lệ');
+            this.cancelRevoke();
+            return;
+        }
+
+        this.messageService.revoke(id).subscribe({
+            next: (res: any) => {
+                const ok = res && (res.success === true || res.status === 200 || res);
+                if (res && res.success === false) {
+                    this.alertService.show('error', res.message || 'Thu hồi thất bại');
+                } else {
+                    this.messages = this.messages.filter(msg => String(msg._id ?? msg.id) !== String(id));
+                    this.alertService.show('success', 'Đã thu hồi tin nhắn');
+                }
+                this.cancelRevoke();
+            },
+            error: (err) => {
+                console.error('Revoke failed', err);
+                this.alertService.show('error', 'Thu hồi thất bại');
+                this.cancelRevoke();
+            }
+        });
     }
 }
