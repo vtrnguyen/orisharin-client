@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LikeTargetType } from '../../shared/enums/like-target.enums';
+import { LikeTargetType } from '../../shared/enums/like-target.enum';
 
 @Injectable({
     providedIn: 'root'

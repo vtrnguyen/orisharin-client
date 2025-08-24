@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
 import { LikeService } from '../../../core/services/like.service';
-import { LikeTargetType } from '../../enums/like-target.enums';
+import { LikeTargetType } from '../../enums/like-target.enum';
 import { Router } from '@angular/router';
 import { CreateCommentComponent } from '../create-comment/create-comment.component';
 import { navigateToProfile } from '../../functions/navigate-to-profile';
