@@ -60,9 +60,9 @@
                     [class.actions-open]="isActiveAction(m, i)">
 
                     <div class="p-2 rounded-lg text-sm relative message-bubble"
-                        [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1)"
+                        [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1 || (m.content && m.content.trim()))"
                         [class.text-white]="isMessageFromCurrentUser(m.senderId)"
-                        [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1)"
+                        [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1 || (m.content && m.content.trim()))"
                         [class.text-gray-800]="!isMessageFromCurrentUser(m.senderId)" [class.opacity-50]="m.isTemp"
                         [class.grouped-corner]="shouldHaveGroupedCorner(i)">
                         <div [class]="(m.content && m.content.trim()) ? 'whitespace-pre-wrap break-words' : ''">
