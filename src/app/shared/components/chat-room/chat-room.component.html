@@ -112,9 +112,28 @@
                         </div>
                     </div>
 
+                    <div *ngIf="hasReactions(m)" class="reaction-summary"
+                        [class.reverse]="isMessageFromCurrentUser(m.senderId)" (click)="openReactionList(m, $event)">
+                        <div class="reaction-icons">
+                            <ng-container *ngFor="let r of reactionTypesToShow(m)">
+                                <span class="reaction-chip">{{ getReactionEmoji(r) }}</span>
+                            </ng-container>
+                        </div>
+                        <div class="reaction-count">{{ totalReactions(m) }}</div>
+                    </div>
+
+                    <div *ngIf="activeReactionPickerId === getMessageActionId(m, i)" class="reaction-picker"
+                        [class.reverse]="isMessageFromCurrentUser(m.senderId)" (clickOutside)="closeReactionPicker()">
+                        <button *ngFor="let r of reactionList" class="reaction-btn" (click)="react(m, r.key, $event)">
+                            <span class="reaction-emoji">{{ r.emoji }}</span>
+                        </button>
+                    </div>
+
                     <div class="message-actions" [class.reverse]="isMessageFromCurrentUser(m.senderId)">
                         <app-tooltip text="Bày tỏ cảm xúc">
-                            <button class="action" aria-label="react"><i class="fa-regular fa-face-smile"></i></button>
+                            <button class="action" aria-label="react" (click)="toggleReactionPicker(m, i, $event)">
+                                <i class="fa-regular fa-face-smile"></i>
+                            </button>
                         </app-tooltip>
 
                         <app-tooltip text="Trả lời">
@@ -263,3 +282,6 @@
     [imageUrl]="selectedMessageToRevoke?.sender?.avatarUrl || selectedMessageToRevoke?.senderAvatarUrl"
     (confirm)="confirmRevoke()" (cancel)="cancelRevoke()">
 </app-confirm-modal>
+
+<app-reaction-list-modal *ngIf="showReactionListModal" [message]="selectedReactionMessage"
+    (close)="closeReactionList()"></app-reaction-list-modal>

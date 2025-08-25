@@ -1,0 +1,44 @@
+<div class="fixed flex items-center justify-center inset-0 z-[99]">
+    <div class="overlay bg-black/60 fixed inset-0" (click)="closeModal()"></div>
+
+    <div class="modal-container bg-white rounded-2xl shadow-xl w-full max-w-xl p-0 relative transition-all duration-300 ease-out opacity-0 scale-95 animate-modal-fade-in"
+        (clickOutside)="closeModal()" (click)="$event.stopPropagation()">
+        <div class="p-4">
+            <div class="header flex items-center justify-center mb-3 px-2">
+                <h3 class="text-lg font-semibold">Lượt cảm xúc</h3>
+            </div>
+
+            <div *ngIf="getReactionTypes().length > 0" class="px-3 pb-2">
+                <div class="tabs mb-2">
+                    <button *ngFor="let t of getReactionTypes()" class="tab" [class.active]="selectedType === t"
+                        (click)="selectType(t)">
+                        <span class="emoji">{{ reactionMap[t] || '👍' }}</span>
+                        <span class="badge">{{ (message?.reactionsCount?.[t] || 0) }}</span>
+                    </button>
+                </div>
+
+                <div *ngIf="selectedType" class="users-list mt-1 px-1 pb-2">
+                    <div *ngFor="let u of usersForType(selectedType)" class="user-row">
+                        <img (click)="navigateToProfile(router, u.username)" [src]="getAvatar(u)" alt="avatar"
+                            class="user-avatar cursor-pointer" />
+                        <div class="user-meta">
+                            <div (click)="navigateToProfile(router, u.username)"
+                                class="name cursor-pointer hover:underline">{{
+                                u.fullName || u.username }}</div>
+                            <div (click)="navigateToProfile(router, u.username)"
+                                class="username text-sm text-gray-500 cursor-pointer">{{ '@' + u.username }}</div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="usersForType(selectedType).length === 0" class="py-4 text-center text-gray-600">
+                        Không tìm thấy người dùng.
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="!getReactionTypes().length" class="py-8 text-center text-gray-600 px-4">
+                Chưa có ai bày tỏ cảm xúc cho tin nhắn này.
+            </div>
+        </div>
+    </div>
+</div>

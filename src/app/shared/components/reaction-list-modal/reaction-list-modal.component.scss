@@ -1,0 +1,101 @@
+@keyframes modal-fade-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-modal-fade-in {
+    animation: modal-fade-in 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+:host {
+    position: relative;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 50;
+}
+
+.modal-container {
+    position: relative;
+    z-index: 60;
+    margin: 1.5rem;
+    max-height: 80vh;
+    overflow: auto;
+}
+
+.header .close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #374151;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 12px;
+    background: #f7f7f8;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tab.active {
+    background: #111827;
+    color: white;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.tab .emoji {
+    font-size: 18px;
+}
+
+.tab .badge {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-left: 6px;
+}
+
+.users-list {
+    max-height: 44vh;
+    overflow: auto;
+}
+
+.user-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 6px;
+    border-bottom: 1px solid #e3e6e9;
+}
+
+.user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    object-fit: cover;
+}
+
+.user-meta .name {
+    font-weight: 600;
+}

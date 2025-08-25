@@ -5,7 +5,7 @@ import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { MediaViewerComponent } from '../media-viewer/media-viewer.component';
 import { isImage, isVideo } from '../../functions/media-type.util';
 import { formatTime } from '../../functions/format-time.util';
-import { MentionHighlightPipe } from '../../pipes/mention-hightlight/mention-hightlight.pipe';
+import { MentionHighlightPipe } from '../../pipes/mention-hightlight.pipe';
 import { LikeService } from '../../../core/services/like.service';
 import { LikeTargetType } from '../../enums/like-target.enum';
 

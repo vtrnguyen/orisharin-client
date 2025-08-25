@@ -17,6 +17,8 @@ import { AlertService } from "../../state-managements/alert.service";
 import { isImage, isVideo } from "../../functions/media-type.util";
 import { MediaViewerComponent } from "../media-viewer/media-viewer.component";
 import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.component";
+import { Reaction } from "../../enums/reaction.enum";
+import { ReactionListModalComponent } from "../reaction-list-modal/reaction-list-modal.component";
 
 @Component({
     selector: "app-chat-room",
@@ -30,6 +32,7 @@ import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.com
         TooltipComponent,
         MediaViewerComponent,
         ConfirmModalComponent,
+        ReactionListModalComponent
     ],
     templateUrl: "./chat-room.component.html",
     styleUrls: ["./chat-room.component.scss"],
@@ -79,6 +82,20 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     viewerMedias: string[] = [];
     viewerStart = 0;
 
+    // reaction properties
+    reactionList = [
+        { key: Reaction.Like, emoji: '👍' },
+        { key: Reaction.Love, emoji: '❤️' },
+        { key: Reaction.Haha, emoji: '😂' },
+        { key: Reaction.Wow, emoji: '😮' },
+        { key: Reaction.Sad, emoji: '😢' },
+        { key: Reaction.Angry, emoji: '😡' }
+    ];
+    activeReactionPickerId: string | null = null;
+    socketReactedSub?: Subscription;
+    selectedReactionMessage: any = null;
+    showReactionListModal = false;
+
     @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
     @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
 
@@ -110,6 +127,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.sub?.unsubscribe();
         this.socketCreatedSub?.unsubscribe();
         this.socketDeletedSub?.unsubscribe();
+        this.socketReactedSub?.unsubscribe();
         this.socketErrSub?.unsubscribe();
         this.messageSocketService.disconnect();
 
@@ -158,6 +176,22 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 this.removeTempMessage(msg.content);
                 this.messages.push(msg);
                 setTimeout(() => this.scrollMessagesToBottom(), 50);
+            }
+        });
+
+        this.socketReactedSub = this.messageSocketService.onMessageReacted().subscribe((payloadObj: any) => {
+            // payload may be { payload: { messageId, userId, type, reactionsCount } } or payload itself depending on server
+            const payload = payloadObj?.payload ?? payloadObj;
+            const messageId = payload?.messageId;
+            if (!messageId) return;
+            const mIdx = this.messages.findIndex(m => (m._id || m.id) === messageId);
+            if (mIdx === -1) return;
+            // update reactionsCount and reactions on local message
+            const updatedCounts = payload?.reactionsCount ?? {};
+            this.messages[mIdx].reactionsCount = updatedCounts;
+            // optionally update whole message if server sent it
+            if (payload?.message) {
+                this.messages[mIdx] = { ...this.messages[mIdx], ...payload.message };
             }
         });
 
@@ -594,10 +628,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return false;
     }
 
-    getMessageActionId(m: any, index: number): string {
-        return String(m?._id ?? m?.id ?? index);
-    }
-
     isActiveAction(m: any, index: number): boolean {
         return this.activeActionId === this.getMessageActionId(m, index);
     }
@@ -747,5 +777,73 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 this.cancelRevoke();
             }
         });
+    }
+
+    getMessageActionId(m: any, index: number): string {
+        return `msg-act-${(m._id || m.id) || index}`;
+    }
+
+    toggleReactionPicker(m: any, index: number, ev?: Event) {
+        ev?.stopPropagation();
+        const id = this.getMessageActionId(m, index);
+        this.activeReactionPickerId = this.activeReactionPickerId === id ? null : id;
+    }
+
+    closeReactionPicker() {
+        this.activeReactionPickerId = null;
+    }
+
+    react(m: any, type: string, ev?: Event) {
+        ev?.stopPropagation();
+        const messageId = m._id || m.id;
+        if (!messageId) return;
+        this.messageService.react(messageId, type).subscribe({
+            next: (res: any) => {
+                if (res && res.success && res.data && res.data.message) {
+                    // update local message with returned updated message
+                    const updated = res.data.message;
+                    const idx = this.messages.findIndex(x => (x._id || x.id) === messageId);
+                    if (idx !== -1) this.messages[idx] = updated;
+                }
+            },
+            error: (err) => {
+                this.alertService.show("error", "Không thể bày tỏ cảm xúc");
+            }
+        });
+        this.closeReactionPicker();
+    }
+
+    hasReactions(m: any): boolean {
+        const rc: Record<string, number> = m?.reactionsCount || {};
+        return Object.values(rc).some(v => (v || 0) > 0);
+    }
+
+    reactionTypesToShow(m: any): string[] {
+        const rc: Record<string, number> = m?.reactionsCount || {};
+        const entries = Object.entries(rc)
+            .filter(([k, v]) => (v || 0) > 0)
+            .sort((a: any, b: any) => (b[1] || 0) - (a[1] || 0))
+            .map(e => e[0]);
+        return entries.slice(0, 3);
+    }
+
+    totalReactions(m: any): number {
+        const rc: Record<string, number> = m?.reactionsCount || {};
+        return Object.values(rc).reduce((s, v) => s + (v || 0), 0);
+    }
+
+    getReactionEmoji(type: string): string {
+        const r = this.reactionList.find(x => x.key === type);
+        return r ? r.emoji : '👍';
+    }
+
+    openReactionList(m: any, ev?: Event) {
+        ev?.stopPropagation();
+        this.selectedReactionMessage = m;
+        this.showReactionListModal = true;
+    }
+    closeReactionList() {
+        this.selectedReactionMessage = null;
+        this.showReactionListModal = false;
     }
 }
