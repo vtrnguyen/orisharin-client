@@ -6,7 +6,8 @@
                 <img *ngIf="conversation?.avatarUrl; else placeholderAvatar" [src]="conversation.avatarUrl"
                     class="group-avatar-lg" />
                 <ng-template #placeholderAvatar>
-                    <div class="group-avatar-placeholder">{{ (conversation?.name || '').charAt(0) || '?'
+                    <div class="group-avatar-placeholder" title="Chưa có ảnh cho đoạn chat">{{ (conversation?.name ||
+                        '').charAt(0) || '?'
                         }}</div>
                 </ng-template>
                 <div class="title-block">
