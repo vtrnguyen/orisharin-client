@@ -124,7 +124,7 @@
                                 <span class="reaction-chip">{{ getReactionEmoji(r) }}</span>
                             </ng-container>
                         </div>
-                        <div class="reaction-count">{{ totalReactions(m) }}</div>
+                        <div *ngIf="totalReactions(m) > 1" class="reaction-count">{{ totalReactions(m) }}</div>
                     </div>
 
                     <div *ngIf="activeReactionPickerId === getMessageActionId(m, i)" class="reaction-picker"
