@@ -516,33 +516,48 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return sender.fullName || sender.username || 'Người dùng';
     }
 
+    private _getSenderId(sender: any): string {
+        if (!sender) return '';
+        if (typeof sender === 'string') return String(sender);
+        return String(sender._id ?? sender.id ?? sender);
+    }
+
     shouldShowAvatar(messageIndex: number): boolean {
-        if (messageIndex >= this.messages.length - 1) {
-            return true;
-        }
+        const THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
 
-        const currentMessage = this.messages[messageIndex];
-        const nextMessage = this.messages[messageIndex + 1];
-
-        if (this.isMessageFromCurrentUser(currentMessage.senderId)) {
+        if (!this.messages || messageIndex < 0 || messageIndex >= this.messages.length) {
             return false;
         }
 
-        if (!nextMessage ||
-            this.isMessageFromCurrentUser(nextMessage.senderId) ||
-            String(currentMessage.senderId) !== String(nextMessage.senderId)) {
+        const currentMessage = this.messages[messageIndex];
+        // if last message, display avatar
+        if (messageIndex === this.messages.length - 1) {
             return true;
         }
 
-        const currentTime = new Date(currentMessage.sentAt).getTime();
-        const nextTime = new Date(nextMessage.sentAt).getTime();
-        const timeDiff = Math.abs(nextTime - currentTime);
-
-        if (timeDiff > 5 * 60 * 1000) {
+        const nextMessage = this.messages[messageIndex + 1];
+        if (!nextMessage) {
             return true;
         }
 
-        return false;
+        const currSender = this._getSenderId(currentMessage?.senderId);
+        const nextSender = this._getSenderId(nextMessage?.senderId);
+
+        // if other senders => show avatar (e.g. A then C then B => A shows)
+        if (currSender !== nextSender) {
+            return true;
+        }
+
+        // same sender: check time difference between 2 messages
+        const currTime = currentMessage?.sentAt ? new Date(currentMessage.sentAt).getTime() : 0;
+        const nextTime = nextMessage?.sentAt ? new Date(nextMessage.sentAt).getTime() : 0;
+
+        if (!currTime || !nextTime) {
+            return false;
+        }
+
+        const diff = Math.abs(nextTime - currTime);
+        return diff > THRESHOLD_MS;
     }
 
     shouldShowSenderName(messageIndex: number): boolean {
