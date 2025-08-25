@@ -797,19 +797,24 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         ev?.stopPropagation();
         const messageId = m._id || m.id;
         if (!messageId) return;
+
         this.messageService.react(messageId, type).subscribe({
             next: (res: any) => {
                 if (res && res.success && res.data && res.data.message) {
-                    // update local message with returned updated message
                     const updated = res.data.message;
                     const idx = this.messages.findIndex(x => (x._id || x.id) === messageId);
-                    if (idx !== -1) this.messages[idx] = updated;
+                    if (idx !== -1) {
+                        this.messages[idx] = updated;
+                    } else {
+                        this.messages.push(updated);
+                    }
                 }
             },
             error: (err) => {
-                this.alertService.show("error", "Không thể bày tỏ cảm xúc");
+                this.alertService.show?.('error', 'Không thể bày tỏ cảm xúc');
             }
         });
+
         this.closeReactionPicker();
     }
 
@@ -842,8 +847,31 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.selectedReactionMessage = m;
         this.showReactionListModal = true;
     }
+
     closeReactionList() {
         this.selectedReactionMessage = null;
         this.showReactionListModal = false;
+    }
+
+    private _extractIdFromRef(ref: any): string | null {
+        if (!ref) return null;
+        if (typeof ref === 'string') return ref;
+        return (ref._id ?? ref.id ?? null) || null;
+    }
+
+    getUserReactionType(m: any): string | null {
+        const uid = this.currentUserId;
+        if (!uid || !m?.reactions) return null;
+        const found = (m.reactions || []).find((r: any) => {
+            const rid = r.userId ?? r.user ?? null;
+            const id = this._extractIdFromRef(rid);
+            return id && String(id) === String(uid);
+        });
+        return found ? found.type : null;
+    }
+
+    isReactionActive(m: any, type: string): boolean {
+        const t = this.getUserReactionType(m);
+        return !!t && String(t) === String(type);
     }
 }

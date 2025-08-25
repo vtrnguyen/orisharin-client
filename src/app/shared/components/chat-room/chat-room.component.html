@@ -124,7 +124,9 @@
 
                     <div *ngIf="activeReactionPickerId === getMessageActionId(m, i)" class="reaction-picker"
                         [class.reverse]="isMessageFromCurrentUser(m.senderId)" (clickOutside)="closeReactionPicker()">
-                        <button *ngFor="let r of reactionList" class="reaction-btn" (click)="react(m, r.key, $event)">
+                        <button *ngFor="let r of reactionList" class="reaction-btn"
+                            [class.active]="isReactionActive(m, r.key)" (click)="react(m, r.key, $event)"
+                            [attr.aria-pressed]="isReactionActive(m, r.key) ? 'true' : 'false'">
                             <span class="reaction-emoji">{{ r.emoji }}</span>
                         </button>
                     </div>

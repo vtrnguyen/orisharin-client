@@ -336,6 +336,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border-radius: 999px;
+    transition: transform 160ms cubic-bezier(.2, .9, .2, 1), box-shadow 160ms ease, background-color 160ms ease;
+    will-change: transform, box-shadow;
+    position: relative;
 }
 
 .reaction-summary {
@@ -374,6 +378,48 @@
     padding: 0 6px;
     background: rgba(0, 0, 0, 0.03);
     border-radius: 12px;
+}
+
+.reaction-btn.active {
+    background: #e9e1e1;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+}
+
+.reaction-btn.active .reaction-emoji {
+    filter: none;
+    font-weight: 700;
+}
+
+.reaction-btn:hover,
+.reaction-btn:focus {
+    transform: translateY(-4px) scale(1.18);
+    outline: none;
+}
+
+.reaction-btn .reaction-emoji {
+    display: inline-block;
+    transition: transform 160ms cubic-bezier(.2, .9, .2, 1);
+}
+
+.reaction-btn:hover .reaction-emoji,
+.reaction-btn:focus .reaction-emoji {
+    transform: scale(1.08);
+}
+
+.reaction-btn.active {
+    background: #ebe7e7;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.reaction-btn.active:hover {
+    transform: translateY(-4px) scale(1.18);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+}
+
+.reaction-btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
 }
 
 @media (min-width: 1024px) {
@@ -415,5 +461,22 @@
         height: 22px;
         font-size: 0.65rem;
         border: 1.5px solid rgba(255, 255, 255, 0.95);
+    }
+}
+
+@media (pointer: coarse) {
+    .reaction-btn:hover {
+        transform: none;
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .reaction-btn:active {
+        transform: translateY(-4px) scale(1.12);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.14);
+    }
+
+    .reaction-btn.active:active {
+        transform: translateY(-4px) scale(1.12);
     }
 }
