@@ -1,0 +1,78 @@
+<div class="fixed flex items-center justify-center inset-0 z-[990] bg-black/60" (click)="onClose()">
+    <div class="panel animate-modal-fade-in" (click)="$event.stopPropagation()" (clickOutside)="onClose()">
+
+        <div class="panel-header">
+            <div class="header-left">
+                <img *ngIf="conversation?.avatarUrl; else placeholderAvatar" [src]="conversation.avatarUrl"
+                    class="group-avatar-lg" />
+                <ng-template #placeholderAvatar>
+                    <div class="group-avatar-placeholder">{{ (conversation?.name || '').charAt(0) || '?'
+                        }}</div>
+                </ng-template>
+                <div class="title-block">
+                    <div class="group-name">{{ conversation?.name || 'Đoạn chat' }}</div>
+                    <div class="group-meta">{{ participants.length || 0 }} thành viên</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button *ngIf="isGroup"
+                    class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
+                    (click)="startEditName()">Đổi tên</button>
+                <label class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer">
+                    Đổi ảnh
+                    <input type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />
+                </label>
+            </div>
+        </div>
+
+        <div class="section settings mb-4">
+            <div class="row">
+                <div class="label flex items-center">
+                    <i class="fa-regular fa-bell mr-2 text-2xl"></i>
+                    Tắt thông báo về tin nhắn
+                </div>
+                <label class="switch-toggle" aria-label="Toggle notifications">
+                    <input type="checkbox" [checked]="notifyEnabled" (change)="toggleNotify()"
+                        [attr.aria-checked]="notifyEnabled" />
+                    <span class="track"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="section participants">
+            <div class="flex justify-between">
+                <h4 class="font-bold">Thành viên</h4>
+                <button *ngIf="isGroup" class="text-blue-800 hover:underline cursor-pointer" (click)="addMember()">Thêm
+                    thành
+                    viên</button>
+            </div>
+            <div class="list">
+                <ng-container *ngFor="let p of participants">
+                    <div class="participant-row">
+                        <img [src]="p.avatarUrl || ('https://ui-avatars.com/api/?name=' + (p.fullName || p.username))"
+                            class="avatar" />
+                        <div class="meta">
+                            <div class="fullname">
+                                {{ p.fullName || p.username }}
+                                <span *ngIf="isCurrentUser(p)" class="text-gray-400"> · Bạn</span>
+                                <span *ngIf="isGroup && isOwner(p)" class="badge admin">Quản trị viên</span>
+                            </div>
+                            <div class="username">{{ '@' + p.username }}</div>
+                        </div>
+                        <div class="more" *ngIf="!isOwner(p) && !isCurrentUser(p)">
+                            <button class="more-btn" (click)="onParticipantMenu(p)">⋯</button>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+
+        <div class="section actions">
+            <div class="action-row">
+                <button *ngIf="isGroup && isAdmin" class="danger" (click)="deleteChat()">Xóa nhóm chat</button>
+                <button *ngIf="isGroup && !isAdmin" class="danger" (click)="leaveChat()">Rời khỏi nhóm</button>
+                <button class="danger" (click)="leaveChat()">Xóa đoạn chat</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -292,3 +292,7 @@
 
 <app-reaction-list-modal *ngIf="showReactionListModal" [message]="selectedReactionMessage"
     (close)="closeReactionList()"></app-reaction-list-modal>
+
+<app-conversation-info-modal *ngIf="showConversationInfoModal" [conversation]="conversation"
+    [participants]="participants" (close)="showConversationInfoModal = false">
+</app-conversation-info-modal>

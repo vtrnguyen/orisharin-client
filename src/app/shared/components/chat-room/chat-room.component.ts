@@ -19,6 +19,7 @@ import { MediaViewerComponent } from "../media-viewer/media-viewer.component";
 import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.component";
 import { Reaction } from "../../enums/reaction.enum";
 import { ReactionListModalComponent } from "../reaction-list-modal/reaction-list-modal.component";
+import { ConversationInfoModalComponent } from "../conversation-info-modal/conversation-info-modal.component";
 
 @Component({
     selector: "app-chat-room",
@@ -32,7 +33,8 @@ import { ReactionListModalComponent } from "../reaction-list-modal/reaction-list
         TooltipComponent,
         MediaViewerComponent,
         ConfirmModalComponent,
-        ReactionListModalComponent
+        ReactionListModalComponent,
+        ConversationInfoModalComponent
     ],
     templateUrl: "./chat-room.component.html",
     styleUrls: ["./chat-room.component.scss"],
@@ -95,6 +97,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     socketReactedSub?: Subscription;
     selectedReactionMessage: any = null;
     showReactionListModal = false;
+
+    // conversation info properties
+    showConversationInfoModal = false;
 
     @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
     @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
@@ -464,7 +469,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     openConversationInfo() {
-        console.log("Open conversation info clicked for room", this.roomId);
+        this.showConversationInfoModal = true;
     }
 
     getSenderAvatar(sender: any): string {
