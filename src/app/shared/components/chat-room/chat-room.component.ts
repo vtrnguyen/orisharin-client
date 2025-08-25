@@ -561,37 +561,33 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     shouldShowSenderName(messageIndex: number): boolean {
-        if (!this.isGroup) {
-            return false;
-        }
+        const THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes threshold (adjustable)
 
-        if (messageIndex <= 0) {
-            return true;
-        }
+        if (!this.isGroup) return false;
+        if (!this.messages || messageIndex < 0 || messageIndex >= this.messages.length) return false;
 
         const currentMessage = this.messages[messageIndex];
-        const prevMessage = this.messages[messageIndex - 1];
+        // show for first message in list
+        if (messageIndex === 0) return true;
 
-        if (this.isMessageFromCurrentUser(currentMessage.senderId)) {
+        const prevMessage = this.messages[messageIndex - 1];
+        if (!prevMessage) return true;
+
+        const currSender = this._getSenderId(currentMessage?.senderId);
+        const prevSender = this._getSenderId(prevMessage?.senderId);
+
+        // different sender -> show name
+        if (currSender !== prevSender) return true;
+
+        // same sender -> check time gap
+        const currTime = currentMessage?.sentAt ? new Date(currentMessage.sentAt).getTime() : 0;
+        const prevTime = prevMessage?.sentAt ? new Date(prevMessage.sentAt).getTime() : 0;
+        if (!currTime || !prevTime) {
+            // if timestamps missing, don't show to keep UI compact
             return false;
         }
 
-        if (!prevMessage ||
-            this.isMessageFromCurrentUser(prevMessage.senderId) ||
-            String(currentMessage.senderId) !== String(prevMessage.senderId)) {
-            return true;
-        }
-
-        // check time difference
-        const currentTime = new Date(currentMessage.sentAt).getTime();
-        const prevTime = new Date(prevMessage.sentAt).getTime();
-        const timeDiff = Math.abs(currentTime - prevTime);
-
-        if (timeDiff > 5 * 60 * 1000) { // in 5 minutes
-            return true;
-        }
-
-        return false;
+        return Math.abs(currTime - prevTime) > THRESHOLD_MS;
     }
 
     getMessageMarginBottom(messageIndex: number): string {

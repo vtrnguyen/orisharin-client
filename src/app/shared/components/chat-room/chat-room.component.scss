@@ -146,6 +146,18 @@
     overflow: visible;
 }
 
+.sender-name {
+    font-size: 0.72rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+    line-height: 1;
+}
+
+.message-row.flex-row-reverse {
+    padding-left: 0;
+    text-align: right;
+}
+
 .message-actions {
     position: absolute;
     top: 50%;
