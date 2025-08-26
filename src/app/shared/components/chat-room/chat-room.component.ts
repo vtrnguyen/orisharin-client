@@ -136,7 +136,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             this.isGroup = !!conv.isGroup;
             this.participants = conv.participantIds ?? conv.participants ?? this.participants;
             this.displayName = conv.name ?? this.displayName;
-            this.displayAvatar = conv.avatarUrl ?? this.displayAvatar;
+            if (conv.avatarUrl) {
+                this.displayAvatar = conv.avatarUrl;
+            }
         });
     }
 
