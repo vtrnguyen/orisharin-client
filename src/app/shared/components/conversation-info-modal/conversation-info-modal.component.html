@@ -80,7 +80,9 @@
                             <div class="username">{{ '@' + p.username }}</div>
                         </div>
                         <div class="more" *ngIf="!isCurrentUser(p)">
-                            <button class="more-btn" (click)="onParticipantMenu(p)">⋯</button>
+                            <button class="more-btn text-gray-600" (click)="onParticipantMenu(p)">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
                         </div>
                     </div>
                 </ng-container>
