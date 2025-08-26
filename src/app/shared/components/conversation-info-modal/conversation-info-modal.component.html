@@ -6,9 +6,7 @@
                 <img *ngIf="conversation?.avatarUrl; else placeholderAvatar" [src]="conversation.avatarUrl"
                     class="group-avatar-lg" />
                 <ng-template #placeholderAvatar>
-                    <div class="group-avatar-placeholder" title="Chưa có ảnh cho đoạn chat">{{ (conversation?.name ||
-                        '').charAt(0) || '?'
-                        }}</div>
+                    <div class="group-avatar-placeholder">{{ (conversation?.name || '').charAt(0) || '?' }}</div>
                 </ng-template>
                 <div class="title-block">
                     <div class="group-name">{{ conversation?.name || 'Đoạn chat' }}</div>
@@ -26,16 +24,15 @@
             </div>
         </div>
 
-        <div class="section settings mb-4">
+        <div class="section settings">
             <div class="row">
-                <div class="label flex items-center">
-                    <i class="fa-regular fa-bell mr-2 text-2xl"></i>
-                    Tắt thông báo về tin nhắn
-                </div>
+                <div class="label">Tắt thông báo</div>
                 <label class="switch-toggle" aria-label="Toggle notifications">
                     <input type="checkbox" [checked]="notifyEnabled" (change)="toggleNotify()"
                         [attr.aria-checked]="notifyEnabled" />
-                    <span class="track"></span>
+                    <span class="track">
+                        <span class="thumb"></span>
+                    </span>
                 </label>
             </div>
         </div>
@@ -43,7 +40,8 @@
         <div class="section participants">
             <div class="flex justify-between">
                 <h4 class="font-bold">Thành viên</h4>
-                <button *ngIf="isGroup" class="text-blue-800 hover:underline cursor-pointer" (click)="addMember()">Thêm
+                <button *ngIf="isGroup" class="text-sm text-blue-800 hover:underline cursor-pointer"
+                    (click)="addMember()">Thêm
                     thành
                     viên</button>
             </div>
@@ -60,7 +58,7 @@
                             </div>
                             <div class="username">{{ '@' + p.username }}</div>
                         </div>
-                        <div class="more" *ngIf="!isOwner(p) && !isCurrentUser(p)">
+                        <div class="more" *ngIf="!isCurrentUser(p)">
                             <button class="more-btn" (click)="onParticipantMenu(p)">⋯</button>
                         </div>
                     </div>
@@ -77,3 +75,6 @@
         </div>
     </div>
 </div>
+
+<app-conversation-rename-modal *ngIf="showRenameModal" [conversation]="conversation" (saved)="onRenameSaved($event)"
+    (close)="onRenameClosed()"></app-conversation-rename-modal>

@@ -3,11 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { UserService } from '../../../core/services/user.service';
+import { ConversationRenameModalComponent } from '../conversation-rename-modal/conversation-rename-modal.component';
+import { ConversationService } from '../../../core/services/conversation.service';
+import { AlertService } from '../../state-managements/alert.service';
+import { ConversationStateService } from '../../state-managements/conversation-state.service';
 
 @Component({
     selector: 'app-conversation-info-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, ClickOutsideModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ClickOutsideModule,
+        ConversationRenameModalComponent
+    ],
     templateUrl: './conversation-info-modal.component.html',
     styleUrls: ['./conversation-info-modal.component.scss']
 })
@@ -20,13 +29,17 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
     isAdmin = false;
     isGroup = false;
 
-    editingName = false;
-    nameDraft = '';
+    // rename modal properties
+    showRenameModal = false;
+
     notifyEnabled = true;
     uploadingAvatar = false;
 
     constructor(
-        private userService: UserService
+        private userService: UserService,
+        private conversationService: ConversationService,
+        private alertService: AlertService,
+        private conversationStateService: ConversationStateService,
     ) { }
 
     ngOnInit() {
@@ -66,30 +79,50 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
     }
 
     toggleNotify() {
-        // simple local toggle; persist via API later if needed
         this.notifyEnabled = !this.notifyEnabled;
     }
 
     startEditName() {
-        this.editingName = true;
-        this.nameDraft = this.conversation?.name || '';
+        this.showRenameModal = true;
     }
 
     addMember() {
 
     }
 
-    saveName() {
-        const v = (this.nameDraft || '').trim();
-        // local update only — backend modal/flow will be implemented later
-        if (v && this.conversation) {
-            this.conversation.name = v;
+    onRenameSaved(newName: string) {
+        if (!this.conversation?.id && !this.conversation?._id) {
+            if (this.conversation) this.conversation.name = newName;
+            this.showRenameModal = false;
+            return;
         }
-        this.editingName = false;
+
+        const id = this.conversation.id ?? this.conversation._id;
+        this.conversationService.updateName(id, newName).subscribe({
+            next: (response: any) => {
+                const updated = response?.data?.conversation ?? response?.conversation ?? null;
+                if (updated) {
+                    this.conversationStateService.setConversation(updated);
+                    this.alertService.show("success", "Tên cuộc trò chuyện đã được thay đổi");
+                } else {
+                    this.conversationStateService.updateName(newName);
+                    this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật tên cuộc trò chuyện");
+                }
+                this.showRenameModal = false;
+            },
+            error: () => {
+                this.conversationStateService.updateName(newName);
+                this.showRenameModal = false;
+                this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật tên cuộc trò chuyện");
+            }
+        });
+    }
+
+    onRenameClosed() {
+        this.showRenameModal = false;
     }
 
     onAvatarSelected(e: Event) {
-        // keep hook for later; currently noop
         const input = e.target as HTMLInputElement;
         if (input) input.value = '';
     }

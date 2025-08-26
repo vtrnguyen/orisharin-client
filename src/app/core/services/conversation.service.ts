@@ -26,4 +26,8 @@ export class ConversationService {
     getById(conversationId: string): Observable<any> {
         return this.http.get<any>(`${this.apiUrl}/${conversationId}`);
     }
+
+    updateName(conversationId: string, name: string): Observable<any> {
+        return this.http.patch<any>(`${this.apiUrl}/${conversationId}/name`, { name });
+    }
 }

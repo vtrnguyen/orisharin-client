@@ -20,6 +20,7 @@ import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.com
 import { Reaction } from "../../enums/reaction.enum";
 import { ReactionListModalComponent } from "../reaction-list-modal/reaction-list-modal.component";
 import { ConversationInfoModalComponent } from "../conversation-info-modal/conversation-info-modal.component";
+import { ConversationStateService } from "../../state-managements/conversation-state.service";
 
 @Component({
     selector: "app-chat-room",
@@ -100,6 +101,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     // conversation info properties
     showConversationInfoModal = false;
+    private convSub?: Subscription;
 
     @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
     @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
@@ -112,6 +114,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         private messageSocketService: MessageSocketService,
         private messageService: MessageService,
         private alertService: AlertService,
+        private conversationStateService: ConversationStateService,
     ) { }
 
     ngOnInit() {
@@ -126,6 +129,15 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 this.resetRoom();
             }
         });
+
+        this.convSub = this.conversationStateService.conversation$.subscribe(conv => {
+            if (!conv) return;
+            this.conversation = conv;
+            this.isGroup = !!conv.isGroup;
+            this.participants = conv.participantIds ?? conv.participants ?? this.participants;
+            this.displayName = conv.name ?? this.displayName;
+            this.displayAvatar = conv.avatarUrl ?? this.displayAvatar;
+        });
     }
 
     ngOnDestroy() {
@@ -134,6 +146,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.socketDeletedSub?.unsubscribe();
         this.socketReactedSub?.unsubscribe();
         this.socketErrSub?.unsubscribe();
+        this.convSub?.unsubscribe();
         this.messageSocketService.disconnect();
 
         this.selectedAttachments.forEach(a => {

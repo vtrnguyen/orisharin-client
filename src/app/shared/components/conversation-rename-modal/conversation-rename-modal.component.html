@@ -1,0 +1,21 @@
+<div class="fixed inset-0 z-[995] flex items-center justify-center bg-black/40" (click)="onCancel()">
+    <div class="rename-panel" (click)="$event.stopPropagation()">
+        <div class="rename-header">
+            <button class="font-semibold px-2 py-1 cursor-pointer" (click)="onCancel()">Hủy</button>
+            <div class="title">Đổi tên nhóm</div>
+            <div class="w-10"></div>
+        </div>
+
+        <div class="rename-body">
+            <label class="label">Tên nhóm</label>
+            <input #nameInput placeholder="Nhập tên nhóm" class="input" [(ngModel)]="name" maxlength="60" />
+        </div>
+
+        <div class="rename-actions">
+            <button class="w-full px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
+                (click)="onSave()" [disabled]="saving || !(name.trim())">
+                {{ saving ? 'Đang lưu...' : 'Lưu' }}
+            </button>
+        </div>
+    </div>
+</div>
