@@ -35,6 +35,11 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
     notifyEnabled = true;
     uploadingAvatar = false;
 
+    // change avatar properties
+    selectedAvatarFile: File | null = null;
+    selectedAvatarPreview: string | null = null;
+
+
     constructor(
         private userService: UserService,
         private conversationService: ConversationService,
@@ -55,6 +60,8 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         document.body.style.overflow = 'auto';
+
+        this.clearAvatarPreview();
     }
 
     private _getId(ref: any): string | null {
@@ -124,7 +131,64 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
 
     onAvatarSelected(e: Event) {
         const input = e.target as HTMLInputElement;
-        if (input) input.value = '';
+        if (!input?.files || input.files.length === 0) return;
+        const file = input.files[0];
+
+        if (!file.type.startsWith('image/')) {
+            this.alertService.show("error", "Vui lòng chọn file ảnh hợp lệ!");
+            input.value = '';
+            return;
+        }
+
+        if (this.selectedAvatarPreview) {
+            try { URL.revokeObjectURL(this.selectedAvatarPreview); } catch { }
+        }
+
+        this.selectedAvatarFile = file;
+        this.selectedAvatarPreview = URL.createObjectURL(file);
+
+        input.value = '';
+    }
+
+    confirmUploadAvatar() {
+        if (!this.selectedAvatarFile) return;
+
+        const convId = this.conversation?.id ?? this.conversation?._id;
+        if (!convId) {
+            this.alertService.show("error", "Không tìm thấy cuộc trò chuyện để cập nhật ảnh");
+            this.clearAvatarPreview();
+            return;
+        }
+
+        this.uploadingAvatar = true;
+
+        this.conversationService.updateAvatar(convId, this.selectedAvatarFile).subscribe({
+            next: (response: any) => {
+                const updated = response?.data?.conversation ?? response?.conversation ?? null;
+                if (updated) {
+                    this.conversationStateService.setConversation(updated);
+                    this.alertService.show("success", "Ảnh đại diện đã được cập nhật");
+                } else {
+                    this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật ảnh đại diện");
+                }
+                this.uploadingAvatar = false;
+                this.clearAvatarPreview();
+            },
+            error: (error: any) => {
+                console.error(error);
+                this.uploadingAvatar = false;
+                this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật ảnh đại diện");
+                this.clearAvatarPreview();
+            }
+        });
+    }
+
+    clearAvatarPreview() {
+        if (this.selectedAvatarPreview) {
+            try { URL.revokeObjectURL(this.selectedAvatarPreview); } catch { }
+        }
+        this.selectedAvatarFile = null;
+        this.selectedAvatarPreview = null;
     }
 
     deleteChat() {

@@ -3,11 +3,33 @@
 
         <div class="panel-header">
             <div class="header-left">
-                <img *ngIf="conversation?.avatarUrl; else placeholderAvatar" [src]="conversation.avatarUrl"
-                    class="group-avatar-lg" />
-                <ng-template #placeholderAvatar>
-                    <div class="group-avatar-placeholder">{{ (conversation?.name || '').charAt(0) || '?' }}</div>
-                </ng-template>
+                <!-- Avatar với preview overlay -->
+                <div class="avatar-container">
+                    <img *ngIf="selectedAvatarPreview; else currentAvatar" [src]="selectedAvatarPreview"
+                        class="group-avatar-lg" />
+
+                    <ng-template #currentAvatar>
+                        <img *ngIf="conversation?.avatarUrl; else placeholderAvatar" [src]="conversation.avatarUrl"
+                            class="group-avatar-lg" />
+                        <ng-template #placeholderAvatar>
+                            <div class="group-avatar-placeholder">{{ (conversation?.name || '').charAt(0) || '?' }}
+                            </div>
+                        </ng-template>
+                    </ng-template>
+
+                    <!-- Preview overlay với loading state -->
+                    <div *ngIf="selectedAvatarPreview" class="preview-overlay">
+                        <div class="preview-actions">
+                            <button class="confirm-btn" (click)="confirmUploadAvatar()" [disabled]="uploadingAvatar">
+                                <span *ngIf="!uploadingAvatar">✓</span>
+                                <span *ngIf="uploadingAvatar" class="loading-spinner">⟳</span>
+                            </button>
+                            <button class="cancel-btn" (click)="clearAvatarPreview()"
+                                [disabled]="uploadingAvatar">✕</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="title-block">
                     <div class="group-name">{{ conversation?.name || 'Đoạn chat' }}</div>
                     <div class="group-meta">{{ participants.length || 0 }} thành viên</div>
@@ -17,6 +39,7 @@
                 <button *ngIf="isGroup"
                     class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
                     (click)="startEditName()">Đổi tên</button>
+
                 <label class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer">
                     Đổi ảnh
                     <input type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />

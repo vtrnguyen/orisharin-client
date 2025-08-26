@@ -27,6 +27,12 @@ export class ConversationService {
         return this.http.get<any>(`${this.apiUrl}/${conversationId}`);
     }
 
+    updateAvatar(conversationId: string, file: File): Observable<any> {
+        const fd = new FormData();
+        fd.append('file', file);
+        return this.http.patch<any>(`${this.apiUrl}/${conversationId}/avatar`, fd);
+    }
+
     updateName(conversationId: string, name: string): Observable<any> {
         return this.http.patch<any>(`${this.apiUrl}/${conversationId}/name`, { name });
     }

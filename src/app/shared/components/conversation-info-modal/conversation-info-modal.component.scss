@@ -10,8 +10,23 @@
     }
 }
 
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .animate-modal-fade-in {
     animation: modal-fade-in 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.loading-spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
 }
 
 .panel {
@@ -44,11 +59,18 @@
     gap: 12px;
 }
 
+/* Avatar container với position relative để chứa overlay */
+.avatar-container {
+    position: relative;
+    display: inline-block;
+}
+
 .group-avatar-lg {
     width: 52px;
     height: 52px;
     border-radius: 50%;
     object-fit: cover;
+    transition: opacity 0.2s ease;
 }
 
 .group-avatar-placeholder {
@@ -61,6 +83,79 @@
     justify-content: center;
     font-weight: 700;
     color: #374151;
+}
+
+/* Preview overlay */
+.preview-overlay {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 16px;
+    padding: 4px;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.preview-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.confirm-btn,
+.cancel-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.confirm-btn {
+    background: #10b981;
+    color: white;
+}
+
+.confirm-btn:hover:not(:disabled) {
+    background: #059669;
+    transform: scale(1.1);
+}
+
+.cancel-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.cancel-btn:hover:not(:disabled) {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.confirm-btn:disabled,
+.cancel-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .title-block {
@@ -88,18 +183,6 @@
 .btn.primary {
     background: #111827;
     color: #fff;
-}
-
-.btn-file {
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-file input {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
 }
 
 .section h4 {
