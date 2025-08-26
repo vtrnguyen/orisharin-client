@@ -105,3 +105,14 @@
 <app-add-participants-modal *ngIf="showAddModal" [conversation]="conversation" [participants]="participants"
     (added)="onMembersAdded($event)" (close)="showAddModal = false">
 </app-add-participants-modal>
+
+<app-participant-menu-modal *ngIf="showParticipantMenu" [conversation]="conversation"
+    [participant]="selectedParticipant" [isAdmin]="isAdmin" [currentUserId]="currentUserId"
+    (acted)="onParticipantActed($event)" (close)="showParticipantMenu = false">
+</app-participant-menu-modal>
+
+<app-confirm-modal *ngIf="showLeaveConfirm" [show]="true" [title]="'Xác nhận rời nhóm'"
+    [message]="'Bạn có chắc muốn rời khỏi nhóm này? Bạn sẽ không còn tham gia.'" [confirmText]="'Rời nhóm'"
+    [cancelText]="'Hủy'" [confirmColor]="'text-red-600'" [zIndex]="999" (confirm)="confirmLeave()"
+    (cancel)="showLeaveConfirm = false">
+</app-confirm-modal>

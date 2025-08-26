@@ -41,4 +41,13 @@ export class ConversationService {
         const body = { userIds: Array.isArray(userIds) ? userIds : [] };
         return this.http.patch<any>(`${this.apiUrl}/${conversationId}/participants`, body);
     }
+
+    removeParticipants(conversationId: string, userIds: string[]) {
+        const body = { userIds: Array.isArray(userIds) ? userIds : [] };
+        return this.http.patch<any>(`${this.apiUrl}/${conversationId}/participants/remove`, body);
+    }
+
+    leaveConversation(conversationId: string) {
+        return this.http.patch<any>(`${this.apiUrl}/${conversationId}/leave`, {});
+    }
 }

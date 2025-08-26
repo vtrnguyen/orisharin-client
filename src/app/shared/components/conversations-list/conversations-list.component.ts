@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { formatTime } from '../../functions/format-time.util';
 import { StartChatService } from '../../state-managements/start-chat.service';
+import { ConversationStateService } from '../../state-managements/conversation-state.service';
 
 interface ConversationRow {
     conversation: any;
@@ -49,10 +50,12 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
     private onScrollBound = this.onScroll.bind(this);
 
     private startChatSub?: Subscription;
+    private convStateSub?: Subscription;
 
     constructor(
         private conversationService: ConversationService,
-        private startChatService: StartChatService
+        private startChatService: StartChatService,
+        private conversationStateService: ConversationStateService
     ) { }
 
     ngOnInit(): void {
@@ -70,6 +73,30 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
             }
             // prepend
             this.conversations = [row, ...this.conversations];
+        });
+
+        this.convStateSub = this.conversationStateService.action$.subscribe((action: any) => {
+            if (!action || !action.type) return;
+
+            if (action.type === 'removed' && action.id) {
+                const id = String(action.id);
+                this.conversations = this.conversations.filter(c => String(c.id) !== id);
+                return;
+            }
+
+            if (action.type === 'updated' && action.conversation) {
+                const updatedConv = action.conversation;
+                const id = String(updatedConv.id ?? updatedConv._id);
+                const idx = this.conversations.findIndex(c => String(c.id) === id);
+
+                const mappedRow = this.mapToRow({ conversation: updatedConv, participants: updatedConv.participants ?? updatedConv.participantIds });
+
+                if (idx === -1) {
+                    this.conversations = [mappedRow, ...this.conversations];
+                } else {
+                    this.conversations[idx] = mappedRow;
+                }
+            }
         });
     }
 
@@ -98,6 +125,7 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
         this.convItemsSub?.unsubscribe();
         this.sub?.unsubscribe();
         this.startChatSub?.unsubscribe();
+        this.convStateSub?.unsubscribe();
     }
 
     private observeLastItem() {

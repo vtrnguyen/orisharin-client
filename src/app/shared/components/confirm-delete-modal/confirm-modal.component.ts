@@ -21,6 +21,8 @@ export class ConfirmModalComponent {
     @Input() imageUrl?: string;
     @Input() show: boolean = true;
 
+    @Input() zIndex: number = 999;
+
     @Output() confirm = new EventEmitter<void>();
     @Output() cancel = new EventEmitter<void>();
 }

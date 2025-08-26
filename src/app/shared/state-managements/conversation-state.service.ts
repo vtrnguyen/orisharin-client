@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -7,6 +7,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class ConversationStateService {
     private conversationSubject = new BehaviorSubject<any | null>(null);
     readonly conversation$: Observable<any | null> = this.conversationSubject.asObservable();
+
+    private actionSubject = new Subject<any>();
+    readonly action$: Observable<any> = this.actionSubject.asObservable();
 
     setConversation(conv: any | null) {
         this.conversationSubject.next(conv ?? null);
@@ -27,6 +30,10 @@ export class ConversationStateService {
             if (!curr) return curr;
             return { ...curr, name: String(name ?? '').trim() };
         });
+    }
+
+    emitAction(action: any) {
+        try { this.actionSubject.next(action); } catch { }
     }
 
     clear() {
