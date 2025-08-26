@@ -36,4 +36,9 @@ export class ConversationService {
     updateName(conversationId: string, name: string): Observable<any> {
         return this.http.patch<any>(`${this.apiUrl}/${conversationId}/name`, { name });
     }
+
+    addParticipants(conversationId: string, userIds: string[]): Observable<any> {
+        const body = { userIds: Array.isArray(userIds) ? userIds : [] };
+        return this.http.patch<any>(`${this.apiUrl}/${conversationId}/participants`, body);
+    }
 }

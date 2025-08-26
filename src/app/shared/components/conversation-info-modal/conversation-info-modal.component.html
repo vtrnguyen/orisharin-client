@@ -3,7 +3,6 @@
 
         <div class="panel-header">
             <div class="header-left">
-                <!-- Avatar với preview overlay -->
                 <div class="avatar-container">
                     <img *ngIf="selectedAvatarPreview; else currentAvatar" [src]="selectedAvatarPreview"
                         class="group-avatar-lg" />
@@ -17,7 +16,6 @@
                         </ng-template>
                     </ng-template>
 
-                    <!-- Preview overlay với loading state -->
                     <div *ngIf="selectedAvatarPreview" class="preview-overlay">
                         <div class="preview-actions">
                             <button class="confirm-btn" (click)="confirmUploadAvatar()" [disabled]="uploadingAvatar">
@@ -101,3 +99,7 @@
 
 <app-conversation-rename-modal *ngIf="showRenameModal" [conversation]="conversation" (saved)="onRenameSaved($event)"
     (close)="onRenameClosed()"></app-conversation-rename-modal>
+
+<app-add-participants-modal *ngIf="showAddModal" [conversation]="conversation" [participants]="participants"
+    (added)="onMembersAdded($event)" (close)="showAddModal = false">
+</app-add-participants-modal>

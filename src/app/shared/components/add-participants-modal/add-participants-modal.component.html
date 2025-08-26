@@ -1,0 +1,50 @@
+<div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/60" (click)="onClose()">
+    <div class="modal-box bg-white rounded-2xl shadow-xl w-full relative transition-all duration-300 ease-out opacity-0 scale-95 animate-modal-fade-in"
+        (click)="$event.stopPropagation()" (clickOutside)="onClose()">
+        <div class="modal-header flex items-center justify-between border-b border-gray-300 px-6 py-4">
+            <button class="font-semibold px-2 py-1 cursor-pointer" (click)="onClose()">Hủy</button>
+            <div class="font-bold text-lg text-gray-800">Thêm thành viên</div>
+            <span class="w-12"></span>
+        </div>
+
+        <div class="modal-body p-4">
+            <div class="search mb-3">
+                <div class="flex gap-3 items-center">
+                    <span class="font-bold">Tới:</span>
+                    <input [(ngModel)]="query" (input)="applySearch()" placeholder="Tìm kiếm người theo dõi..."
+                        class="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none" />
+                </div>
+            </div>
+
+            <div *ngIf="isLoading" class="text-center text-gray-500 py-6">Đang tải...</div>
+
+            <div *ngIf="!isLoading && filtered.length === 0" class="text-center text-gray-400 py-6">
+                Không có người để thêm.
+            </div>
+
+            <div *ngIf="!isLoading" class="list max-h-64 overflow-auto pr-2">
+                <button *ngFor="let u of filtered" (click)="toggleSelection(u, $event)"
+                    class="user-row flex items-center gap-3 p-2 rounded hover:bg-gray-50 w-full text-left cursor-pointer">
+                    <img [src]="u.avatarUrl || ('https://ui-avatars.com/api/?name=' + (u.fullName || u.username))"
+                        class="w-12 h-12 rounded-full object-cover" alt="avatar" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium truncate">{{ u.fullName || u.username }}</div>
+                        <div class="text-xs text-gray-500 truncate">{{ '@' + (u.username || '') }}</div>
+                    </div>
+
+                    <button type="button" class="select-circle" (click)="toggleSelection(u, $event)"
+                        [class.selected]="isSelected(u)" aria-label="Chọn người"></button>
+                </button>
+            </div>
+        </div>
+
+        <div class="modal-footer border-t p-4 flex justify-end">
+            <button class="btn-start" [disabled]="selectedUsers.length === 0 || isAdding" (click)="addSelected()">
+                <ng-container *ngIf="isAdding; else btnText">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang thêm
+                </ng-container>
+                <ng-template #btnText>Thêm ({{ selectedUsers.length }})</ng-template>
+            </button>
+        </div>
+    </div>
+</div>

@@ -7,6 +7,7 @@ import { ConversationRenameModalComponent } from '../conversation-rename-modal/c
 import { ConversationService } from '../../../core/services/conversation.service';
 import { AlertService } from '../../state-managements/alert.service';
 import { ConversationStateService } from '../../state-managements/conversation-state.service';
+import { AddParticipantsModalComponent } from '../add-participants-modal/add-participants-modal.component';
 
 @Component({
     selector: 'app-conversation-info-modal',
@@ -15,7 +16,8 @@ import { ConversationStateService } from '../../state-managements/conversation-s
         CommonModule,
         FormsModule,
         ClickOutsideModule,
-        ConversationRenameModalComponent
+        ConversationRenameModalComponent,
+        AddParticipantsModalComponent
     ],
     templateUrl: './conversation-info-modal.component.html',
     styleUrls: ['./conversation-info-modal.component.scss']
@@ -31,6 +33,9 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
 
     // rename modal properties
     showRenameModal = false;
+
+    // add participants modal
+    showAddModal = false;
 
     notifyEnabled = true;
     uploadingAvatar = false;
@@ -94,7 +99,22 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
     }
 
     addMember() {
+        this.showAddModal = true;
+    }
 
+    onMembersAdded(payload: any) {
+        const conv = payload?.conversation ?? payload ?? null;
+        if (conv) {
+            this.conversation = conv;
+            // update participants array if populated
+            if (Array.isArray(conv.participantIds) && conv.participantIds.length > 0) {
+                this.participants = conv.participantIds;
+            } else if (Array.isArray(conv.participants) && conv.participants.length > 0) {
+                this.participants = conv.participants;
+            }
+            this.conversationStateService.setConversation(conv);
+        }
+        this.showAddModal = false;
     }
 
     onRenameSaved(newName: string) {
