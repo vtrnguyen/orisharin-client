@@ -16,6 +16,7 @@ import { PostService } from '../../../core/services/post.service';
 import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.component';
 import { SharePostModalComponent } from "../share-post-modal/share-post-modal.component";
 import { navigateToPost } from '../../functions/navigate-to-post';
+import { MentionHighlightPipe } from '../../pipes/mention-hightlight.pipe';
 
 @Component({
     selector: 'app-post',
@@ -26,7 +27,8 @@ import { navigateToPost } from '../../functions/navigate-to-post';
         CreateCommentComponent,
         ClickOutsideModule,
         ConfirmModalComponent,
-        SharePostModalComponent
+        SharePostModalComponent,
+        MentionHighlightPipe,
     ],
     templateUrl: './post.component.html',
     styleUrls: ['./post.component.scss']
