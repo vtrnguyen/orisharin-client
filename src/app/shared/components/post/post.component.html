@@ -49,10 +49,45 @@
                 </ul>
             </div>
         </div>
-        <div class="mt-2 text-gray-800 text-base whitespace-pre-line">
+
+        <div *ngIf="isShared" class="mt-2">
+            <div class="my-2 text-gray-800 text-base whitespace-pre-line">{{ content }}</div>
+            <div (click)="navigateToPost(router, sharedPost?.author?.username, sharedPost?.post?._id)"
+                class="p-3 border border-gray-300 rounded-lg bg-gray-50">
+                <div class="flex items-center gap-3 mb-2">
+                    <img (click)="navigateToProfile(router, sharedPost?.author?.username)"
+                        [src]="sharedPost?.author?.avatarUrl" class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                        alt="avatar tác giả" />
+                    <div class="leading-tight">
+                        <div (click)="navigateToProfile(router, sharedPost?.author?.username)"
+                            class="font-medium text-sm hover:underline cursor-pointer">
+                            {{ sharedPost?.author?.fullName || sharedPost?.author?.username || 'Người dùng' }}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            {{ formatTime(sharedPost?.post?.createdAt) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ sharedPost?.post?.content || '' }}</div>
+
+                <div *ngIf="(sharedPost?.post?.mediaUrls || []).length" class="mt-2 flex gap-2 overflow-x-auto">
+                    <img *ngFor="let m of (sharedPost?.post?.mediaUrls || [])" [src]="m"
+                        class="w-28 h-20 object-cover rounded-md" />
+                </div>
+
+                <div *ngIf="!sharedPost?.post.content && !(sharedPost?.post?.mediaUrls?.length)"
+                    class="text-xs text-blue-600 mt-2">
+                    Xem bài gốc
+                </div>
+            </div>
+        </div>
+
+        <!-- (non-shared) -->
+        <div *ngIf="!isShared" class="mt-2 text-gray-800 text-base whitespace-pre-line">
             {{ content }}
         </div>
-        <div *ngIf="medias.length > 0" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
+
+        <div *ngIf="!isShared && medias.length > 0" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
             <ng-container *ngFor="let media of medias; let i = index">
                 <img *ngIf="isImage(media)" [src]="media"
                     class="no-post-detail rounded-xl border border-gray-300 max-h-72 object-cover flex-shrink-0 cursor-pointer transition-transform duration-200"
@@ -82,7 +117,8 @@
                 <i class="fa-solid fa-retweet w-5 h-5 text-lg"></i>
                 <span class="leading-none">{{ reposts }}</span>
             </button>
-            <button class="flex items-center gap-1 transition cursor-pointer rounded-full px-4 py-2 hover:bg-gray-100">
+            <button (click)="openShareModal()"
+                class="flex items-center gap-1 transition cursor-pointer rounded-full px-4 py-2 hover:bg-gray-100">
                 <i class="fa-solid fa-share-nodes w-5 h-5 text-lg"></i>
                 <span class="leading-none">{{ shares }}</span>
             </button>
@@ -100,3 +136,6 @@
 <app-confirm-modal *ngIf="showDeleteConfirm" [message]="'Bạn có chắc muốn xóa bài viết này?'" confirmText="Xóa"
     cancelText="Hủy" confirmColor="text-red-600" (confirm)="confirmDelete()" (cancel)="showDeleteConfirm = false">
 </app-confirm-modal>
+
+<app-share-post-modal *ngIf="showShareModal" [originalPost]="post"
+    (close)="showShareModal = false"></app-share-post-modal>

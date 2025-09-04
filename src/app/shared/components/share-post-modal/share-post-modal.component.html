@@ -1,0 +1,74 @@
+<div class="fixed flex items-center justify-center inset-0 z-[99] bg-black/80">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-0 relative animate-modal-fade-in"
+        (clickOutside)="close.emit()">
+
+        <div class="flex items-center justify-between border-b border-gray-300 px-6 py-4">
+            <button class="font-semibold px-2 py-1 cursor-pointer" (click)="close.emit()">Hủy</button>
+            <span class="font-bold text-lg">Chia sẻ bài viết</span>
+            <span class="w-12"></span>
+        </div>
+
+        <div class="p-6 flex gap-3 items-start">
+            <img [src]="userInfo?.avatarUrl" class="w-10 h-10 rounded-full object-cover mt-1" alt="avatar" />
+            <div class="flex-1">
+                <textarea [(ngModel)]="content" rows="2"
+                    class="w-full resize-none text-gray-900 placeholder-gray-400 bg-transparent border-none outline-none focus:ring-0 text-base min-h-[48px] max-h-60"
+                    placeholder="Cảm nghĩ về bài viết này..."></textarea>
+
+                <div *ngIf="originalPost" class="mt-2 p-3 border border-gray-300 rounded-lg bg-gray-50">
+                    <div class="flex items-center gap-3 mb-2">
+                        <img (click)="navigateToProfile(router, originalPost?.author?.username || originalPost?.post?.author?.username || '')"
+                            [src]="originalPost?.author?.avatarUrl || originalPost?.post?.author?.avatarUrl" class="
+                            w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer" alt="avatar tác giả" />
+                        <div class="leading-tight">
+                            <div (click)="navigateToProfile(router, originalPost?.author?.username || originalPost?.post?.author?.username || '')"
+                                class="font-medium text-sm hover:underline cursor-pointer">
+                                {{ originalPost?.author?.fullName || originalPost?.post?.author?.fullName ||
+                                originalPost?.author?.username || originalPost?.post?.author?.username || 'Người dùng'
+                                }}
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                {{ formatTime(originalPost?.post?.createdAt) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-sm text-gray-800 whitespace-pre-line mb-2">
+                        {{ originalPost?.post?.content ?? originalPost?.content }}
+                    </div>
+
+                    <div *ngIf="(originalPost?.post?.mediaUrls || originalPost?.mediaUrls)?.length"
+                        class="mt-2 flex gap-2 overflow-x-auto">
+                        <ng-container *ngFor="let m of (originalPost?.post?.mediaUrls ?? originalPost?.mediaUrls)">
+                            <img *ngIf="isImage(m)" [src]="m" class="w-28 h-20 object-cover rounded-md" />
+                            <video *ngIf="isVideo(m)" [src]="m" controls
+                                class="w-48 h-28 object-contain rounded-md bg-black"></video>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div *ngIf="images.length > 0" class="mb-2 mt-3">
+                    <div class="flex gap-3 overflow-x-auto">
+                        <div *ngFor="let media of images; let i = index" class="relative">
+                            <img [src]="media" class="rounded-xl border w-[200px] max-h-40 object-cover" />
+                            <button class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1"
+                                (click)="removeImage(i)">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex gap-2 items-center">
+                        <label class="cursor-pointer text-gray-600"><i class="fa-regular fa-face-smile"
+                                (click)="toggleEmojiPicker()"></i></label>
+                    </div>
+                    <button class="font-semibold px-4 py-2 rounded-lg shadow cursor-pointer"
+                        [disabled]="isLoading || (!content.trim() && images.length === 0)" (click)="submitShare()">
+                        <ng-container *ngIf="isLoading; else txt">Đang gửi</ng-container>
+                        <ng-template #txt>Chia sẻ</ng-template>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

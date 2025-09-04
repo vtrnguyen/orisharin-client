@@ -14,6 +14,8 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { AlertService } from '../../state-managements/alert.service';
 import { PostService } from '../../../core/services/post.service';
 import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.component';
+import { SharePostModalComponent } from "../share-post-modal/share-post-modal.component";
+import { navigateToPost } from '../../functions/navigate-to-post';
 
 @Component({
     selector: 'app-post',
@@ -24,6 +26,7 @@ import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.com
         CreateCommentComponent,
         ClickOutsideModule,
         ConfirmModalComponent,
+        SharePostModalComponent
     ],
     templateUrl: './post.component.html',
     styleUrls: ['./post.component.scss']
@@ -40,6 +43,7 @@ export class PostComponent implements OnInit, OnChanges {
     navigateToProfile = navigateToProfile;
     formatTime = formatTime;
     isOwner = isOwner;
+    navigateToPost = navigateToPost;
 
     liked = false;
     likesCount = 0;
@@ -60,6 +64,9 @@ export class PostComponent implements OnInit, OnChanges {
     showDeleteConfirm = false;
     isDeleteLoading = false;
     isDeleted = false;
+
+    // share post properties
+    showShareModal: boolean = false;
 
     constructor(
         private likeService: LikeService,
@@ -202,6 +209,16 @@ export class PostComponent implements OnInit, OnChanges {
         return this.post?.mediaUrls || this.post?.post?.mediaUrls || [];
     }
 
+    get isShared() {
+        const p = this.post?.post ?? this.post;
+        return !!(p?.sharedFromPost || p?.sharedFromPostId || p?.sharedFrom);
+    }
+
+    get sharedPost() {
+        const p = this.post?.sharedPost;
+        return p;
+    }
+
     openViewer(index: number) {
         this.zoomingIndex = index;
         setTimeout(() => {
@@ -235,5 +252,9 @@ export class PostComponent implements OnInit, OnChanges {
             this.post.commentsCount = (this.post.commentsCount || 0) + 1;
         }
         this.showCommentModal = false;
+    }
+
+    openShareModal(): void {
+        this.showShareModal = true;
     }
 }

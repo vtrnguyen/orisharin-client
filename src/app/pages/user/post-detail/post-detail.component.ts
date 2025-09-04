@@ -25,6 +25,7 @@ export class PostDetailComponent implements OnInit {
     post: any = null;
     comments: any[] = [];
     postAuthor: any = null;
+    sharedPost: any = null;
     showCommentModal = false;
     selectedParent: any = null;
     isReplyMode = false;
@@ -99,6 +100,7 @@ export class PostDetailComponent implements OnInit {
                     this.post = response.data.post;
                     this.comments = response.data.comments || [];
                     this.postAuthor = response.data.author;
+                    this.sharedPost = response.data.sharedPost || null;
                 } else {
                     this.alertService.show('error', 'Bài viết không tồn tại');
                     this.router.navigate(['/not-found']);
