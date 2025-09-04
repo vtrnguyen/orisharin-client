@@ -9,6 +9,7 @@
         <input type="text" [(ngModel)]="fullName" name="fullName" placeholder="Họ và tên"
             class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />
         <input type="text" [(ngModel)]="userName" name="userName" placeholder="Tên người dùng"
+            (input)="onUsernameChange($event)"
             class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />
         <input type="email" autocomplete="email" [(ngModel)]="email" name="email" placeholder="Email"
             class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />

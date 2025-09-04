@@ -25,6 +25,19 @@ export class RegisterComponent {
         private authService: AuthService,
     ) { }
 
+    // Xử lý sự kiện khi người dùng nhập username
+    onUsernameChange(event: Event) {
+        const target = event.target as HTMLInputElement;
+        let value = target.value;
+
+        // Chỉ giữ lại chữ thường (a-z) và số (0-9)
+        const sanitizedValue = value.replace(/[^a-z0-9]/g, '');
+
+        // Cập nhật giá trị đã được làm sạch
+        this.userName = sanitizedValue;
+        target.value = sanitizedValue;
+    }
+
     onSubmit() {
         this.error = '';
         if (!this.fullName.trim() || !this.userName.trim() || !this.email.trim() || !this.password.trim() || !this.confirmPassword.trim()) {
