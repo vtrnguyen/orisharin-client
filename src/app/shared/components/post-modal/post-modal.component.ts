@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
@@ -20,7 +20,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
   templateUrl: './post-modal.component.html',
   styleUrls: ['./post-modal.component.scss']
 })
-export class PostModalComponent implements OnInit, OnDestroy {
+export class PostModalComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() avatar: string = '';
   @Input() content: string = '';
   @Output() close = new EventEmitter<void>();
@@ -32,6 +32,8 @@ export class PostModalComponent implements OnInit, OnDestroy {
   showEmojiPicker = false;
 
   isImage = isImage;
+
+  @ViewChild('contentArea') contentArea?: ElementRef<HTMLTextAreaElement>;
 
   constructor(
     private userService: UserService,
@@ -46,6 +48,16 @@ export class PostModalComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     document.body.style.overflow = 'auto';
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      const el = this.contentArea?.nativeElement;
+      if (el) {
+        el.focus();
+        el.selectionStart = el.selectionEnd = el.value.length;
+      }
+    });
   }
 
   onImageSelected(event: Event) {

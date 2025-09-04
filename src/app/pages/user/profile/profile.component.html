@@ -110,7 +110,8 @@
             {{ isFollowing ? 'Đang theo dõi' : 'Theo dõi' }}
         </button>
         <button
-            class="flex-1 py-2 font-semibold rounded-lg bg-white text-black border border-gray-300 hover:bg-gray-100 transition-all cursor-pointer">
+            class="flex-1 py-2 font-semibold rounded-lg bg-white text-black border border-gray-300 hover:bg-gray-100 transition-all cursor-pointer"
+            (click)="openPostModal('@' + (userInfo.username || ''))">
             Nhắc đến
         </button>
     </div>
@@ -151,7 +152,9 @@
     </div>
 </div>
 
-<app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatarUrl || ''" (close)="closePostModal()"></app-post-modal>
+<app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatarUrl || ''" [content]="postModalContent"
+    (close)="closePostModal()">
+</app-post-modal>
 
 <app-media-viewer *ngIf="showAvatarViewer" [medias]="[userInfo.avatarUrl || '']" [startIndex]="0"
     [onClose]="closeAvatarViewer.bind(this)">

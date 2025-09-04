@@ -78,6 +78,9 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
   // web urls modal properties
   showWebsiteModal = false;
 
+  // metion user properties
+  postModalContent: string = '';
+
   @ViewChildren('postItem', { read: ElementRef }) postItems!: QueryList<ElementRef>;
   private intersectionObserver: IntersectionObserver | null = null;
 
@@ -154,7 +157,8 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     this.intersectionObserver.observe(lastEl);
   }
 
-  openPostModal(): void {
+  openPostModal(initialContent: string = ''): void {
+    this.postModalContent = initialContent + ' ' || '';
     this.showPostModal = true;
   }
 
