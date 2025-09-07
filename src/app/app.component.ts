@@ -19,7 +19,6 @@ export class AppComponent implements OnInit {
     // initialize notification service when user is authenticated
     if (this.authService.isLoggedIn && this.authService.isLoggedIn()) {
       this.notificationService.initializeNotificationCount();
-      this.notificationService.initializeSocket();
     }
   }
 }

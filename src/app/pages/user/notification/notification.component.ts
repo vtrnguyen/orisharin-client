@@ -110,9 +110,11 @@ export class NotificationComponent implements OnInit, OnDestroy {
   private loadNotifications() {
     this.isLoading = true;
     this.notificationService.getMyNotifications().subscribe({
-      next: (data: any) => {
-        this.notifications = data;
-        this.isLoading = false;
+      next: (response: any) => {
+        if (response && response.success && response.data) {
+          this.notifications = response.data;
+          this.isLoading = false;
+        }
       },
       error: (error: any) => {
         this.isLoading = false;
