@@ -91,8 +91,11 @@ export class NotificationService implements OnDestroy {
 
     private updateNotificationCount() {
         this.getMyNotifications().subscribe({
-            next: (notifications: any[]) => {
-                const unread = (notifications || []).filter(n => !n.isRead).length;
+            next: (resp: any) => {
+                const notificationsArray = Array.isArray(resp)
+                    ? resp
+                    : (resp?.data ?? resp?.payload ?? []);
+                const unread = (notificationsArray || []).filter((n: any) => !n.isRead).length;
                 this.notificationCount$.next(unread);
             },
             error: () => { }
