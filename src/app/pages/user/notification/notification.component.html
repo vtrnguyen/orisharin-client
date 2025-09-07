@@ -36,7 +36,7 @@
         <div>
             <ng-container *ngFor="let notification of notifications; let last = last">
                 <app-notification-item [noti]="notification"
-                    (markAsRead)="maskAsRead(notification._id)"></app-notification-item>
+                    (markAsRead)="maskAsRead(notification)"></app-notification-item>
                 <hr *ngIf="!last" class="my-4 border-gray-200" />
             </ng-container>
             <div *ngIf="notifications.length === 0" class="text-center text-gray-400 py-8">

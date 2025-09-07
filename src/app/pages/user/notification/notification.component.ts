@@ -78,10 +78,10 @@ export class NotificationComponent implements OnInit, OnDestroy {
     });
   }
 
-  maskAsRead(id: string): void {
-    this.notificationService.markAsRead(id).subscribe({
+  maskAsRead(notification: any): void {
+    this.notificationService.markAsRead(notification._id).subscribe({
       next: () => {
-        this.notifications = this.notifications.map(n => n._id === id ? { ...n, isRead: true } : n);
+        this.notifications = this.notifications.map(n => n._id === notification._id ? { ...n, isRead: true } : n);
         this.alertService.show('success', 'Đã đọc thông báo!');
       },
       error: (error: any) => {
