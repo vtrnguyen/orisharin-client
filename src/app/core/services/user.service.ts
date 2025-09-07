@@ -24,6 +24,11 @@ export class UserService {
         return user ? user.avatarUrl : '';
     }
 
+    getCurrentUserId(): string | null {
+        const user = this.getCurrentUserInfo();
+        return user ? user._id : null;
+    }
+
     introduceUser(query: string): Observable<ApiResponse<any>> {
         return this.http.get<ApiResponse<any>>(`${this.apiUrl}/introduce/${query}`);
     }
