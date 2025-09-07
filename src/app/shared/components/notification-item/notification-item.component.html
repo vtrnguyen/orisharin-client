@@ -11,6 +11,7 @@
             <ng-container [ngSwitch]="noti.type">
                 <i *ngSwitchCase="'like'" class="fa-solid fa-heart text-pink-500"></i>
                 <i *ngSwitchCase="'comment'" class="fa-regular fa-comment-dots text-blue-500"></i>
+                <i *ngSwitchCase="'reply'" class="fa-solid fa-reply text-yellow-500"></i>
                 <i *ngSwitchCase="'follow'" class="fa-solid fa-user-plus text-green-500"></i>
                 <i *ngSwitchCase="'repost'" class="fa-solid fa-retweet text-emerald-500"></i>
                 <i *ngSwitchCase="'message'" class="fa-regular fa-envelope text-indigo-500"></i>
@@ -21,6 +22,7 @@
             <ng-container [ngSwitch]="noti.type">
                 <span *ngSwitchCase="'like'">đã thích bài viết của bạn.</span>
                 <span *ngSwitchCase="'comment'">đã bình luận: "{{ noti.content }}"</span>
+                <span *ngSwitchCase="'reply'">đã trả lời bình luận của bạn: "{{ noti.content }}"</span>
                 <span *ngSwitchCase="'follow'">đã theo dõi bạn.</span>
                 <span *ngSwitchCase="'repost'">đã đăng lại bài viết của bạn.</span>
                 <span *ngSwitchCase="'message'">đã gửi tin nhắn: "{{ noti.content }}"</span>

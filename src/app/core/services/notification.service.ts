@@ -142,6 +142,8 @@ export class NotificationService implements OnDestroy {
                 return `${notification.senderName || notification.fromUserId?.username} đã bình luận bài viết của bạn`;
             case 'follow':
                 return `${notification.senderName || notification.fromUserId?.username} đã theo dõi bạn`;
+            case 'reply':
+                return `${notification.senderName || notification.fromUserId?.username} đã trả lời bình luận của bạn`;
             case 'message':
                 return 'Bạn có tin nhắn mới';
             case 'call':
