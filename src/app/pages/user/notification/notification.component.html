@@ -17,7 +17,7 @@
                             <button
                                 class="flex justify-between w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg items-center gap-2 cursor-pointer"
                                 (click)="markAllAsRead(); closeMenu()">
-                                <span class="font-semibold">Đánh dấu là đã đọc</span>
+                                <span class="font-semibold">Đánh dấu tất cả là đã đọc</span>
                                 <i class="fa-solid fa-circle-check text-gray-500"></i>
                             </button>
                         </li>
@@ -35,7 +35,8 @@
         </div>
         <div>
             <ng-container *ngFor="let notification of notifications; let last = last">
-                <app-notification-item [noti]="notification"></app-notification-item>
+                <app-notification-item [noti]="notification"
+                    (markAsRead)="maskAsRead(notification._id)"></app-notification-item>
                 <hr *ngIf="!last" class="my-4 border-gray-200" />
             </ng-container>
             <div *ngIf="notifications.length === 0" class="text-center text-gray-400 py-8">

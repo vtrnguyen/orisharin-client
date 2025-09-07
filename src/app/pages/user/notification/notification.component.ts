@@ -7,6 +7,7 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { AlertService } from '../../../shared/state-managements/alert.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-delete-modal/confirm-modal.component';
 import { Subscription } from 'rxjs';
+import { formatTime } from '../../../shared/functions/format-time.util';
 
 @Component({
   selector: 'app-notification',
@@ -78,7 +79,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleMarkAsRead(id: string): void {
+  maskAsRead(id: string): void {
     this.notificationService.markAsRead(id).subscribe({
       next: () => {
         this.notifications = this.notifications.map(n => n._id === id ? { ...n, isRead: true } : n);

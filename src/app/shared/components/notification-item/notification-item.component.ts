@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { formatTime } from '../../functions/format-time.util';
 
 @Component({
     selector: 'app-notification-item',
@@ -14,6 +15,8 @@ export class NotificationItemComponent {
     @Input() noti: any;
     @Input() last: boolean = false;
     @Output() markAsRead = new EventEmitter<string>();
+
+    formatTime = formatTime;
 
     onClick(): void {
         if (!this.noti.isRead) {

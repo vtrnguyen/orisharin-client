@@ -26,7 +26,7 @@
                 <span *ngSwitchCase="'message'">đã gửi tin nhắn: "{{ noti.content }}"</span>
             </ng-container>
         </div>
-        <div class="text-xs text-gray-400 mt-1">{{ noti.createdAt | date:'short' }}</div>
+        <div class="text-xs text-gray-400 mt-1">{{ formatTime(noti.createdAt) }}</div>
     </div>
     <!-- Có thể thêm ảnh post nếu muốn -->
     <!-- <img *ngIf="noti.postImage" [src]="noti.postImage" class="w-12 h-12 rounded-lg object-cover border" alt="post" /> -->
