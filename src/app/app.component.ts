@@ -7,7 +7,7 @@ import { AuthService } from './core/services/auth.service';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   constructor(
@@ -17,8 +17,9 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     // initialize notification service when user is authenticated
-    if (this.authService.isLoggedIn()) {
+    if (this.authService.isLoggedIn && this.authService.isLoggedIn()) {
       this.notificationService.initializeNotificationCount();
+      this.notificationService.initializeSocket();
     }
   }
 }

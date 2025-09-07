@@ -7,7 +7,6 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { AlertService } from '../../../shared/state-managements/alert.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-delete-modal/confirm-modal.component';
 import { Subscription } from 'rxjs';
-import { formatTime } from '../../../shared/functions/format-time.util';
 
 @Component({
   selector: 'app-notification',
