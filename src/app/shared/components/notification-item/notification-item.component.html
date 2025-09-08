@@ -21,8 +21,8 @@
         <div class="text-gray-700 text-sm mt-1 font-medium" [class.font-bold]="!noti.isRead">
             <ng-container [ngSwitch]="noti.type">
                 <span *ngSwitchCase="'like'">đã thích bài viết của bạn.</span>
-                <span *ngSwitchCase="'comment'">đã bình luận: "{{ noti.content }}"</span>
-                <span *ngSwitchCase="'reply'">đã trả lời bình luận của bạn: "{{ noti.content }}"</span>
+                <span *ngSwitchCase="'comment'">đã bình luận: "{{ noti.commentContent }}"</span>
+                <span *ngSwitchCase="'reply'">đã trả lời bình luận của bạn: "{{ noti.commentContent }}"</span>
                 <span *ngSwitchCase="'follow'">đã theo dõi bạn.</span>
                 <span *ngSwitchCase="'repost'">đã đăng lại bài viết của bạn.</span>
                 <span *ngSwitchCase="'message'">đã gửi tin nhắn: "{{ noti.content }}"</span>

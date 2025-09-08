@@ -63,7 +63,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     let isAllRead = this.notifications.every(n => n.isRead);
 
     if (isAllRead) {
-      this.alertService.show('success', 'Bạn không có thông báo mới nào!');
+      this.alertService.show('warning', 'Bạn không có thông báo mới nào!');
       return;
     }
 
