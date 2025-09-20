@@ -20,7 +20,13 @@
         </div>
         <div class="text-gray-700 text-sm mt-1 font-medium" [class.font-bold]="!noti.isRead">
             <ng-container [ngSwitch]="noti.type">
-                <span *ngSwitchCase="'like'">đã thích bài viết của bạn.</span>
+                <span *ngSwitchCase="'like'">
+                    <ng-container *ngIf="noti.commentId; else likePost">
+                        đã thích bình luận của bạn<span *ngIf="noti.commentContent">: "{{ noti.commentContent
+                            }}"</span>.
+                    </ng-container>
+                    <ng-template #likePost>đã thích bài viết của bạn.</ng-template>
+                </span>
                 <span *ngSwitchCase="'comment'">đã bình luận: "{{ noti.commentContent }}"</span>
                 <span *ngSwitchCase="'reply'">đã trả lời bình luận của bạn: "{{ noti.commentContent }}"</span>
                 <span *ngSwitchCase="'follow'">đã theo dõi bạn.</span>

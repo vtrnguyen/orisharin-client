@@ -137,6 +137,12 @@ export class NotificationService implements OnDestroy {
     private getNotificationMessage(notification: any): string {
         switch (notification?.type) {
             case 'like':
+                // if the like references a comment, show 'liked your comment' and include comment text when available
+                if (notification?.commentId) {
+                    const sender = notification.senderName || notification.fromUserId?.username || 'Người dùng';
+                    const commentText = notification.commentContent ?? (typeof notification.commentId === 'object' ? notification.commentId.content ?? '' : '');
+                    return `${sender} đã thích bình luận của bạn${commentText ? `: "${commentText}"` : ''}`;
+                }
                 return `${notification.senderName || notification.fromUserId?.username} đã thích bài viết của bạn`;
             case 'comment':
                 return `${notification.senderName || notification.fromUserId?.username} đã bình luận bài viết của bạn`;
