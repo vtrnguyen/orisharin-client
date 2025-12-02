@@ -252,7 +252,7 @@
             </div>
 
             <div class="right">
-                <ng-container *ngIf="!(text?.trim() || selectedAttachments.length); else hasText">
+                <ng-container *ngIf="!(text.trim() || selectedAttachments.length); else hasText">
                     <button class="icon-btn" (click)="startVoiceRecording()" title="Clip âm thanh">
                         <i class="fa-solid fa-microphone"></i>
                     </button>
