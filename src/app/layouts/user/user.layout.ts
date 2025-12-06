@@ -27,22 +27,30 @@ import { filter, Subscription } from 'rxjs';
     styleUrl: './user.layout.scss'
 })
 export class UserLayoutComponent implements OnInit, OnDestroy {
-    alertState: AlertState = { show: false, type: 'success', message: '', duration: 2500 };
+    alertState: AlertState = {
+        show: false,
+        type: 'success',
+        message: '',
+        duration: 2500
+    };
+
     userInfo: any;
 
-    // post modal properties
     showPostModal = false;
     newPostContent = '';
 
     showUserMenu = false;
+    showBottomPanel = false;
 
     navigateToProfile = navigateToProfile;
 
-    // on page inbox properties
     isInbox = false;
     isMobile = false;
+
     private routerSub?: Subscription;
-    private resizeHandler = () => { this.isMobile = window.innerWidth <= 768; };
+    private resizeHandler = () => {
+        this.isMobile = window.innerWidth <= 768;
+    };
 
     constructor(
         private authService: AuthService,
@@ -65,6 +73,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
             .subscribe(() => {
                 const url = this.router.url || '';
                 this.isInbox = /^\/inbox(\/|$)/.test(url);
+                this.closeBottomPanel();
             });
 
         window.addEventListener('resize', this.resizeHandler, { passive: true });
@@ -73,6 +82,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.routerSub?.unsubscribe();
         window.removeEventListener('resize', this.resizeHandler);
+        this.setBodyScrollDisabled(false);
     }
 
     onHomePageClick(): void {
@@ -95,6 +105,24 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
         this.showUserMenu = !this.showUserMenu;
     }
 
+    private setBodyScrollDisabled(disabled: boolean) {
+        try {
+            document.body.style.overflow = disabled ? 'hidden' : '';
+            document.body.style.touchAction = disabled ? 'none' : '';
+        } catch (e) { }
+    }
+
+    toggleBottomPanel(event?: Event) {
+        if (event) event.stopPropagation();
+        this.showBottomPanel = !this.showBottomPanel;
+        this.setBodyScrollDisabled(this.showBottomPanel);
+    }
+
+    closeBottomPanel() {
+        this.showBottomPanel = false;
+        this.setBodyScrollDisabled(false);
+    }
+
     logout() {
         this.authService.logout();
     }
@@ -102,5 +130,12 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
     navigateToTrash() {
         this.router.navigate(['/trash']);
         this.toggleUserMenu();
+        this.closeBottomPanel();
+    }
+
+    navigateToInbox() {
+        this.router.navigate(['/inbox']);
+        this.toggleUserMenu();
+        this.closeBottomPanel();
     }
 }
