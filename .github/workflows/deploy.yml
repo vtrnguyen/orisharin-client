@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Inject environment.prod.ts từ GitHub Secrets
+      - name: Inject environment.prod.ts from GitHub Secrets
         run: |
           cat > src/environments/environment.prod.ts << EOF
           export const environment = {
