@@ -1,0 +1,19 @@
+.share-original {
+    background: #f8fafb;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.share-original .author-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.share-original .author-username {
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+.animate-modal-fade-in {
+    animation: modal-fade-in 0.28s cubic-bezier(.4, 0, .2, 1) forwards;
+}

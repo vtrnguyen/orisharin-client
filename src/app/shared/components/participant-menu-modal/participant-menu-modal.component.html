@@ -1,0 +1,28 @@
+<div class="fixed inset-0 z-[1100] flex items-center justify-center bg-black/30" (click)="onClose()">
+    <div class="menu-box animate-modal-fade-in" (click)="$event.stopPropagation()">
+        <div class="menu-list">
+            <button *ngIf="isAdmin && participant && (participant.id ?? participant._id) !== currentUserId"
+                class="menu-item text-red-500" (click)="removeFromGroup()" [disabled]="loadingAction">
+                Xóa khỏi nhóm
+            </button>
+
+            <button *ngIf="participant && (participant.id ?? participant._id) !== currentUserId" class="menu-item"
+                class="menu-item text-red-500" (click)="blockUser()" [disabled]="loadingAction">
+                Chặn
+            </button>
+
+            <button *ngIf="isAdmin && participant && (participant.id ?? participant._id) !== currentUserId"
+                class="menu-item" (click)="promoteToAdmin()" [disabled]="loadingAction">
+                Chỉ định làm quản trị viên
+            </button>
+
+            <button class="menu-item" (click)="onClose()">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<app-confirm-modal *ngIf="showConfirmRemove" [show]="true" [title]="'Xác nhận xóa'"
+    [message]="'Bạn có chắc muốn xóa người này khỏi nhóm? Đây là thao tác không thể hoàn tác.'" [confirmText]="'Xóa'"
+    [cancelText]="'Hủy'" [confirmColor]="'text-red-600'" [zIndex]="1200" (confirm)="confirmRemove()"
+    (cancel)="showConfirmRemove = false">
+</app-confirm-modal>

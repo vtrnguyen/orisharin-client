@@ -1,84 +1,249 @@
 <div class="flex min-h-screen bg-white">
-    <div class="w-20 lg:w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div class="p-4 lg:p-6">
-            <div class="flex items-center">
-                <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                    <span class="text-white font-bold text-sm">O</span>
+    <div class="w-20 bg-white border-r border-gray-200 flex-col h-screen fixed left-0 top-0 z-40 hidden md:flex">
+        <div class="p-4">
+            <div class="flex items-center justify-center cursor-pointer" (click)="onHomePageClick()">
+                <div
+                    class="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden bg-white shadow group">
+                    <img src="images/orisharin_logo.png" alt="OriSharin Logo"
+                        class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-110" />
                 </div>
-                <span class="ml-3 text-xl font-bold hidden lg:block">OriSharin</span>
             </div>
         </div>
 
-        <nav class="flex-1 px-4 lg:px-6">
-            <ul class="space-y-2">
-                <li *ngFor="let item of navigationItems">
-                    <a [routerLink]="item.route" routerLinkActive="bg-gray-100 text-black"
-                        class="flex items-center p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group">
-                        <div class="w-6 h-6 flex items-center justify-center">
-                            <ng-container [ngSwitch]="item.icon">
-                                <svg *ngSwitchCase="'home'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                                    </path>
-                                </svg>
-                                <svg *ngSwitchCase="'search'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                                <svg *ngSwitchCase="'edit'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                <svg *ngSwitchCase="'heart'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                    </path>
-                                </svg>
-                                <svg *ngSwitchCase="'user'" class="w-6 h-6" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                            </ng-container>
-                        </div>
-                        <span class="ml-3 font-medium hidden lg:block">{{ item.label }}</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <div class="flex-1 flex flex-col justify-center">
+            <nav class="px-4">
+                <ul class="space-y-2">
+                    <li>
+                        <button (click)="onHomePageClick()" [ngClass]="{'bg-gray-200 text-black': router.url === '/'}"
+                            title="Trang chủ"
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
+                            <div class="w-7 h-7 flex items-center justify-center">
+                                <i class="fa-solid fa-house text-2xl"></i>
+                            </div>
+                        </button>
+                    </li>
+                    <li>
+                        <a routerLink="/search" routerLinkActive="bg-gray-200 text-black" title="Tìm kiếm"
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
+                            <div class="w-7 h-7 flex items-center justify-center">
+                                <i class="fa-solid fa-magnifying-glass text-2xl"></i>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <button (click)="openPostModal()" title="Tạo bài đăng"
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 bg-gray-00 hover:bg-gray-200 hover:text-black transition-colors group w-full cursor-pointer">
+                            <div class="w-7 h-7 flex items-center justify-center">
+                                <i class="fa-regular fa-plus text-2xl"></i>
+                            </div>
+                        </button>
+                    </li>
+                    <li>
+                        <a routerLink="/notifications" routerLinkActive="bg-gray-200 text-black" title="Thông báo"
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
+                            <div class="w-7 h-7 flex items-center justify-center">
+                                <i class="fa-regular fa-heart text-2xl"></i>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <button (click)="navigateToProfile(router, userInfo.username)" title="Trang cá nhân"
+                            [ngClass]="{'bg-gray-200 text-black': router.url === '/@' + userInfo.username}"
+                            class="flex items-center justify-center min-h-[44px] p-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-black transition-colors group w-full cursor-pointer">
+                            <div class="w-7 h-7 flex items-center justify-center">
+                                <i class="fa-regular fa-user text-2xl"></i>
+                            </div>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
-        <div class="p-4 lg:p-6 border-t border-gray-200">
-            <div class="flex items-center">
-                <img [src]="user.avatar" [alt]="user.name" class="w-10 h-10 rounded-full">
-                <div class="ml-3 hidden lg:block">
-                    <p class="text-sm font-medium text-gray-900">{{ user.name }}</p>
-                    <p class="text-xs text-gray-500">{{ user.username }}</p>
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center justify-center cursor-pointer group relative" (click)="toggleUserMenu()">
+                <div class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition">
+                    <i class="fa-solid fa-bars-staggered text-2xl text-gray-700"></i>
+                </div>
+                <div *ngIf="showUserMenu"
+                    class="absolute left-0 bottom-14 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in px-2 border-gray-300"
+                    (click)="$event.stopPropagation()" (clickOutside)="toggleUserMenu()">
+                    <ul class="py-2">
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Giao diện
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Cài đặt
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Thông tin chi tiết
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer">
+                                Đã thích
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer"
+                                (click)="navigateToTrash()">
+                                Thùng rác
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 rounded-lg flex items-center gap-2 cursor-pointer text-red-500"
+                                (click)="logout()">
+                                Đăng xuất
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="flex-1 flex flex-col">
-        <header class="bg-white border-b border-gray-200 px-6 py-4">
-            <div class="flex items-center justify-between">
-                <h1 class="text-xl font-semibold text-gray-900">Home</h1>
-                <div class="flex items-center space-x-4">
-                    <button class="p-2 text-gray-600 hover:text-gray-900">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 17h5l-5 5l5-5m-5 5V3"></path>
-                        </svg>
-                    </button>
-                </div>
+    <header *ngIf="!(isInbox && isMobile)"
+        class="fixed top-0 left-0 right-0 z-40 bg-white/70 backdrop-blur-md border-b border-gray-200/50 h-16 flex items-center justify-center md:hidden">
+        <div class="flex items-center cursor-pointer" (click)="onHomePageClick()">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden bg-white shadow group">
+                <img src="images/orisharin_logo.png" alt="OriSharin Logo"
+                    class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-110" />
             </div>
-        </header>
+        </div>
+    </header>
 
-        <main class="flex-1 overflow-y-auto">
+    <div class="flex-1 flex flex-col md:ml-20">
+        <main class="flex-1 overflow-y-auto md:pt-0" [class.pt-16]="!(isInbox && isMobile)">
             <router-outlet></router-outlet>
         </main>
+
+        <button *ngIf="!router.url.startsWith('/inbox')"
+            class="fixed bottom-8 right-8 z-50 bg-white hover:bg-gray-100 text-black rounded-2xl shadow-2xl w-20 h-16 flex items-center justify-center gap-3 transition-all duration-200 cursor-pointer hidden md:flex"
+            aria-label="Tạo mới">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+        </button>
+
+        <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center h-16 md:hidden"
+            [class.hidden]="router.url.startsWith('/inbox')">
+            <button (click)="onHomePageClick()" [ngClass]="{'text-blue-600': router.url === '/'}" title="Trang chủ"
+                class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
+                <i class="fa-solid fa-house w-6 h-6 text-2xl"></i>
+            </button>
+            <a routerLink="/search" routerLinkActive="text-blue-600" title="Tìm kiếm"
+                class="flex flex-col items-center justify-center text-gray-500">
+                <i class="fa-solid fa-magnifying-glass w-6 h-6 text-2xl"></i>
+            </a>
+            <button class="flex flex-col items-center justify-center text-gray-500 cursor-pointer"
+                (click)="openPostModal()" title="Tạo bài đăng">
+                <i class="fa-regular fa-plus w-6 h-6 text-2xl"></i>
+            </button>
+            <a routerLink="/notifications" routerLinkActive="text-blue-600" title="Thông báo"
+                class="flex flex-col items-center justify-center text-gray-500">
+                <i class="fa-regular fa-heart w-6 h-6 text-2xl"></i>
+            </a>
+            <button (click)="toggleBottomPanel()" title="Menu"
+                class="flex flex-col items-center justify-center text-gray-500 cursor-pointer">
+                <i class="fa-solid fa-bars-staggered w-6 h-6 text-2xl"></i>
+            </button>
+        </nav>
+
+        <div *ngIf="showBottomPanel" class="fixed inset-0 z-60" (click)="toggleBottomPanel()">
+            <div class="absolute inset-0 bg-black/40 animate-fade-in"></div>
+
+            <aside (click)="$event.stopPropagation()"
+                class="absolute top-0 right-0 h-full w-72 bg-white shadow-xl z-50 animate-slide-in-right">
+                <div class="flex items-center justify-between p-4 border-b border-gray-300">
+                    <div class="flex flex-col items-center justify-center p-2 w-100">
+                        <img [src]="userInfo.avatarUrl || 'images/default-avatar.png'"
+                            [alt]="userInfo.username ? userInfo.username + ' avatar' : 'avatar'"
+                            class="w-24 h-24 rounded-full object-cover mb-3" />
+                        <div class="text-center">
+                            <div class="text-base font-semibold text-gray-900">{{ userInfo.username }}</div>
+                            <div class="text-sm text-gray-500">{{ userInfo.fullName || userInfo.fullname ||
+                                userInfo.name }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="py-2 px-2 space-y-1">
+                    <li>
+                        <button (click)="navigateToProfile(router, userInfo.username)"
+                            class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg flex items-center gap-3 cursor-pointer">
+                            <i class="fa-solid fa-user w-5"></i>
+                            <span>Trang cá nhân</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button (click)="navigateToInbox()"
+                            class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg flex items-center gap-3 cursor-pointer">
+                            <i class="fa-brands fa-facebook-messenger w-5"></i>
+                            <span>Nhắn tin</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg flex items-center gap-3 cursor-pointer">
+                            <i class="fa-solid fa-circle-half-stroke w-5"></i>
+                            <span>Giao diện</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg flex items-center gap-3 cursor-pointer">
+                            <i class="fa-solid fa-gear w-5"></i>
+                            <span>Cài đặt</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg flex items-center gap-3 cursor-pointer">
+                            <i class="fa-solid fa-info-circle w-5"></i>
+                            <span>Thông tin chi tiết</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg flex items-center gap-3 cursor-pointer">
+                            <i class="fa-regular fa-heart w-5"></i>
+                            <span>Đã thích</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button (click)="navigateToTrash()"
+                            class="w-full text-left px-4 py-3 hover:bg-gray-100 rounded-lg flex items-center gap-3 cursor-pointer">
+                            <i class="fa-regular fa-trash-can w-5"></i>
+                            <span>Thùng rác</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button (click)="logout()"
+                            class="w-full text-left px-4 py-3 hover:bg-red-50 rounded-lg flex items-center gap-3 cursor-pointer text-red-500">
+                            <i class="fa-solid fa-sign-out w-5"></i>
+                            <span>Đăng xuất</span>
+                        </button>
+                    </li>
+                </ul>
+            </aside>
+        </div>
     </div>
 </div>
+
+<app-post-modal *ngIf="showPostModal" [avatar]="userInfo.avatar" (content)="newPostContent" (submit)="openPostModal()"
+    (close)="closePostModal()"></app-post-modal>
+
+<app-alert *ngIf="alertState.show" [type]="alertState.type" [message]="alertState.message"
+    [duration]="alertState.duration ?? 2500" [actionLabel]="alertState.actionLabel"
+    [actionRoute]="alertState.actionRoute" (closed)="alertService.hide()">
+</app-alert>

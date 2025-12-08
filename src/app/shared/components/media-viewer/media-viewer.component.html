@@ -1,0 +1,24 @@
+<div class="fixed inset-0 z-[999] bg-black/90 flex items-center justify-center" (clickOutside)="close()">
+    <button *ngIf="medias.length > 1 && current > 0" (click)="prev()"
+        class="absolute left-4 top-1/2 -translate-y-1/2 text-white text-3xl p-2 !rounded-full hover:bg-black/40 cursor-pointer">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <ng-container *ngIf="isImage(medias[current]); else videoBlock">
+        <img [src]="medias[current]" class="max-h-[80vh] max-w-[90vw] rounded-xl shadow-xl" />
+    </ng-container>
+    <ng-template #videoBlock>
+        <video [src]="medias[current]" controls class="max-h-[80vh] max-w-[90vw] rounded-xl shadow-xl bg-black"></video>
+    </ng-template>
+    <button *ngIf="medias.length > 1 && current < medias.length - 1" (click)="next()"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-3xl p-2 !rounded-full hover:bg-black/40 cursor-pointer">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+    <button (click)="close()"
+        class="absolute top-6 right-6 text-white text-2xl p-2 !rounded-full hover:bg-black/40 cursor-pointer">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div *ngIf="medias.length > 1" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+        <span *ngFor="let img of medias; let i = index" class="w-2 h-2 rounded-full"
+            [ngClass]="i === current ? 'bg-white' : 'bg-white/40'"></span>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.conversations-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+.conversations-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: 0.75rem;
+    padding-right: 4px;
+    max-height: calc(100vh - 9rem);
+}
+
+.conv-item.selected {
+    background: #f1f5f9;
+}
+
+.conversations-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.conversations-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+}

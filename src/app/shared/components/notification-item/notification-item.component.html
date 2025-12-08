@@ -1,0 +1,42 @@
+<div [ngClass]="{
+      'bg-blue-50': !noti.isRead,
+      'bg-white': noti.isRead
+    }" class="flex items-center gap-3 p-4 rounded-xl hover:bg-gray-50 transition mb-1 cursor-pointer relative"
+    (click)="onClick()">
+    <img [src]="noti.senderAvatar || 'https://ui-avatars.com/api/?name=' + (noti.fromUserId.fullName || noti.fromUserId.username)"
+        class="w-10 h-10 rounded-full object-cover" alt="avatar" />
+    <div class="flex-1">
+        <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-900">{{ noti.fromUserId.username }}</span>
+            <ng-container [ngSwitch]="noti.type">
+                <i *ngSwitchCase="'like'" class="fa-solid fa-heart text-pink-500"></i>
+                <i *ngSwitchCase="'comment'" class="fa-regular fa-comment-dots text-blue-500"></i>
+                <i *ngSwitchCase="'reply'" class="fa-solid fa-reply text-yellow-500"></i>
+                <i *ngSwitchCase="'follow'" class="fa-solid fa-user-plus text-green-500"></i>
+                <i *ngSwitchCase="'repost'" class="fa-solid fa-retweet text-emerald-500"></i>
+                <i *ngSwitchCase="'message'" class="fa-regular fa-envelope text-indigo-500"></i>
+            </ng-container>
+            <span *ngIf="!noti.isRead" class="ml-2 w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
+        </div>
+        <div class="text-gray-700 text-sm mt-1 font-medium" [class.font-bold]="!noti.isRead">
+            <ng-container [ngSwitch]="noti.type">
+                <span *ngSwitchCase="'like'">
+                    <ng-container *ngIf="noti.commentId; else likePost">
+                        đã thích bình luận của bạn<span *ngIf="noti.commentContent">: "{{ noti.commentContent
+                            }}"</span>.
+                    </ng-container>
+                    <ng-template #likePost>đã thích bài viết của bạn.</ng-template>
+                </span>
+                <span *ngSwitchCase="'comment'">đã bình luận: "{{ noti.commentContent }}"</span>
+                <span *ngSwitchCase="'reply'">đã trả lời bình luận của bạn: "{{ noti.commentContent }}"</span>
+                <span *ngSwitchCase="'follow'">đã theo dõi bạn.</span>
+                <span *ngSwitchCase="'repost'">đã đăng lại bài viết của bạn.</span>
+                <span *ngSwitchCase="'message'">đã gửi tin nhắn: "{{ noti.content }}"</span>
+            </ng-container>
+        </div>
+        <div class="text-xs text-gray-400 mt-1">{{ formatTime(noti.createdAt) }}</div>
+    </div>
+    <!-- Có thể thêm ảnh post nếu muốn -->
+    <!-- <img *ngIf="noti.postImage" [src]="noti.postImage" class="w-12 h-12 rounded-lg object-cover border" alt="post" /> -->
+</div>
+<div *ngIf="!last" class="border-b border-gray-100 mx-2"></div>

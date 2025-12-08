@@ -1,0 +1,298 @@
+<div class="h-full flex flex-col">
+    <div class="header flex items-center gap-3 px-4 py-3 border-b border-gray-200">
+        <button class=" md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
+            (click)="back()">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+        <div class="flex items-center gap-3">
+            <img (click)="!isGroup ? navigateToProfile(router, username) : null" [src]="displayAvatar" alt="avatar"
+                class="w-10 h-10 rounded-full object-cover cursor-pointer" />
+            <div>
+                <div (click)="!isGroup ? navigateToProfile(router, username) : null"
+                    class="font-semibold truncate cursor-pointer" style="max-width: 220px;">{{ displayName }}</div>
+                <div (click)="!isGroup ? navigateToProfile(router, username) : null" *ngIf="!isGroup"
+                    class="text-xs text-gray-400 cursor-pointer">{{ "@" + username }}</div>
+            </div>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2 header-actions">
+            <button class="icon-btn" title="Gọi thoại" (click)="callPhone()">
+                <i class="fa-solid fa-phone text-gray-600"></i>
+            </button>
+
+            <button class="icon-btn" title="Gửi video" (click)="callVideo()">
+                <i class="fa-solid fa-video text-gray-600"></i>
+            </button>
+
+            <button class="icon-btn" title="Thông tin về cuộc trò chuyện" (click)="openConversationInfo()">
+                <i class="fa-solid fa-circle-info text-gray-600"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="messages flex-1 overflow-auto p-4" #messagesContainer (scroll)="onScroll($event)"
+        (click)="activeActionId = null">
+        <div *ngIf="isLoadingMessages && messages.length === 0" class="py-8">
+            <app-loading></app-loading>
+        </div>
+
+        <div *ngIf="isLoadingMessages && messages.length > 0" class="py-2">
+            <app-loading></app-loading>
+        </div>
+
+        <div *ngFor="let m of messages; let i = index; trackBy: trackByMessageId" class="message-row"
+            [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)"
+            [style.margin-bottom]="getMessageMarginBottom(i)">
+
+            <div *ngIf="!isMessageFromCurrentUser(m.senderId)" class="avatar-container" [style.width.px]="32"
+                [style.height.px]="32">
+                <app-tooltip *ngIf="shouldShowAvatar(i)" [text]="getSenderName(m.senderId)">
+                    <img (click)="navigateToProfile(router, m.senderId.username)"
+                        class="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer"
+                        [src]="getSenderAvatar(m.senderId)" alt="avatar" />
+                </app-tooltip>
+                <div *ngIf="!shouldShowAvatar(i)" class="w-8 h-8"></div>
+            </div>
+
+            <div class="max-w-xs lg:max-w-md">
+                <div class="message-bubble-wrapper p-0 relative" (click)="onBubbleClick(m, i, $event)"
+                    [class.actions-open]="isActiveAction(m, i)">
+
+                    <div *ngIf="isGroup && shouldShowSenderName(i) && !isMessageFromCurrentUser(m.senderId)"
+                        class="sender-name mt-2">
+                        {{ getSenderName(m.senderId) }}
+                    </div>
+
+                    <div class="p-2 rounded-lg text-sm relative message-bubble"
+                        [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1 || (m.content && m.content.trim()))"
+                        [class.text-white]="isMessageFromCurrentUser(m.senderId)"
+                        [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1 || (m.content && m.content.trim()))"
+                        [class.text-gray-800]="!isMessageFromCurrentUser(m.senderId)" [class.opacity-50]="m.isTemp"
+                        [class.grouped-corner]="shouldHaveGroupedCorner(i)">
+                        <div [class]="(m.content && m.content.trim()) ? 'whitespace-pre-wrap break-words' : ''">
+                            {{ m.content }}
+                        </div>
+                        <div *ngIf="m.mediaUrls?.length" [class]="(m.content && m.content.trim()) ? 'mt-2' : ''">
+                            <ng-container *ngIf="m.mediaUrls.length <= 2; else manyMedias">
+                                <div [class]="m.mediaUrls.length === 2 ? 'grid grid-cols-2 gap-2' : ''">
+                                    <ng-container *ngFor="let url of m.mediaUrls; let j = index">
+                                        <ng-container *ngIf="isVideo(url); else imageBlockSmall">
+                                            <video [src]="url" class="w-full h-36 object-cover rounded cursor-pointer"
+                                                controls
+                                                (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
+                                        </ng-container>
+                                        <ng-template #imageBlockSmall>
+                                            <img [src]="url" alt="media"
+                                                class="w-full h-36 object-cover rounded cursor-pointer"
+                                                (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
+                                        </ng-template>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+
+                            <ng-template #manyMedias>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <ng-container *ngFor="let url of m.mediaUrls.slice(0,2); let j = index">
+                                        <div class="media-tile">
+                                            <ng-container *ngIf="isVideo(url); else imgBlock">
+                                                <video [src]="url"
+                                                    class="w-full h-36 object-cover rounded cursor-pointer" controls
+                                                    (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
+                                            </ng-container>
+                                            <ng-template #imgBlock>
+                                                <img [src]="url" alt="media"
+                                                    class="w-full h-36 object-cover rounded cursor-pointer"
+                                                    (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
+                                            </ng-template>
+
+                                            <div *ngIf="j === 1 && m.mediaUrls.length > 2" class="media-overlay"
+                                                (click)="openMediaViewer(m.mediaUrls, 1); $event.stopPropagation()">
+                                                +{{ m.mediaUrls.length - 2 }}
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+
+                    <div *ngIf="hasReactions(m)" class="reaction-summary"
+                        [class.reverse]="isMessageFromCurrentUser(m.senderId)" (click)="openReactionList(m, $event)">
+                        <div class="reaction-icons">
+                            <ng-container *ngFor="let r of reactionTypesToShow(m)">
+                                <span class="reaction-chip">{{ getReactionEmoji(r) }}</span>
+                            </ng-container>
+                        </div>
+                        <div *ngIf="totalReactions(m) > 1" class="reaction-count">{{ totalReactions(m) }}</div>
+                    </div>
+
+                    <div *ngIf="activeReactionPickerId === getMessageActionId(m, i)" class="reaction-picker"
+                        [class.reverse]="isMessageFromCurrentUser(m.senderId)" (clickOutside)="closeReactionPicker()">
+                        <button *ngFor="let r of reactionList" class="reaction-btn"
+                            [class.active]="isReactionActive(m, r.key)" (click)="react(m, r.key, $event)"
+                            [attr.aria-pressed]="isReactionActive(m, r.key) ? 'true' : 'false'">
+                            <span class="reaction-emoji">{{ r.emoji }}</span>
+                        </button>
+                    </div>
+
+                    <div class="message-actions" [class.reverse]="isMessageFromCurrentUser(m.senderId)">
+                        <app-tooltip text="Bày tỏ cảm xúc">
+                            <button class="action" aria-label="react" (click)="toggleReactionPicker(m, i, $event)">
+                                <i class="fa-regular fa-face-smile"></i>
+                            </button>
+                        </app-tooltip>
+
+                        <app-tooltip text="Trả lời">
+                            <button class="action" aria-label="reply"><i class="fa-solid fa-reply"></i></button>
+                        </app-tooltip>
+
+                        <app-tooltip text="Xem thêm">
+                            <button class="action" title="Xem thêm" (click)="toggleMoreMenu(m, i, $event)">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                        </app-tooltip>
+                    </div>
+
+                    <div *ngIf="activeMoreMenuId === getMessageActionId(m, i) || activeMoreMenuId === (m._id || m.id)"
+                        class="message-more-menu" [ngClass]="{ 'reverse': isMessageFromCurrentUser(m.senderId) }"
+                        (click)="$event.stopPropagation()" (clickOutside)="closeMoreMenu()">
+
+                        <div class="menu-item time">
+                            <div class="time-label">
+                                <div class="time-value">{{ formatExactSentAt(m) }}</div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="menu-row">
+                            <button class="menu-action" (click)="onForwardMessage(m)">
+                                Chuyển tiếp <i class="fa-solid fa-paper-plane mr-2"></i>
+                            </button>
+                            <button class="menu-action" (click)="onCopyMessage(m)">
+                                Sao chép <i class="fa-regular fa-copy mr-2"></i>
+                            </button>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <button *ngIf="isMessageFromCurrentUser(m.senderId)" class="menu-action danger"
+                            (click)="requestRevokeMessage(m, $event)">
+                            <i class="fa-solid fa-trash-can mr-2"></i> Thu hồi
+                        </button>
+
+                        <button *ngIf="!isMessageFromCurrentUser(m.senderId)" class="menu-action danger"
+                            (click)="onReportMessage(m)">
+                            Báo cáo <i class="fa-solid fa-flag mr-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="messages.length === 0 && !isLoadingMessages" class="py-8">
+            <div *ngIf="messages.length === 0 && !isLoadingMessages" class="py-8">
+                <ng-container *ngIf="isGroup; else singleEmpty">
+                    <div class="text-sm text-gray-500 text-center">
+                        Chưa có tin nhắn trong nhóm này. Hãy bắt đầu cuộc trò chuyện!
+                    </div>
+                </ng-container>
+
+                <ng-template #singleEmpty>
+                    <div class="flex flex-col items-center justify-center text-center text-gray-500">
+                        <img [src]="displayAvatar" alt="avatar" class="w-24 h-24 rounded-full object-cover mb-2" />
+                        <div class="text-lg font-semibold">{{ displayName }}</div>
+                        <div class="text-sm text-gray-500 mb-4">{{ '@' + username || '' }}</div>
+                        <button class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
+                            (click)="navigateToProfile(router, username)">
+                            Xem trang cá nhân
+                        </button>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+
+    <div class="composer">
+        <div *ngIf="selectedAttachments.length" class="attachments-preview px-2 pb-2">
+            <div class="flex gap-2 overflow-auto py-1">
+                <div *ngFor="let att of selectedAttachments; let idx = index" class="attachment-item relative">
+                    <button type="button" class="remove-att-btn" (click)="removeAttachment(idx)" aria-label="Xóa">
+                        <app-tooltip text="Gỡ file đính kèm">
+                            <i class="fa-solid fa-xmark"></i>
+                        </app-tooltip>
+                    </button>
+
+                    <ng-container [ngSwitch]="att.type">
+                        <img *ngSwitchCase="'image'" [src]="att.url" alt="preview"
+                            class="w-28 h-20 object-cover rounded" />
+                        <video *ngSwitchCase="'video'" [src]="att.url" class="w-28 h-20 object-cover rounded"
+                            muted></video>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="isUploading" class="text-sm text-gray-500 px-2 py-1">Đang gửi...</div>
+        <div class="composer-inner">
+            <div class="left">
+                <button class="icon-btn" (click)="toggleEmojiPicker()" aria-label="Emoji">
+                    <i class="fa-regular fa-face-smile"></i>
+                </button>
+
+                <div (clickOutside)="showEmojiPicker = false" class="emoji-panel" *ngIf="showEmojiPicker">
+                    <emoji-mart (emojiSelect)="addEmoji($event)" [style.width.px]="320"
+                        [style.height.px]="260"></emoji-mart>
+                </div>
+            </div>
+
+            <div class="center">
+                <textarea [(ngModel)]="text" name="text" rows="1" placeholder="Nhập tin nhắn..." class="message-input"
+                    (input)="autoResize($event)" (keydown.enter)="onEnterKey($event)"></textarea>
+            </div>
+
+            <div class="right">
+                <ng-container *ngIf="!(text.trim() || selectedAttachments.length); else hasText">
+                    <button class="icon-btn" (click)="startVoiceRecording()" title="Clip âm thanh">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+
+                    <button class="icon-btn" (click)="openFilePicker()" title="Thêm ảnh hoặc video">
+                        <i class="fa-solid fa-image"></i>
+                    </button>
+                    <input #fileInput type="file" accept="image/*,video/*" multiple (change)="onFileSelected($event)"
+                        hidden />
+
+                    <button class="icon-btn" (click)="openStickerPicker()" title="Chọn một ảnh GIF hoặc nhãn dán">
+                        <i class="fa-solid fa-icons"></i>
+                    </button>
+
+                    <button class="icon-btn" (click)="quickHeart()" title="Thích">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
+                </ng-container>
+
+                <ng-template #hasText>
+                    <button class="send-btn" (click)="send()" [disabled]="isUploading">Gửi</button>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-media-viewer *ngIf="showMediaViewer" [medias]="viewerMedias" [startIndex]="viewerStart"
+    [onClose]="closeMediaViewer">
+</app-media-viewer>
+
+<app-confirm-modal *ngIf="showRevokeConfirm" [message]="'Bạn có chắc muốn thu hồi tin nhắn này?'" confirmText="Thu hồi"
+    cancelText="Hủy" confirmColor="text-red-600"
+    [imageUrl]="selectedMessageToRevoke?.sender?.avatarUrl || selectedMessageToRevoke?.senderAvatarUrl"
+    (confirm)="confirmRevoke()" (cancel)="cancelRevoke()">
+</app-confirm-modal>
+
+<app-reaction-list-modal *ngIf="showReactionListModal" [message]="selectedReactionMessage"
+    (close)="closeReactionList()"></app-reaction-list-modal>
+
+<app-conversation-info-modal *ngIf="showConversationInfoModal" [conversation]="conversation"
+    [participants]="participants" (close)="showConversationInfoModal = false">
+</app-conversation-info-modal>

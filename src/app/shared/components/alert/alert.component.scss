@@ -1,0 +1,30 @@
+.alert-message {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.25;
+    vertical-align: middle;
+}
+
+.inline-action {
+    vertical-align: middle;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s;
+}

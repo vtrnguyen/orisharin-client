@@ -1,0 +1,23 @@
+.trash-actions {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.15rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    z-index: 40;
+}
+
+.trash-actions i {
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+@media (max-width: 420px) {
+    .trash-actions {
+        position: static !important;
+        margin-top: 0.5rem;
+        justify-content: flex-end;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+    }
+}

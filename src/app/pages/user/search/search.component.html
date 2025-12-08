@@ -1,0 +1,47 @@
+<div class="max-w-2xl mx-auto py-8 px-2">
+    <div class="bg-white rounded-2xl shadow p-4">
+        <div class="flex items-center gap-3 rounded-2xl px-4 py-3 border border-gray-200 transition mb-4">
+            <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
+            <input type="text" [(ngModel)]="searchValue" (ngModelChange)="onSearchChange()"
+                class="flex-1 bg-transparent border-none outline-none text-base" placeholder="Tìm kiếm"
+                autocomplete="off" />
+        </div>
+
+        <div class="mb-3 flex items-center gap-2">
+            <span class="font-semibold text-gray-400 text-sm">Gợi ý theo dõi</span>
+        </div>
+
+        <div>
+            <ng-container *ngIf="suggestions.length; else emptyTemplate">
+                <ng-container *ngFor="let user of suggestions; let last = last; let i = index">
+                    <div #userItem>
+                        <app-user-list-item [user]="user" [showFollowButton]="true" (follow)="toggleFollow(user)"
+                            (unfollow)="toggleFollow(user)">
+                        </app-user-list-item>
+                    </div>
+                    <hr *ngIf="!last" class="my-4 border-gray-200" />
+                </ng-container>
+
+                <div class="py-2 flex justify-center" *ngIf="isLoading">
+                    <app-loading></app-loading>
+                </div>
+            </ng-container>
+
+            <ng-template #emptyTemplate>
+                <div *ngIf="isLoading" class="py-8">
+                    <app-loading></app-loading>
+                </div>
+                <div *ngIf="!isLoading" class="text-center text-gray-400 py-8">
+                    Không tìm thấy kết quả phù hợp.
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>
+
+<app-confirm-modal *ngIf="showUnfollowConfirm"
+    [message]="'Bỏ theo dõi ' + (selectedUserToUnfollow ? selectedUserToUnfollow.username : '') + '?'"
+    confirmText="Bỏ theo dõi" cancelText="Hủy" confirmColor="text-red-600"
+    [imageUrl]="selectedUserToUnfollow ? selectedUserToUnfollow.avatarUrl : undefined"
+    (confirm)="confirmUnfollow(selectedUserToUnfollow ?? undefined)" (cancel)="cancelUnfollow()">
+</app-confirm-modal>

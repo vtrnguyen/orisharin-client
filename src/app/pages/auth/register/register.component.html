@@ -1,0 +1,35 @@
+<div class="flex flex-col items-center justify-center min-h-[70vh]">
+    <div class="flex justify-center mb-4">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden bg-white shadow">
+            <img src="images/orisharin_logo.png" alt="OriSharin Logo" class="w-full h-full object-contain" />
+        </div>
+    </div>
+    <div class="mb-4 text-center text-base text-gray-700 font-medium">Đăng ký tài khoản OriSharin</div>
+    <form class="space-y-2 w-full max-w-sm" (ngSubmit)="onSubmit()">
+        <input type="text" [(ngModel)]="fullName" name="fullName" placeholder="Họ và tên"
+            class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />
+        <input type="text" [(ngModel)]="userName" name="userName" placeholder="Tên người dùng"
+            (input)="onUsernameChange($event)"
+            class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />
+        <input type="email" autocomplete="email" [(ngModel)]="email" name="email" placeholder="Email"
+            class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />
+        <input type="password" autocomplete="new-password" [(ngModel)]="password" name="password" placeholder="Mật khẩu"
+            class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />
+        <input type="password" autocomplete="new-password" [(ngModel)]="confirmPassword" name="confirmPassword"
+            placeholder="Xác nhận mật khẩu"
+            class="block w-full rounded-lg border border-gray-300 px-4 py-3 bg-gray-50 focus:border-gray-500 focus:ring-1 focus:ring-gray-400 outline-none transition text-base placeholder-gray-400" />
+        <button type="submit"
+            [disabled]="!fullName.trim() || !userName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim() || isLoading"
+            class="w-full py-3 px-4 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg shadow transition cursor-pointer disabled:text-gray-400 disabled:cursor-not-allowed">
+            <ng-container *ngIf="isLoading; else btnText">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang đăng ký
+            </ng-container>
+            <ng-template #btnText>Đăng ký</ng-template>
+        </button>
+        <div *ngIf="error" class="text-red-500 text-sm mt-2 text-center">{{ error }}</div>
+    </form>
+    <div class="mt-8 text-center text-sm text-gray-600">
+        Đã có tài khoản?
+        <a href="/auth/login" class="text-black font-medium hover:underline cursor-pointer">Đăng nhập ngay</a>
+    </div>
+</div>

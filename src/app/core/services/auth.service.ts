@@ -2,30 +2,21 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-
-export interface User {
-    id: string;
-    username: string;
-    fullName: string;
-    email: string;
-    role: string;
-}
-
-export interface AuthResponse {
-    success: boolean;
-    accessToken: string;
-    user: User;
-}
+import { AuthResponse } from '../../shared/dtos/auth-response.dto';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private apiUrl = environment.apiUrl + '/auth';
-    private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
+    private currentUserSubject = new BehaviorSubject<any>(this.getUserFromStorage());
     currentUser$ = this.currentUserSubject.asObservable();
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private router: Router
+    ) { }
 
     login(email: string, password: string): Observable<AuthResponse> {
         return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
@@ -42,7 +33,7 @@ export class AuthService {
     logout() {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
-        this.currentUserSubject.next(null);
+        this.router.navigate(['/auth/login']);
     }
 
     isLoggedIn(): boolean {
@@ -53,7 +44,7 @@ export class AuthService {
         return localStorage.getItem('accessToken');
     }
 
-    getCurrentUser(): User | null {
+    getCurrentUser(): any {
         return this.currentUserSubject.value;
     }
 
@@ -71,7 +62,7 @@ export class AuthService {
         }
     }
 
-    private getUserFromStorage(): User | null {
+    private getUserFromStorage(): any {
         const user = localStorage.getItem('user');
         return user ? JSON.parse(user) : null;
     }

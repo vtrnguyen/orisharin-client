@@ -1,0 +1,41 @@
+<div class="flex gap-3 items-start mb-4">
+    <img [src]="comment?.authorId?.avatarUrl" class="w-8 h-8 rounded-full object-cover cursor-pointer"
+        (click)="navigateToProfile(router, comment?.authorId?.username)" />
+    <div class="flex-1">
+        <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-900 hover:underline cursor-pointer"
+                (click)="navigateToProfile(router, comment?.authorId?.username)">{{ comment?.authorId?.username
+                }}</span>
+            <span class="text-gray-400 text-xs">{{ formatTime(comment?.createdAt) }}</span>
+        </div>
+        <div class="mt-2 text-gray-800 text-base whitespace-pre-line" [innerHTML]="comment?.content | mentionHighlight">
+        </div>
+        <div *ngIf="medias.length > 0" class="mt-2 flex gap-2 overflow-x-auto scrollbar-hide">
+            <ng-container *ngFor="let media of medias; let i = index">
+                <img *ngIf="isImage(media)" [src]="media"
+                    class="rounded-xl border border-gray-300 max-h-32 object-cover flex-shrink-0 cursor-pointer transition-transform duration-200"
+                    [class.scale-110]="zoomingIndex === i" alt="comment image" (click)="openViewer(i)" />
+
+                <video *ngIf="isVideo(media)" [src]="media" controls
+                    class="rounded-xl border border-gray-300 max-h-32 object-contain flex-shrink-0 bg-black cursor-pointer transition-transform duration-200"
+                    [class.scale-110]="zoomingIndex === i" (click)="openViewer(i)">
+                </video>
+            </ng-container>
+        </div>
+        <div class="flex gap-4 mt-2 text-gray-500 text-sm">
+            <button class="flex items-center gap-1 cursor-pointer rounded transition-colors duration-150"
+                [class.opacity-50]="loadingLike" (click)="toggleLike($event)" [disabled]="loadingLike">
+                <i [ngClass]="liked ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart'"></i>
+                <span>{{ likesCount }}</span>
+            </button>
+
+            <button class="flex items-center gap-1 cursor-pointer hover:text-blue-500" (click)="reply.emit(comment)">
+                <i class="fa-regular fa-comment-dots"></i>
+                <span *ngIf="isTopLevel">{{ commentsCount }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<app-media-viewer *ngIf="showViewer" [medias]="medias" [startIndex]="viewerIndex" [onClose]="closeViewer.bind(this)">
+</app-media-viewer>

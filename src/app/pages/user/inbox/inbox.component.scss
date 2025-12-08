@@ -1,0 +1,46 @@
+.conv-item.selected {
+    background: #f1f5f9;
+}
+
+.flex-1.overflow-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+.flex-1.overflow-auto::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+
+    .inbox-page aside,
+    .inbox-page section {
+        display: block !important;
+    }
+
+    .inbox-page:not(.has-selected) section {
+        display: none !important;
+    }
+
+    .inbox-page:not(.has-selected) aside {
+        display: block !important;
+        grid-column: 1 / -1;
+        height: 100%;
+    }
+
+    .inbox-page.has-selected aside {
+        display: none !important;
+    }
+
+    .inbox-page.has-selected section {
+        display: block !important;
+        grid-column: 1 / -1;
+        height: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .inbox-page .grid {
+        gap: 4px;
+    }
+}

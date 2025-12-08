@@ -1,0 +1,8 @@
+<span class="tooltip-wrapper" (mouseenter)="show()" (mouseleave)="hide()">
+    <ng-content></ng-content>
+
+    <span class="tooltip" role="tooltip" [class.show]="visible" *ngIf="text">
+        {{ text }}
+        <i class="arrow" aria-hidden="true"></i>
+    </span>
+</span>
