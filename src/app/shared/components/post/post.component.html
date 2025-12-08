@@ -71,7 +71,8 @@
                 </div>
                 <div class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ sharedPost?.post?.content || '' }}</div>
 
-                <div *ngIf="(sharedPost?.post?.mediaUrls || []).length" class="mt-2 flex gap-2 overflow-x-auto">
+                <div *ngIf="(sharedPost?.post?.mediaUrls || []).length"
+                    class="mt-2 flex gap-2 overflow-x-auto scrollbar-hide">
                     <img *ngFor="let m of (sharedPost?.post?.mediaUrls || [])" [src]="m"
                         class="w-36 h-24 object-cover rounded-md" />
                 </div>
