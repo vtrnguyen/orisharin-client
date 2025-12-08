@@ -26,7 +26,7 @@ jobs:
             socketUrl: '${{ secrets.API_BASE_URL }}'
           };
           EOF
-          npx ng build --configuration production
+          npx ng build --configuration production --output-hashing=all
 
       - name: Deploy to VPS
         uses: appleboy/scp-action@v0.1.7
