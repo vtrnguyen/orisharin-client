@@ -11,8 +11,7 @@
             <div>
                 <div (click)="!isGroup ? navigateToProfile(router, username) : null"
                     class="font-semibold truncate cursor-pointer" style="max-width: 220px;">{{ displayName }}</div>
-                <div (click)="!isGroup ? navigateToProfile(router, username) : null" *ngIf="!isGroup"
-                    class="text-xs text-gray-400 cursor-pointer">{{ "@" + username }}</div>
+                <div *ngIf="!isGroup" class="text-xs text-gray-400">Hoạt động gần đây</div>
             </div>
         </div>
 
@@ -30,24 +29,13 @@
             </button>
         </div>
     </div>
-    <div class="py-8">
-        <ng-container *ngIf="isGroup; else singleEmpty">
+
+    <div *ngIf="isGroup && messages.length === 0" class="py-8">
+        <ng-container>
             <div class="text-sm text-gray-500 text-center">
                 Chưa có tin nhắn trong nhóm này. Hãy bắt đầu cuộc trò chuyện!
             </div>
         </ng-container>
-
-        <ng-template #singleEmpty>
-            <div class="flex flex-col items-center justify-center text-center text-gray-500">
-                <img [src]="displayAvatar" alt="avatar" class="w-24 h-24 rounded-full object-cover mb-2" />
-                <div class="text-lg font-semibold">{{ displayName }}</div>
-                <div class="text-sm text-gray-500 mb-4">{{ '@' + username || '' }}</div>
-                <button class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
-                    (click)="navigateToProfile(router, username)">
-                    Xem trang cá nhân
-                </button>
-            </div>
-        </ng-template>
     </div>
 
     <div class="messages flex-1 overflow-auto p-4" #messagesContainer (scroll)="onScroll($event)"
@@ -58,6 +46,16 @@
 
         <div *ngIf="isLoadingMessages && messages.length > 0" class="py-2">
             <app-loading></app-loading>
+        </div>
+
+        <div *ngIf="!isGroup" class="py-6 flex flex-col items-center justify-center text-center text-gray-500">
+            <img [src]="displayAvatar" alt="avatar" class="w-24 h-24 rounded-full object-cover mb-2" />
+            <div class="text-lg font-semibold">{{ displayName }}</div>
+            <div class="text-sm text-gray-500 mb-4">{{ '@' + username || '' }}</div>
+            <button class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
+                (click)="navigateToProfile(router, username)">
+                Xem trang cá nhân
+            </button>
         </div>
 
         <div *ngFor="let m of messages; let i = index; trackBy: trackByMessageId" class="message-row"
@@ -93,46 +91,24 @@
                             {{ m.content }}
                         </div>
                         <div *ngIf="m.mediaUrls?.length" [class]="(m.content && m.content.trim()) ? 'mt-2' : ''">
-                            <ng-container *ngIf="m.mediaUrls.length <= 2; else manyMedias">
-                                <div [class]="m.mediaUrls.length === 2 ? 'grid grid-cols-2 gap-2' : ''">
-                                    <ng-container *ngFor="let url of m.mediaUrls; let j = index">
-                                        <ng-container *ngIf="isVideo(url); else imageBlockSmall">
-                                            <video [src]="url" class="w-full h-36 object-cover rounded cursor-pointer"
-                                                controls
-                                                (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
-                                        </ng-container>
-                                        <ng-template #imageBlockSmall>
-                                            <img [src]="url" alt="media"
-                                                class="w-full h-36 object-cover rounded cursor-pointer"
-                                                (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
-                                        </ng-template>
-                                    </ng-container>
+                            <ng-container>
+                                <ng-container *ngIf="isVideo(m.mediaUrls[0]); else imageBlock">
+                                    <video [src]="m.mediaUrls[0]"
+                                        class="w-full h-36 object-cover rounded cursor-pointer" controls
+                                        (click)="openMediaViewer(m.mediaUrls, 0); $event.stopPropagation()"></video>
+                                </ng-container>
+
+                                <ng-template #imageBlock>
+                                    <img [src]="m.mediaUrls[0]" alt="media"
+                                        class="w-full h-36 object-cover rounded cursor-pointer"
+                                        (click)="openMediaViewer(m.mediaUrls, 0); $event.stopPropagation()" />
+                                </ng-template>
+
+                                <div *ngIf="m.mediaUrls.length > 1" class="media-overlay"
+                                    (click)="openMediaViewer(m.mediaUrls, 0); $event.stopPropagation()">
+                                    +{{ m.mediaUrls.length - 1 }}
                                 </div>
                             </ng-container>
-
-                            <ng-template #manyMedias>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <ng-container *ngFor="let url of m.mediaUrls.slice(0,2); let j = index">
-                                        <div class="media-tile">
-                                            <ng-container *ngIf="isVideo(url); else imgBlock">
-                                                <video [src]="url"
-                                                    class="w-full h-36 object-cover rounded cursor-pointer" controls
-                                                    (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()"></video>
-                                            </ng-container>
-                                            <ng-template #imgBlock>
-                                                <img [src]="url" alt="media"
-                                                    class="w-full h-36 object-cover rounded cursor-pointer"
-                                                    (click)="openMediaViewer(m.mediaUrls, j); $event.stopPropagation()" />
-                                            </ng-template>
-
-                                            <div *ngIf="j === 1 && m.mediaUrls.length > 2" class="media-overlay"
-                                                (click)="openMediaViewer(m.mediaUrls, 1); $event.stopPropagation()">
-                                                +{{ m.mediaUrls.length - 2 }}
-                                            </div>
-                                        </div>
-                                    </ng-container>
-                                </div>
-                            </ng-template>
                         </div>
                     </div>
 

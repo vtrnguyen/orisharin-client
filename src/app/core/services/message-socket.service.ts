@@ -37,6 +37,12 @@ export class MessageSocketService {
         });
 
         this.socket.on('message:created', (msg: any) => {
+            if (Array.isArray(msg)) {
+                for (const single of msg) {
+                    this.ngZone.run(() => this.msgCreated$.next(single));
+                }
+                return;
+            }
             this.ngZone.run(() => this.msgCreated$.next(msg));
         });
 

@@ -200,16 +200,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         });
 
         this.socketReactedSub = this.messageSocketService.onMessageReacted().subscribe((payloadObj: any) => {
-            // payload may be { payload: { messageId, userId, type, reactionsCount } } or payload itself depending on server
             const payload = payloadObj?.payload ?? payloadObj;
             const messageId = payload?.messageId;
             if (!messageId) return;
             const mIdx = this.messages.findIndex(m => (m._id || m.id) === messageId);
             if (mIdx === -1) return;
-            // update reactionsCount and reactions on local message
             const updatedCounts = payload?.reactionsCount ?? {};
             this.messages[mIdx].reactionsCount = updatedCounts;
-            // optionally update whole message if server sent it
             if (payload?.message) {
                 this.messages[mIdx] = { ...this.messages[mIdx], ...payload.message };
             }
@@ -374,18 +371,36 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                     this.isUploading = false;
                     const payloadData = response?.data ?? response;
                     const created = payloadData?.data ?? payloadData;
-                    const msg = created?.message ?? created;
+                    let msgs: any[] = [];
+
+                    if (!created) {
+                        msgs = [];
+                    } else if (Array.isArray(created)) {
+                        msgs = created;
+                    } else if (created.message) {
+                        if (Array.isArray(created.message)) msgs = created.message;
+                        else msgs = [created.message];
+                    } else {
+                        msgs = [created];
+                    }
 
                     try {
                         previewUrls.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) { } });
                     } catch (e) { }
 
-                    if (msg) {
+                    if (msgs.length > 0) {
                         this.removeTempMessageById(tempId);
 
-                        if (!this.hasMessageId(msg._id)) {
-                            this.messages.push(msg);
+                        for (const m of msgs) {
+                            if (!m) continue;
+                            const mid = m._id ?? m.id ?? null;
+                            if (!m.conversationId || String(m.conversationId) !== String(this.roomId)) continue;
+                            if (!mid) continue;
+                            if (!this.hasMessageId(mid)) {
+                                this.messages.push(m);
+                            }
                         }
+
                         setTimeout(() => this.scrollMessagesToBottom(), 50);
                     } else {
                         this.removeTempMessageById(tempId);
