@@ -180,7 +180,7 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
     }
 
     private mapToRow(it: any): ConversationRow {
-        const conv = it?.conversation ?? it ?? {};
+        const conv = it?.conversation ?? {};
 
         let participants: any[] = it?.participants ?? conv?.participants ?? [];
         if ((!participants || participants.length === 0) && Array.isArray(conv?.participantIds)) {
@@ -199,6 +199,43 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
                 ? other.avatarUrl
                 : (`https://ui-avatars.com/api/?name=${encodeURIComponent(other?.fullName || other?.username || title)}`);
 
+        let lastMessageText = '';
+        let lastMessageAt: any = conv?.updatedAt ?? conv?.createdAt ?? new Date().toISOString();
+
+        const lm = conv?.lastMessage;
+        if (!lm) {
+            lastMessageText = 'Bắt đầu cuộc trò chuyện';
+        } else if (typeof lm === 'string') {
+            lastMessageText = lm;
+        } else if (typeof lm === 'object') {
+            if (lm.content && String(lm.content).trim() !== '') {
+                lastMessageText = String(lm.content);
+            } else if (Array.isArray(lm.mediaUrls) && lm.mediaUrls.length > 0) {
+                const t = lm.type ?? '';
+                if (t === 'image') {
+                    lastMessageText = 'Đã gửi một hình ảnh';
+                } else if (t === 'video') {
+                    lastMessageText = 'Đã gửi một video';
+                } else if (t === 'audio') {
+                    lastMessageText = 'Đã gửi một đoạn ghi âm';
+                } else if (t === 'file') {
+                    lastMessageText = 'Đã gửi một tập tin';
+                } else {
+                    lastMessageText = 'Đã gửi một media';
+                }
+            } else {
+                lastMessageText = lm.content ?? '';
+            }
+
+            if (lm.sentAt) {
+                lastMessageAt = lm.sentAt;
+            } else if (lm.updatedAt) {
+                lastMessageAt = lm.updatedAt;
+            }
+        } else {
+            lastMessageText = '';
+        }
+
         return {
             conversation: conv,
             participants,
@@ -206,9 +243,9 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
             isGroup,
             title,
             avatarUrl: avatarCandidate,
-            lastMessage: conv?.lastMessage ?? '',
-            updatedAt: conv?.updatedAt ?? conv?.createdAt ?? new Date().toISOString(),
-            unread: conv?.unread ?? 0
+            lastMessage: lastMessageText,
+            updatedAt: lastMessageAt,
+            unread: conv?.unread ?? conv?.unreadCount ?? 0
         } as ConversationRow;
     }
 
