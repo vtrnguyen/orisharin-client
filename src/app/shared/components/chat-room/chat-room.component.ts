@@ -16,11 +16,11 @@ import { TooltipComponent } from '../tooltip/tooltip.component';
 import { AlertService } from "../../state-managements/alert.service";
 import { isImage, isVideo } from "../../functions/media-type.util";
 import { MediaViewerComponent } from "../media-viewer/media-viewer.component";
-import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.component";
 import { Reaction } from "../../enums/reaction.enum";
 import { ReactionListModalComponent } from "../reaction-list-modal/reaction-list-modal.component";
 import { ConversationInfoModalComponent } from "../conversation-info-modal/conversation-info-modal.component";
 import { ConversationStateService } from "../../state-managements/conversation-state.service";
+import { RevokeChoiceModalComponent } from "../revoke-choice-modal/revoke-choice-modal.component";
 
 @Component({
     selector: "app-chat-room",
@@ -33,9 +33,9 @@ import { ConversationStateService } from "../../state-managements/conversation-s
         LoadingComponent,
         TooltipComponent,
         MediaViewerComponent,
-        ConfirmModalComponent,
         ReactionListModalComponent,
-        ConversationInfoModalComponent
+        ConversationInfoModalComponent,
+        RevokeChoiceModalComponent,
     ],
     templateUrl: "./chat-room.component.html",
     styleUrls: ["./chat-room.component.scss"],
@@ -213,16 +213,59 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         });
 
         this.socketDeletedSub = this.messageSocketService.onMessageDeleted().subscribe((payload: any) => {
+            if (!payload) return;
+
             const id = payload?.id ?? payload;
             if (!id) return;
 
+            const forAll = !!payload?.forAll;
+            const hiddenForUserId = payload?.hiddenForUserId ?? payload?.hiddenForUser ?? null;
+            const conversationId = payload?.conversationId ?? (payload?.conversation?._id ?? null);
+
+            if (conversationId && String(conversationId) !== String(this.roomId)) return;
+
+            if (hiddenForUserId) {
+                if (String(hiddenForUserId) === String(this.currentUserId)) {
+                    this.messages = this.messages.filter(m => String(m._id ?? m.id) !== String(id));
+                }
+                return;
+            }
+
+            if (forAll) {
+                const idx = this.messages.findIndex(m => String(m._id ?? m.id) === String(id));
+                if (idx !== -1) {
+                    this.messages[idx] = {
+                        ...this.messages[idx],
+                        isHideAll: true,
+                        hideForUsers: []
+                    };
+                } else {
+                    if (this.conversation && (String(this.conversation.lastMessageId) === String(id) || String(this.conversation?.lastMessage?._id) === String(id))) {
+                        if (!this.conversation.lastMessage) this.conversation.lastMessage = {};
+                        this.conversation.lastMessage.isHideAll = true;
+                    }
+                }
+
+                if (this.conversation && (String(this.conversation.lastMessageId) === String(id) || String(this.conversation?.lastMessage?._id) === String(id))) {
+                    if (!this.conversation.lastMessage) this.conversation.lastMessage = {};
+                    this.conversation.lastMessage.isHideAll = true;
+                    if (typeof (this.conversationStateService as any).updateConversation === 'function') {
+                        (this.conversationStateService as any).updateConversation(this.conversation);
+                    } else if (typeof (this.conversationStateService as any).setConversation === 'function') {
+                        (this.conversationStateService as any).setConversation(this.conversation);
+                    }
+                }
+
+                this.alertService.show("success", "Tin nhắn đã được thu hồi cho tất cả.");
+                return;
+            }
+
             const before = this.messages.length;
             this.messages = this.messages.filter(m => String(m._id ?? m.id) !== String(id));
-
             if (this.messages.length !== before) {
-                this.alertService.show("success", "Người dùng đã thu hồi một tin nhắn.");
+                this.alertService.show("success", "Một tin nhắn đã bị thu hồi.");
             }
-        })
+        });
 
         this.socketErrSub = this.messageSocketService.onError().subscribe(err => {
             console.error("Socket error", err);
@@ -625,6 +668,24 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return Math.abs(currTime - prevTime) > THRESHOLD_MS;
     }
 
+    shouldHideForCurrentUser(m: any): boolean {
+        if (!m) return false;
+        const uid = String(this.currentUserId ?? "");
+        if (Array.isArray(m.hideForUsers) && m.hideForUsers.length) {
+            try {
+                return m.hideForUsers.some((x: any) => String(x) === uid);
+            } catch { }
+        }
+        if (m.hiddenForUserId) {
+            return String(m.hiddenForUserId) === uid;
+        }
+        return false;
+    }
+
+    isMessageRevoked(m: any): boolean {
+        return !!(m && (m.isHideAll === true || m.isHideAll || m.isHiddenForAll));
+    }
+
     getMessageMarginBottom(messageIndex: number): string {
         if (messageIndex >= this.messages.length - 1) {
             return '8px'; // last message
@@ -793,7 +854,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.selectedMessageToRevoke = null;
     }
 
-    confirmRevoke() {
+    confirmRevoke(event: { forAll: boolean }) {
         const m = this.selectedMessageToRevoke;
         if (!m) {
             this.cancelRevoke();
@@ -806,15 +867,63 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             return;
         }
 
-        this.messageService.revoke(id).subscribe({
+        const doForAll = !!event?.forAll;
+
+        this.messageService.revoke(id, doForAll).subscribe({
             next: (res: any) => {
-                const ok = res && (res.success === true || res.status === 200 || res);
-                if (res && res.success === false) {
-                    this.alertService.show('error', res.message || 'Thu hồi thất bại');
-                } else {
-                    this.messages = this.messages.filter(msg => String(msg._id ?? msg.id) !== String(id));
-                    this.alertService.show('success', 'Đã thu hồi tin nhắn');
+                const payload = res?.data ?? res;
+                const data = payload?.data ?? payload;
+
+                const respId = data?.id ?? data;
+                const respConversationId = data?.conversationId ?? data?.conversation?._id ?? null;
+                const respForAll = !!data?.forAll;
+                const respHiddenForUserId = data?.hiddenForUserId ?? data?.hiddenForUser ?? null;
+
+                this.closeMoreMenu();
+
+                if (respForAll && respId) {
+                    const idx = this.messages.findIndex(m => String(m._id ?? m.id) === String(respId));
+                    if (idx !== -1) {
+                        this.messages[idx] = { ...this.messages[idx], isHideAll: true, hideForUsers: [] };
+                    }
+
+                    if (this.conversation && (String(this.conversation.lastMessageId) === String(respId) || String(this.conversation?.lastMessage?._id) === String(respId))) {
+                        if (!this.conversation.lastMessage) this.conversation.lastMessage = {};
+                        this.conversation.lastMessage.isHideAll = true;
+                        if (typeof (this.conversationStateService as any).updateConversation === 'function') {
+                            (this.conversationStateService as any).updateConversation(this.conversation);
+                        } else if (typeof (this.conversationStateService as any).setConversation === 'function') {
+                            (this.conversationStateService as any).setConversation(this.conversation);
+                        }
+                    }
+
+                    this.alertService.show('success', 'Tin nhắn đã được thu hồi cho tất cả.');
+                    this.cancelRevoke();
+                    return;
                 }
+
+                if (respHiddenForUserId && String(respHiddenForUserId) === String(this.currentUserId)) {
+                    this.messages = this.messages.filter(m => String(m._id ?? m.id) !== String(respId));
+                    this.alertService.show('success', 'Đã xóa 1 tin nhắn đối với bạn');
+                    this.cancelRevoke();
+                    return;
+                }
+
+                const ok = res && (res.success === true || res.status === 200 || res);
+                if (ok) {
+                    const idx = this.messages.findIndex(m => String(m._id ?? m.id) === String(respId));
+                    if (idx !== -1) {
+                        if (typeof this.messages[idx].isHideAll !== 'undefined') {
+                            this.messages[idx] = { ...this.messages[idx], isHideAll: true };
+                        } else {
+                            this.messages.splice(idx, 1);
+                        }
+                    }
+                    this.alertService.show('success', 'Thu hồi hoàn tất.');
+                } else {
+                    this.alertService.show('error', 'Thu hồi thất bại');
+                }
+
                 this.cancelRevoke();
             },
             error: (err) => {
