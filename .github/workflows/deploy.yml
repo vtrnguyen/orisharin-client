@@ -18,9 +18,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Inject environment.prod.ts from GitHub Secrets to production
+      - name: Inject environment.prod.ts from Secrets
         run: |
-          cat > src/environments/environment.prod.ts << EOF
+          cat > src/environments/environment.prod.ts << 'EOF'
           export const environment = {
             production: true,
             apiUrl: '${{ secrets.API_BASE_URL }}/api/v1',
@@ -28,17 +28,18 @@ jobs:
           };
           EOF
 
-      - name: Build Angular
-        run: npx ng build --configuration production --output-hashing=all
-
-      - name: Deploy to VPS
-        uses: appleboy/scp-action@v0.1.7
+      - name: Deploy + Pull new code mới
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
-          source: "dist/client/browser/*"
-          target: "/var/www/orisharin/"
-          strip_components: 3
-          overwrite: true
+          script: |
+            cd /home/orisharin/apps/client
+            git pull origin main || (git fetch && git reset --hard origin/main && git clean -fd)
+            npm ci
+            npx ng build --configuration production --output-hashing=all
+            sudo rm -rf /var/www/orisharin/*
+            sudo cp -r dist/client/browser/* /var/www/orisharin/
+            echo "Deploy frontend thành công!"
