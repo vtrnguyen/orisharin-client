@@ -72,9 +72,10 @@
                 <div class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ sharedPost?.post?.content || '' }}</div>
 
                 <div *ngIf="(sharedPost?.post?.mediaUrls || []).length"
-                    class="mt-2 flex gap-2 overflow-x-auto scrollbar-hide">
-                    <img *ngFor="let m of (sharedPost?.post?.mediaUrls || [])" [src]="m"
-                        class="w-36 h-24 object-cover rounded-md" />
+                    class="mt-2 flex gap-2 overflow-x-auto scrollbar-hide media-drag-container" appDragToScroll>
+                    <img *ngFor="let m of (sharedPost?.post?.mediaUrls || []); let i = index" [src]="m"
+                        draggable="false" class="w-36 h-24 object-cover rounded-md flex-shrink-0 cursor-pointer"
+                        (click)="onSharedMediaClick(i, $event)" />
                 </div>
 
                 <div *ngIf="!sharedPost?.post.content && !(sharedPost?.post?.mediaUrls?.length)"
@@ -89,9 +90,10 @@
             [innerHTML]="content | mentionHighlight">
         </div>
 
-        <div *ngIf="!isShared && medias.length > 0" class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
+        <div *ngIf="!isShared && medias.length > 0"
+            class="mt-3 flex gap-2 overflow-x-auto scrollbar-hide media-drag-container" appDragToScroll>
             <ng-container *ngFor="let media of medias; let i = index">
-                <img *ngIf="isImage(media)" [src]="media"
+                <img *ngIf="isImage(media)" [src]="media" draggable="false"
                     class="no-post-detail rounded-xl border border-gray-300 max-h-72 object-cover flex-shrink-0 cursor-pointer transition-transform duration-200"
                     [class.scale-110]="zoomingIndex === i" alt="post image" (click)="openViewer(i)" />
 
@@ -101,6 +103,7 @@
                 </video>
             </ng-container>
         </div>
+
         <div class="flex gap-8 mt-4 text-gray-500 text-sm">
             <button
                 class="flex items-center gap-1 transition cursor-pointer rounded-full px-4 py-2 hover:bg-gray-100 select-none"

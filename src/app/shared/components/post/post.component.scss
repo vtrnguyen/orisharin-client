@@ -31,3 +31,22 @@
 .animate-like i {
     animation: like-pop 0.3s;
 }
+
+.media-drag-container {
+    cursor: grab;
+    user-select: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.media-drag-container.dragging {
+    cursor: grabbing;
+}
+
+.media-drag-container img,
+.media-drag-container video {
+    flex: 0 0 auto;
+    width: auto;
+    max-height: 18rem;
+    object-fit: cover;
+    display: block;
+}

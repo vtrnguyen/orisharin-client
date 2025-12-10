@@ -158,7 +158,7 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   openPostModal(initialContent: string = ''): void {
-    this.postModalContent = initialContent || '';
+    this.postModalContent = initialContent + ' ' || '';
     this.showPostModal = true;
   }
 

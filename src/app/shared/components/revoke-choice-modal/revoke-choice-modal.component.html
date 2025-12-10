@@ -1,0 +1,65 @@
+<div class="fixed flex items-center justify-center inset-0 z-[1000] bg-black/60" (click)="onCancel()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-0 relative transition-all duration-300 ease-out opacity-0 scale-95 animate-modal-fade-in"
+        (click)="$event.stopPropagation()">
+        <div class="rcm-header text-center">
+            <div class="rcm-title">{{ title }}</div>
+        </div>
+
+        <div class="rcm-body">
+            <div class="msg-preview" *ngIf="message">
+                <div class="msg-content">{{ message.content }}</div>
+                <div *ngIf="message.mediaUrls?.length" class="msg-media">
+                    <ng-container *ngIf="isImage(message.mediaUrls[0]); else maybeVideo">
+                        <img [src]="message.mediaUrls[0]" alt="media" class="thumb" />
+                    </ng-container>
+
+                    <ng-template #maybeVideo>
+                        <ng-container *ngIf="isVideo(message.mediaUrls[0]); else fileBlock">
+                            <video [src]="message.mediaUrls[0]" class="thumb" controls muted></video>
+                        </ng-container>
+                    </ng-template>
+
+                    <ng-template #fileBlock>
+                        <div class="thumb file-placeholder">
+                            <span class="file-label">Tệp đính kèm</span>
+                        </div>
+                    </ng-template>
+
+                    <div *ngIf="message.mediaUrls.length > 1" class="more">+{{ message.mediaUrls.length - 1 }}</div>
+                </div>
+            </div>
+
+            <div class="rcm-options">
+                <div class="flex items-center ps-4 border border-gray-300 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer mb-2"
+                    (click)="selectedOption = 'forAll'">
+                    <input id="radio-for-all" type="radio" [(ngModel)]="selectedOption" value="forAll"
+                        name="revoke-radio"
+                        class="w-4 h-4 text-blue-600 border-gray-400 bg-white rounded-full checked:border-blue-600 focus:ring-2 focus:outline-none focus:ring-blue-200 border appearance-none cursor-pointer">
+                    <label for="radio-for-all"
+                        class="w-full py-3 select-none ms-3 text-sm font-medium text-gray-900 cursor-pointer">
+                        Gỡ với tất cả mọi người
+                    </label>
+                </div>
+
+                <div class="flex items-center ps-4 border border-gray-300 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer"
+                    (click)="selectedOption = 'forMe'">
+                    <input id="radio-for-me" type="radio" [(ngModel)]="selectedOption" value="forMe" name="revoke-radio"
+                        class="w-4 h-4 text-blue-600 border-gray-400 bg-white rounded-full checked:border-blue-600 focus:ring-2 focus:outline-none focus:ring-blue-200 border appearance-none cursor-pointer">
+                    <label for="radio-for-me"
+                        class="w-full py-3 select-none ms-3 text-sm font-medium text-gray-900 cursor-pointer">
+                        Gỡ chỉ với tôi
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex w-full rcm-footer border-t border-gray-200">
+            <button class="flex-1 rounded-bl-2xl text-sm cursor-pointer transition" (click)="onCancel()">Hủy</button>
+            <div class="w-px bg-gray-200"></div>
+            <button class="flex-1 rounded-br-2xl font-semibold text-sm cursor-pointer transition text-red-600"
+                [disabled]="!selectedOption" (click)="onSubmit()">
+                Xác nhận
+            </button>
+        </div>
+    </div>
+</div>
