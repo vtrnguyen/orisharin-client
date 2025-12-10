@@ -1,17 +1,15 @@
 <div class="h-full flex flex-col">
     <div class="header flex items-center gap-3 px-4 py-3 border-b border-gray-200">
-        <button class=" md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer"
-            (click)="back()">
+        <button class=" md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100" (click)="back()">
             <i class="fa-solid fa-arrow-left"></i>
         </button>
 
-        <div class="flex items-center gap-3">
-            <img (click)="!isGroup ? navigateToProfile(router, username) : null" [src]="displayAvatar" alt="avatar"
-                class="w-10 h-10 rounded-full object-cover cursor-pointer" />
+        <div (click)="!isGroup ? navigateToProfile(router, username) : openConversationInfo()"
+            class="flex items-center gap-3 cursor-pointer">
+            <img [src]="displayAvatar" alt="avatar" class="w-10 h-10 rounded-full object-cover" />
             <div>
-                <div (click)="!isGroup ? navigateToProfile(router, username) : null"
-                    class="font-semibold truncate cursor-pointer" style="max-width: 220px;">{{ displayName }}</div>
-                <div *ngIf="!isGroup" class="text-xs text-gray-400">Hoạt động gần đây</div>
+                <div class="font-semibold truncate" style="max-width: 220px;">{{ displayName }}</div>
+                <div class="text-xs text-gray-400">Hoạt động gần đây</div>
             </div>
         </div>
 
@@ -59,7 +57,15 @@
         </div>
 
         <ng-container *ngFor="let m of messages; let i = index; trackBy: trackByMessageId">
-            <div *ngIf="!shouldHideForCurrentUser(m)" class="message-row"
+            <!-- system message -->
+            <div *ngIf="m.type === 'system'" class="py-1 flex items-center justify-center">
+                <div class="text-gray-600 text-xs text-center text-sm">
+                    {{ m.content }}
+                </div>
+            </div>
+
+            <!-- regular message -->
+            <div *ngIf="m.type !== 'system' && !shouldHideForCurrentUser(m)" class="message-row"
                 [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)"
                 [style.margin-bottom]="getMessageMarginBottom(i)">
 
