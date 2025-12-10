@@ -1,11 +1,16 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-conversation-rename-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        EscToCloseDirective,
+    ],
     templateUrl: './conversation-rename-modal.component.html',
     styleUrls: ['./conversation-rename-modal.component.scss']
 })

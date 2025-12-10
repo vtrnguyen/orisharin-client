@@ -160,7 +160,7 @@
     [onClose]="closeAvatarViewer.bind(this)">
 </app-media-viewer>
 
-<ng-container *ngIf="showEditProfileModal">
+<ng-container *ngIf="showEditProfileModal" appEscClose (appEscClose)="closeEditProfileModal()">
     <div class="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative animate-modal-fade-in"
             (clickOutside)="closeEditProfileModal()">
@@ -258,7 +258,7 @@
 </ng-container>
 
 <!-- add website modal -->
-<ng-container *ngIf="showAddWebsiteModal">
+<ng-container *ngIf="showAddWebsiteModal" appEscClose (appEscClose)="closeAddWebsiteModal()">
     <div class="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative animate-modal-fade-in"
             (clickOutside)="closeAddWebsiteModal()">
@@ -300,7 +300,7 @@
 </ng-container>
 
 <!-- add follow list modal -->
-<ng-container *ngIf="showFollowModal">
+<ng-container *ngIf="showFollowModal" appEscClose (appEscClose)="showFollowModal = false">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-0 flex flex-col animate-modal-fade-in"
             (clickOutside)="showFollowModal = false">
@@ -348,7 +348,7 @@
 </app-confirm-modal>
 
 <!-- introduce modal -->
-<ng-container *ngIf="showIntroduceModal">
+<ng-container *ngIf="showIntroduceModal" appEscClose (appEscClose)="closeIntroduceModal()">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[350px] p-6 animate-modal-fade-in relative"
             (clickOutside)="showIntroduceModal = false">
@@ -374,7 +374,7 @@
 </ng-container>
 
 <!-- website links modal -->
-<ng-container *ngIf="showWebsiteModal">
+<ng-container *ngIf="showWebsiteModal" appEscClose (appEscClose)="closeWebsiteModal()">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-4 animate-modal-fade-in"
             (clickOutside)="closeWebsiteModal()">

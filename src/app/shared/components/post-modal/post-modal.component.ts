@@ -7,6 +7,7 @@ import { PostService } from '../../../core/services/post.service';
 import { isImage } from '../../functions/media-type.util';
 import { PostEventService } from '../../state-managements/post-event.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
   selector: 'app-post-modal',
@@ -16,6 +17,7 @@ import { PickerComponent } from '@ctrl/ngx-emoji-mart';
     FormsModule,
     ClickOutsideModule,
     PickerComponent,
+    EscToCloseDirective,
   ],
   templateUrl: './post-modal.component.html',
   styleUrls: ['./post-modal.component.scss']

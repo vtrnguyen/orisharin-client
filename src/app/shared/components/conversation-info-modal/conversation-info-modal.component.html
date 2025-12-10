@@ -1,4 +1,5 @@
-<div class="fixed flex items-center justify-center inset-0 z-[990] bg-black/60" (click)="onClose()">
+<div class="fixed flex items-center justify-center inset-0 z-[990] bg-black/60" (click)="onClose()" appEscClose
+    (appEscClose)="onClose()">
     <div class="panel animate-modal-fade-in" (click)="$event.stopPropagation()" (clickOutside)="onClose()">
 
         <div class="panel-header">

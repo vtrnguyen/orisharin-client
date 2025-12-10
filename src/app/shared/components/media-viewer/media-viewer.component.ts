@@ -2,6 +2,7 @@ import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { isImage, isVideo } from '../../functions/media-type.util';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-media-viewer',
@@ -9,6 +10,7 @@ import { isImage, isVideo } from '../../functions/media-type.util';
     imports: [
         CommonModule,
         ClickOutsideModule,
+        EscToCloseDirective,
     ],
     templateUrl: './media-viewer.component.html',
     styleUrls: ['./media-viewer.component.scss']
@@ -42,35 +44,5 @@ export class MediaViewerComponent implements OnInit, OnDestroy {
 
     close(): void {
         this.onClose();
-    }
-
-    @HostListener('window:keydown', ['$event'])
-    onWindowKeydown(e: KeyboardEvent): void {
-        if (!this.medias || this.medias.length === 0) return;
-
-        const key = e.key;
-
-        switch (key) {
-            case 'ArrowRight':
-            case 'ArrowUp':
-                if (this.current < this.medias.length - 1) {
-                    this.next();
-                    e.preventDefault();
-                }
-                break;
-            case 'ArrowLeft':
-            case 'ArrowDown':
-                if (this.current > 0) {
-                    this.prev();
-                    e.preventDefault();
-                }
-                break;
-            case 'Escape':
-                this.close();
-                e.preventDefault();
-                break;
-            default:
-                break;
-        }
     }
 }

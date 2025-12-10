@@ -11,6 +11,7 @@ import { AddParticipantsModalComponent } from '../add-participants-modal/add-par
 import { ParticipantMenuModalComponent } from "../participant-menu-modal/participant-menu-modal.component";
 import { Router } from '@angular/router';
 import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.component";
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-conversation-info-modal',
@@ -22,7 +23,8 @@ import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.com
         ConversationRenameModalComponent,
         AddParticipantsModalComponent,
         ParticipantMenuModalComponent,
-        ConfirmModalComponent
+        ConfirmModalComponent,
+        EscToCloseDirective,
     ],
     templateUrl: './conversation-info-modal.component.html',
     styleUrls: ['./conversation-info-modal.component.scss']

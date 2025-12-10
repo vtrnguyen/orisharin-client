@@ -5,6 +5,7 @@ import { ConversationService } from '../../../core/services/conversation.service
 import { UserService } from '../../../core/services/user.service';
 import { AlertService } from '../../state-managements/alert.service';
 import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.component';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-participant-menu-modal',
@@ -13,6 +14,7 @@ import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.com
         CommonModule,
         ClickOutsideModule,
         ConfirmModalComponent,
+        EscToCloseDirective,
     ],
     templateUrl: './participant-menu-modal.component.html',
     styleUrls: ['./participant-menu-modal.component.scss']
