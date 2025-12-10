@@ -89,9 +89,9 @@
                         </div>
 
                         <div class="p-2 rounded-lg text-sm relative message-bubble"
-                            [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1 || (m.content && m.content.trim()))"
+                            [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length === 0 || isMessageRevoked(m))"
                             [class.text-white]="isMessageFromCurrentUser(m.senderId)"
-                            [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length > 1 || (m.content && m.content.trim()))"
+                            [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length === 0 || isMessageRevoked(m))"
                             [class.text-gray-800]="!isMessageFromCurrentUser(m.senderId)" [class.opacity-50]="m.isTemp"
                             [class.grouped-corner]="shouldHaveGroupedCorner(i)">
 
