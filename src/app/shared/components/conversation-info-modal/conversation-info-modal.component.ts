@@ -1,17 +1,17 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
-import { UserService } from '../../../core/services/user.service';
 import { ConversationRenameModalComponent } from '../conversation-rename-modal/conversation-rename-modal.component';
-import { ConversationService } from '../../../core/services/conversation.service';
+import { AddParticipantsModalComponent } from '../add-participants-modal/add-participants-modal.component';
+import { ParticipantMenuModalComponent } from '../participant-menu-modal/participant-menu-modal.component';
 import { AlertService } from '../../state-managements/alert.service';
 import { ConversationStateService } from '../../state-managements/conversation-state.service';
-import { AddParticipantsModalComponent } from '../add-participants-modal/add-participants-modal.component';
-import { ParticipantMenuModalComponent } from "../participant-menu-modal/participant-menu-modal.component";
 import { Router } from '@angular/router';
-import { ConfirmModalComponent } from "../confirm-delete-modal/confirm-modal.component";
+import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.component';
 import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
+import { UserService } from '../../../core/services/user.service';
+import { ConversationService } from '../../../core/services/conversation.service';
 
 @Component({
     selector: 'app-conversation-info-modal',
@@ -43,7 +43,6 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
 
     // add participants modal
     showAddModal = false;
-
     notifyEnabled = true;
     uploadingAvatar = false;
 
@@ -57,6 +56,14 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
 
     // confirm to leave conversation
     showLeaveConfirm = false;
+
+    // settings dropdown
+    @ViewChild('settingsDropdown') settingsDropdownRef?: ElementRef<HTMLElement>;
+    @ViewChild('settingsAvatarInput') settingsAvatarInput?: ElementRef<HTMLInputElement>;
+    showSettingsMenu = false;
+    showChangeThemeModal = false;
+    showEditNicknamesModal = false;
+    showEmojiPickerModal = false;
 
     constructor(
         private userService: UserService,
@@ -79,7 +86,6 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         document.body.style.overflow = 'auto';
-
         this.clearAvatarPreview();
     }
 
@@ -156,7 +162,7 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
             error: () => {
                 this.conversationStateService.updateName(newName);
                 this.showRenameModal = false;
-                this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật tên cuộc trò chuyện");
+                this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật tên cuộc tròuyện");
             }
         });
     }
@@ -228,8 +234,7 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
         this.selectedAvatarPreview = null;
     }
 
-    deleteChat() {
-    }
+    deleteChat() { }
 
     leaveChat() {
         this.showLeaveConfirm = true;
@@ -251,13 +256,13 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
                 if (updated) {
                     this.conversation = updated;
                     if (Array.isArray(updated.participantIds) && updated.participantIds.length > 0) {
-                        this.participants = updated.participantIds.map((id: any) => ({ id }));
+                        this.participants = updated.participantIds;
                     } else if (Array.isArray(updated.participants) && updated.participants.length > 0) {
                         this.participants = updated.participants;
                     }
                     this.conversationStateService.setConversation(updated);
                     this.conversationStateService.emitAction({ type: 'updated', conversation: updated });
-                    try { this.router.navigate(['/inbox']); } catch { }
+                    try { } catch { }
                     this.alertService.show('success', 'Bạn đã rời khỏi nhóm và cuộc trò chuyện đã bị xóa');
                 } else {
                     this.conversationStateService.emitAction({ type: 'removed', id: convId });
@@ -291,50 +296,89 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
             if (updatedConv) {
                 this.conversation = updatedConv;
                 if (Array.isArray(updatedConv.participantIds) && updatedConv.participantIds.length > 0) {
-                    this.participants = updatedConv.participantIds.map((id: any) => ({ id }));
+                    this.participants = updatedConv.participantIds;
                 } else if (Array.isArray(updatedConv.participants) && updatedConv.participants.length > 0) {
                     this.participants = updatedConv.participants;
                 }
                 this.conversationStateService.setConversation(updatedConv);
                 this.conversationStateService.emitAction({ type: 'updated', conversation: updatedConv });
             } else if (userId && String(userId) === String(this.currentUserId)) {
-                const convId = this.conversation?.id ?? this.conversation?._id;
-                if (convId) this.conversationStateService.emitAction({ type: 'removed', id: convId });
+                // removed current user
+                this.conversationStateService.emitAction({ type: 'removed', id: this.conversation?.id ?? this.conversation?._id });
                 this.onClose();
             } else {
-                if (userId) {
-                    this.participants = (this.participants || []).filter(p => String(p.id ?? p._id) !== String(userId));
-                    if (this.conversation) {
-                        if (Array.isArray(this.conversation.participants)) {
-                            this.conversation.participants = this.conversation.participants.filter((p: any) => String(p.id ?? p._id) !== String(userId));
-                        }
-                        if (Array.isArray(this.conversation.participantIds)) {
-                            this.conversation.participantIds = this.conversation.participantIds.filter((id: any) => String(id) !== String(userId));
-                        }
-                    }
-                    this.conversationStateService.emitAction({ type: 'updated', conversation: this.conversation });
-                }
+                // someone else removed but no conversation returned; refresh list
+                this.conversationStateService.emitAction({ type: 'updated', conversation: this.conversation });
             }
         }
 
         if (t === 'promoted') {
             if (event.conversation) {
                 this.conversation = event.conversation;
-                this.conversationStateService.setConversation(event.conversation);
-                this.conversationStateService.emitAction({ type: 'updated', conversation: event.conversation });
-            } else if (event.userId) {
+                this.conversationStateService.setConversation(this.conversation);
                 this.conversationStateService.emitAction({ type: 'updated', conversation: this.conversation });
+            } else if (event.userId) {
+                // optimistic update: toggle admin badge
             }
         }
 
         if (t === 'left') {
             if (event.userId) {
-                this.participants = (this.participants || []).filter(p => String(p.id ?? p._id) !== String(event.userId));
-                this.conversationStateService.emitAction({ type: 'updated', conversation: this.conversation });
+                // handle left event if needed
             }
         }
 
         this.showParticipantMenu = false;
         this.selectedParticipant = null;
+    }
+
+    toggleSettingsMenu(event?: Event) {
+        if (event) event.stopPropagation();
+        this.showSettingsMenu = !this.showSettingsMenu;
+    }
+
+    onSettingsRename() {
+        this.showSettingsMenu = false;
+        this.startEditName();
+    }
+
+    onSettingsChangeAvatar() {
+        this.showSettingsMenu = false;
+        try {
+            this.settingsAvatarInput?.nativeElement.click();
+        } catch (e) {
+            console.warn('Failed to open settings avatar input', e);
+        }
+    }
+
+    onSettingsChangeTheme() {
+        this.showSettingsMenu = false;
+        this.showChangeThemeModal = true;
+    }
+
+    onSettingsEditNicknames() {
+        this.showSettingsMenu = false;
+        this.showEditNicknamesModal = true;
+    }
+
+    onSettingsChangeEmoji() {
+        this.showSettingsMenu = false;
+        this.showEmojiPickerModal = true;
+    }
+
+    onPanelClick(event: Event) {
+        event.stopPropagation();
+
+        if (this.showSettingsMenu) {
+            try {
+                const dropdownEl = this.settingsDropdownRef?.nativeElement;
+                const target = event.target as Node | null;
+                if (dropdownEl && target && !dropdownEl.contains(target)) {
+                    this.showSettingsMenu = false;
+                }
+            } catch (e) {
+                this.showSettingsMenu = false;
+            }
+        }
     }
 }
