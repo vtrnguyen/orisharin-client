@@ -12,6 +12,7 @@ import { ConfirmModalComponent } from '../confirm-delete-modal/confirm-modal.com
 import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 import { UserService } from '../../../core/services/user.service';
 import { ConversationService } from '../../../core/services/conversation.service';
+import { ConversationThemeModalComponent } from "../conversation-theme-modal/conversation-theme-modal.component";
 
 @Component({
     selector: 'app-conversation-info-modal',
@@ -25,6 +26,7 @@ import { ConversationService } from '../../../core/services/conversation.service
         ParticipantMenuModalComponent,
         ConfirmModalComponent,
         EscToCloseDirective,
+        ConversationThemeModalComponent
     ],
     templateUrl: './conversation-info-modal.component.html',
     styleUrls: ['./conversation-info-modal.component.scss']
@@ -379,6 +381,13 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
             } catch (e) {
                 this.showSettingsMenu = false;
             }
+        }
+    }
+
+    onThemeSaved(themeType: string) {
+        this.showChangeThemeModal = false;
+        if (this.conversation) {
+            this.conversation.theme = themeType;
         }
     }
 }

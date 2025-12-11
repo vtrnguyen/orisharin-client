@@ -145,3 +145,7 @@
     [cancelText]="'Hủy'" [confirmColor]="'text-red-600'" [zIndex]="999" (confirm)="confirmLeave()"
     (cancel)="showLeaveConfirm = false">
 </app-confirm-modal>
+
+<app-conversation-theme-modal *ngIf="showChangeThemeModal" [conversation]="conversation" (saved)="onThemeSaved($event)"
+    (close)="showChangeThemeModal = false">
+</app-conversation-theme-modal>

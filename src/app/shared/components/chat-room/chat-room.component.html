@@ -1,6 +1,7 @@
 <div class="h-full flex flex-col">
     <div class="header flex items-center gap-3 px-4 py-3 border-b border-gray-200">
-        <button class=" md:hidden mr-2 text-gray-600 px-2 py-1 rounded hover:bg-gray-100" (click)="back()">
+        <button class=" md:hidden mr-2 px-2 py-1 rounded hover:bg-gray-100" (click)="back()"
+            [ngStyle]="getIconButtonStyle()">
             <i class="fa-solid fa-arrow-left"></i>
         </button>
 
@@ -14,16 +15,17 @@
         </div>
 
         <div class="ml-auto flex items-center gap-2 header-actions">
-            <button class="icon-btn" title="Gọi thoại" (click)="callPhone()">
-                <i class="fa-solid fa-phone text-gray-600"></i>
+            <button class="icon-btn" title="Gọi thoại" (click)="callPhone()" [ngStyle]="getIconButtonStyle()">
+                <i class="fa-solid fa-phone"></i>
             </button>
 
-            <button class="icon-btn" title="Gửi video" (click)="callVideo()">
-                <i class="fa-solid fa-video text-gray-600"></i>
+            <button class="icon-btn" title="Gọi video" (click)="callVideo()" [ngStyle]="getIconButtonStyle()">
+                <i class="fa-solid fa-video"></i>
             </button>
 
-            <button class="icon-btn" title="Thông tin về cuộc trò chuyện" (click)="openConversationInfo()">
-                <i class="fa-solid fa-circle-info text-gray-600"></i>
+            <button class="icon-btn" title="Thông tin về cuộc trò chuyện" (click)="openConversationInfo()"
+                [ngStyle]="getIconButtonStyle()">
+                <i class="fa-solid fa-circle-info"></i>
             </button>
         </div>
     </div>
@@ -37,7 +39,7 @@
     </div>
 
     <div class="messages flex-1 overflow-auto p-4" #messagesContainer (scroll)="onScroll($event)"
-        (click)="activeActionId = null">
+        (click)="activeActionId = null" [ngStyle]="getMessagesStyle()">
         <div *ngIf="isLoadingMessages && messages.length === 0" class="py-8">
             <app-loading></app-loading>
         </div>
@@ -88,12 +90,8 @@
                             {{ getSenderName(m.senderId) }}
                         </div>
 
-                        <div class="p-2 rounded-lg text-sm relative message-bubble"
-                            [class.bg-blue-500]="isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length === 0 || isMessageRevoked(m))"
-                            [class.text-white]="isMessageFromCurrentUser(m.senderId)"
-                            [class.bg-gray-100]="!isMessageFromCurrentUser(m.senderId) && (m.mediaUrls?.length === 0 || isMessageRevoked(m))"
-                            [class.text-gray-800]="!isMessageFromCurrentUser(m.senderId)" [class.opacity-50]="m.isTemp"
-                            [class.grouped-corner]="shouldHaveGroupedCorner(i)">
+                        <div class="p-2 rounded-lg text-sm relative message-bubble" [ngStyle]="getBubbleStyles(m)"
+                            [class.opacity-50]="m.isTemp" [class.grouped-corner]="shouldHaveGroupedCorner(i)">
 
                             <div *ngIf="isMessageRevoked(m)" class="text-xs italic text-black">
                                 <div class="bg-white p-1 rounded-md">
@@ -231,7 +229,8 @@
         <div *ngIf="isUploading" class="text-sm text-gray-500 px-2 py-1">Đang gửi...</div>
         <div class="composer-inner">
             <div class="left">
-                <button class="icon-btn" (click)="toggleEmojiPicker()" aria-label="Emoji">
+                <button class="icon-btn" (click)="toggleEmojiPicker()" aria-label="Emoji"
+                    [ngStyle]="getIconButtonStyle()">
                     <i class="fa-regular fa-face-smile"></i>
                 </button>
 
@@ -248,27 +247,31 @@
 
             <div class="right">
                 <ng-container *ngIf="!(text.trim() || selectedAttachments.length); else hasText">
-                    <button class="icon-btn" (click)="startVoiceRecording()" title="Clip âm thanh">
+                    <button class="icon-btn" (click)="startVoiceRecording()" title="Clip âm thanh"
+                        [ngStyle]="getIconButtonStyle()">
                         <i class="fa-solid fa-microphone"></i>
                     </button>
 
-                    <button class="icon-btn" (click)="openFilePicker()" title="Thêm ảnh hoặc video">
+                    <button class="icon-btn" (click)="openFilePicker()" title="Thêm ảnh hoặc video"
+                        [ngStyle]="getIconButtonStyle()">
                         <i class="fa-solid fa-image"></i>
                     </button>
                     <input #fileInput type="file" accept="image/*,video/*" multiple (change)="onFileSelected($event)"
                         hidden />
 
-                    <button class="icon-btn" (click)="openStickerPicker()" title="Chọn một ảnh GIF hoặc nhãn dán">
+                    <button class="icon-btn" (click)="openStickerPicker()" title="Chọn một ảnh GIF hoặc nhãn dán"
+                        [ngStyle]="getIconButtonStyle()">
                         <i class="fa-solid fa-icons"></i>
                     </button>
 
-                    <button class="icon-btn" (click)="quickHeart()" title="Thích">
+                    <button class="icon-btn" (click)="quickHeart()" title="Thích" [ngStyle]="getIconButtonStyle()">
                         <i class="fa-solid fa-heart"></i>
                     </button>
                 </ng-container>
 
                 <ng-template #hasText>
-                    <button class="send-btn" (click)="send()" [disabled]="isUploading">Gửi</button>
+                    <button class="send-btn" (click)="send()" [ngStyle]="getSendButtonStyle()"
+                        [disabled]="isUploading">Gửi</button>
                 </ng-template>
             </div>
         </div>

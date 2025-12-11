@@ -21,6 +21,8 @@ import { ReactionListModalComponent } from "../reaction-list-modal/reaction-list
 import { ConversationInfoModalComponent } from "../conversation-info-modal/conversation-info-modal.component";
 import { ConversationStateService } from "../../state-managements/conversation-state.service";
 import { RevokeChoiceModalComponent } from "../revoke-choice-modal/revoke-choice-modal.component";
+import { getThemeByType } from "../../constants/conversation-themes";
+import { ConversationThemes } from "../../interfaces/conversation-themes.interface";
 
 @Component({
     selector: "app-chat-room",
@@ -1028,5 +1030,45 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     isReactionActive(m: any, type: string): boolean {
         const t = this.getUserReactionType(m);
         return !!t && String(t) === String(type);
+    }
+
+    private getConversationTheme(): ConversationThemes {
+        const type = this.conversation?.theme ?? this.conversation?.themeColor ?? 'default';
+        return getThemeByType(type);
+    }
+
+    getMessagesStyle(): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        return { 'background': theme.bg };
+    }
+
+    getBubbleStyles(m: any): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        const isMe = this.isMessageFromCurrentUser(m.senderId);
+        if (m.type === 'system') return {};
+        if (m.isTemp) {
+            return { 'background': isMe ? theme.bubbleMe : theme.bubbleOther, 'color': isMe ? (theme.textMe ?? '#fff') : (theme.textOther ?? '#111') };
+        }
+        return {
+            'background': isMe ? theme.bubbleMe : theme.bubbleOther,
+            'color': isMe ? (theme.textMe ?? '#fff') : (theme.textOther ?? '#111'),
+        };
+    }
+
+    getIconButtonStyle(): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        return {
+            'color': theme.bubbleMe,
+            'border-color': theme.bubbleMe
+        };
+    }
+
+    getSendButtonStyle(): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        return {
+            'background': theme.bubbleMe,
+            'color': (theme.textMe ?? '#ffffff'),
+            'border': 'none'
+        };
     }
 }
