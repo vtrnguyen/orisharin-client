@@ -138,7 +138,7 @@
 }
 
 .message-row .max-w-xs {
-    max-width: calc(100% - 48px);
+    max-width: 50%;
 }
 
 .message-bubble-wrapper {
@@ -573,6 +573,10 @@
     .message-row.flex-row-reverse .pinned-badge {
         right: auto;
         left: -8px;
+    }
+
+    .message-row .max-w-xs {
+        max-width: 70%;
     }
 }
 

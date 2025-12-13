@@ -107,7 +107,7 @@
                             {{ getSenderName(m.senderId) }}
                         </div>
 
-                        <div class="p-2 rounded-lg text-sm relative"
+                        <div class="p-2 rounded-lg text-sm relative text-left"
                             [ngStyle]="(m.type !== 'video' && m.type !== 'image') ? getBubbleStyles(m) : {}"
                             [class.opacity-50]="m.isTemp" [class.grouped-corner]="shouldHaveGroupedCorner(i)">
 
