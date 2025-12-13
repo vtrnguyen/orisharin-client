@@ -112,11 +112,12 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
             if (idx !== -1) {
                 const row = this.conversations[idx];
                 row.conversation = { ...row.conversation, lastMessage };
-
                 row.lastMessage = this.formatLastMessageForRow(lastMessage);
                 row.updatedAt = lastMessage?.sentAt ? new Date(lastMessage.sentAt).toISOString() : new Date().toISOString();
 
-                this.conversations = [...this.conversations];
+                // remove old position and put at front
+                const rest = this.conversations.filter((c, i) => i !== idx);
+                this.conversations = [row, ...rest];
             } else { }
         });
     }
@@ -143,10 +144,11 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
             sc.removeEventListener('scroll', this.onScrollBound);
         }
 
-        this.convItemsSub?.unsubscribe();
         this.sub?.unsubscribe();
+        this.convItemsSub?.unsubscribe();
         this.startChatSub?.unsubscribe();
         this.convStateSub?.unsubscribe();
+        this.convLastMessageSub?.unsubscribe();
     }
 
     private observeLastItem() {
