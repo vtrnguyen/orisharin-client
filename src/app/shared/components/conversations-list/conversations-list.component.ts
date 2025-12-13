@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { formatTime } from '../../functions/format-time.util';
 import { StartChatService } from '../../state-managements/start-chat.service';
 import { ConversationStateService } from '../../state-managements/conversation-state.service';
+import { MessageSocketService } from '../../../core/services/message-socket.service';
 
 interface ConversationRow {
     conversation: any;
@@ -46,6 +47,7 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
     private observer?: IntersectionObserver;
     private sub?: Subscription;
     private convItemsSub?: Subscription;
+    private convLastMessageSub?: Subscription;
 
     private onScrollBound = this.onScroll.bind(this);
 
@@ -55,7 +57,8 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
     constructor(
         private conversationService: ConversationService,
         private startChatService: StartChatService,
-        private conversationStateService: ConversationStateService
+        private conversationStateService: ConversationStateService,
+        private messageSocketService: MessageSocketService,
     ) { }
 
     ngOnInit(): void {
@@ -97,6 +100,24 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
                     this.conversations[idx] = mappedRow;
                 }
             }
+        });
+
+        this.convLastMessageSub = this.messageSocketService.onConversationLastMessageUpdated().subscribe((payload: any) => {
+            if (!payload) return;
+            const convId = String(payload.conversationId);
+            const lastMessage = payload.lastMessage ?? null;
+
+            // find existing row by conversation id
+            const idx = this.conversations.findIndex(r => String(r.id) === convId || String(r.conversation?._id) === convId);
+            if (idx !== -1) {
+                const row = this.conversations[idx];
+                row.conversation = { ...row.conversation, lastMessage };
+
+                row.lastMessage = this.formatLastMessageForRow(lastMessage);
+                row.updatedAt = lastMessage?.sentAt ? new Date(lastMessage.sentAt).toISOString() : new Date().toISOString();
+
+                this.conversations = [...this.conversations];
+            } else { }
         });
     }
 
@@ -284,5 +305,13 @@ export class ConversationsListComponent implements OnInit, AfterViewInit, OnDest
 
     onSelect(conv: ConversationRow) {
         this.select.emit(conv);
+    }
+
+    private formatLastMessageForRow(lm: any): string {
+        if (!lm) return '';
+        if (lm.type === 'system') return lm.content || '';
+        if (lm.content && String(lm.content).trim()) return lm.content;
+        if (Array.isArray(lm.mediaUrls) && lm.mediaUrls.length) return lm.type === 'video' ? 'Đã gửi 1 video' : 'Đã gửi 1 ảnh';
+        return '';
     }
 }

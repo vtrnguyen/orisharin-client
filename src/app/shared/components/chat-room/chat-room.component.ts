@@ -108,6 +108,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
     @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
 
+    // pinned UI state
+    pinnedMessages: any[] = [];
+    showPinnedModal = false;
+    filteredPinnedMessages: any[] = [];
+    pinnedSearch = '';
+
     constructor(
         private route: ActivatedRoute,
         public router: Router,
@@ -1032,7 +1038,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return !!t && String(t) === String(type);
     }
 
-    private getConversationTheme(): ConversationThemes {
+    getConversationTheme(): ConversationThemes {
         const type = this.conversation?.theme ?? this.conversation?.themeColor ?? 'default';
         return getThemeByType(type);
     }
@@ -1070,5 +1076,168 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             'color': (theme.textMe ?? '#ffffff'),
             'border': 'none'
         };
+    }
+
+    getLatestPinned(): any | null {
+        const arr = this.conversation?.pinnedMessages ?? [];
+        if (!arr || arr.length === 0) return null;
+        return arr[arr.length - 1];
+    }
+
+    openPinnedModal() {
+        const raw = this.conversation?.pinnedMessages ?? [];
+        this.pinnedMessages = (raw || []).map((p: any) => {
+            const messageId = p.messageId?._id ? String(p.messageId._id) : (p.messageId || p._id || null);
+            const content = p.content ?? (p.message?.content ?? '');
+            return {
+                messageId,
+                message: p.message ?? null,
+                content,
+                pinnedAt: p.pinnedAt ? new Date(p.pinnedAt) : (p.pinnedAt ? new Date(p.pinnedAt) : null),
+                pinnedBy: p.pinnedBy ?? null,
+                sender: p.sender ?? null
+            };
+        }).reverse();
+        this.filteredPinnedMessages = this.pinnedMessages.slice();
+        this.pinnedSearch = '';
+        this.showPinnedModal = true;
+    }
+
+    closePinnedModal() {
+        this.showPinnedModal = false;
+        this.pinnedMessages = [];
+        this.filteredPinnedMessages = [];
+    }
+
+    async jumpToPinnedMessage(p: any) {
+        this.closePinnedModal();
+
+        const mid = p.messageId || (p.message && (p.message._id || p.message.id));
+        if (!mid) return;
+
+        const idx = this.messages.findIndex(m => String(m._id ?? m.id) === String(mid));
+        if (idx !== -1) {
+            setTimeout(() => {
+                const el = this.messagesContainer?.nativeElement;
+                if (!el) return;
+                const node = document.getElementById(`msg-${mid}`);
+                if (node && el) {
+                    el.scrollTop = node.offsetTop - 60;
+                    node.classList.add('highlight-pinned');
+                    setTimeout(() => node.classList.remove('highlight-pinned'), 2000);
+                } else {
+                    el.scrollTop = el.scrollHeight;
+                }
+            }, 50);
+            return;
+        }
+
+        this.messageService.getById(String(mid)).subscribe({
+            next: (res: any) => {
+                const payload = res?.data ?? res;
+                const msg = payload?.message ?? payload;
+                if (!msg) return;
+                this.messages.push(msg);
+                setTimeout(() => {
+                    const el = this.messagesContainer?.nativeElement;
+                    const node = document.getElementById(`msg-${mid}`);
+                    if (node && el) {
+                        el.scrollTop = node.offsetTop - 60;
+                        node.classList.add('highlight-pinned');
+                        setTimeout(() => node.classList.remove('highlight-pinned'), 2000);
+                    } else if (el) {
+                        el.scrollTop = el.scrollHeight;
+                    }
+                }, 100);
+            },
+            error: (err) => {
+                this.alertService.show('error', 'Không thể tải tin nhắn');
+            }
+        });
+    }
+
+    pinMessage(m: any) {
+        const id = m._id;
+        if (!id) return;
+        this.messageService.pin(id).subscribe({
+            next: (res: any) => {
+                m.isPinned = true;
+                const pinnedObj = {
+                    messageId: id,
+                    content: m.content || '',
+                    pinnedBy: this.currentUserId,
+                    pinnedAt: new Date(),
+                    sender: m.senderId,
+                };
+                this.conversation = this.conversation || {};
+                this.conversation.pinnedMessages = this.conversation.pinnedMessages || [];
+                this.conversation.pinnedMessages.push(pinnedObj);
+                this.alertService.show('success', 'Đã ghim tin nhắn');
+            },
+            error: (err) => {
+                console.error('Pin failed', err);
+                this.alertService.show('error', 'Không thể ghim tin nhắn');
+            }
+        });
+    }
+
+    unpinMessage(m: any) {
+        const id = m._id || m.id || (m.messageId ? (m.messageId._id || m.messageId) : null);
+        if (!id) return;
+        this.messageService.unpin(id).subscribe({
+            next: (res: any) => {
+                // update messages list: set isPinned false
+                const idx = this.messages.findIndex(x => String(x._id ?? x.id) === String(id));
+                if (idx !== -1) {
+                    this.messages[idx].isPinned = false;
+                }
+                // remove from conversation pinned messages
+                if (this.conversation?.pinnedMessages) {
+                    this.conversation.pinnedMessages = this.conversation.pinnedMessages.filter((p: any) => {
+                        const mid = (p.messageId && (p.messageId._id || p.messageId)) || p.messageId;
+                        return String(mid) !== String(id);
+                    });
+                }
+                this.alertService.show('success', 'Đã bỏ ghim tin nhắn');
+            },
+            error: (err) => {
+                console.error('Unpin failed', err);
+                this.alertService.show('error', 'Không thể bỏ ghim');
+            }
+        });
+    }
+
+    unpinPinnedMessage(p: any) {
+        const mid = p?.messageId;
+        if (!mid) return;
+
+        this.messageService.unpin(String(mid)).subscribe({
+            next: (res: any) => {
+                const msgIdx = this.messages.findIndex(m => String(m._id ?? m.id) === String(mid));
+                if (msgIdx !== -1) {
+                    this.messages[msgIdx].isPinned = false;
+                }
+
+                if (this.conversation?.pinnedMessages) {
+                    this.conversation.pinnedMessages = this.conversation.pinnedMessages.filter((item: any) => {
+                        const itemMid = (item.messageId && (item.messageId._id || item.messageId)) || item.messageId || item._id;
+                        return String(itemMid) !== String(mid);
+                    });
+                }
+
+                if (Array.isArray(this.pinnedMessages)) {
+                    this.pinnedMessages = this.pinnedMessages.filter((item: any) => String(item.messageId) !== String(mid));
+                }
+                if (Array.isArray(this.filteredPinnedMessages)) {
+                    this.filteredPinnedMessages = this.filteredPinnedMessages.filter((item: any) => String(item.messageId) !== String(mid));
+                }
+
+                this.alertService.show('success', 'Đã bỏ ghim tin nhắn');
+            },
+            error: (err) => {
+                console.error('Unpin (modal) failed', err);
+                this.alertService.show('error', 'Không thể bỏ ghim');
+            }
+        });
     }
 }

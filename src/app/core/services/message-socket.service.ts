@@ -12,6 +12,7 @@ export class MessageSocketService {
     private msgCreated$ = new Subject<any>();
     private msgDeleted$ = new Subject<any>();
     private msgReacted$ = new Subject<any>();
+    private conversationLastMessageUpdated$ = new Subject<any>();
     private error$ = new Subject<any>();
 
     constructor(
@@ -52,7 +53,11 @@ export class MessageSocketService {
 
         this.socket.on("message:reacted", (msg: any) => {
             this.ngZone.run(() => this.msgReacted$.next(msg?.payload ?? msg));
-        })
+        });
+
+        this.socket.on('conversation:lastMessageUpdated', (payload: any) => {
+            this.ngZone.run(() => this.conversationLastMessageUpdated$.next(payload));
+        });
 
         this.socket.on('message:error', (err: any) => {
             this.ngZone.run(() => this.error$.next(err));
@@ -79,6 +84,10 @@ export class MessageSocketService {
 
     onMessageReacted(): Observable<any> {
         return this.msgReacted$.asObservable();
+    }
+
+    onConversationLastMessageUpdated(): Observable<any> {
+        return this.conversationLastMessageUpdated$.asObservable();
     }
 
     onError(): Observable<any> {

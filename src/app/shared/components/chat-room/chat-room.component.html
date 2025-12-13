@@ -30,6 +30,23 @@
         </div>
     </div>
 
+    <div *ngIf="conversation?.pinnedMessages?.length"
+        class="pinned-bar px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-3 cursor-pointer"
+        (click)="openPinnedModal()">
+        <i class="fa-solid fa-thumbtack text-gray-600"></i>
+        <div>
+            <span class="text-sm">{{ getLatestPinned()?.sender?.fullName || getLatestPinned()?.sender?.username ||
+                'Người dùng' }}
+            </span>
+            <div class="text-sm truncate font-semibold" style="max-width: 100%;">
+                {{ getLatestPinned()?.content || getLatestPinned()?.message?.content || 'Tin nhắn đã ghim' }}
+            </div>
+        </div>
+        <div class="ml-auto text-xs text-gray-500">
+            {{ formatTime(getLatestPinned()?.pinnedAt) }}
+        </div>
+    </div>
+
     <div *ngIf="isGroup && messages.length === 0" class="py-8">
         <ng-container>
             <div class="text-sm text-gray-500 text-center">
@@ -68,8 +85,8 @@
 
             <!-- regular message -->
             <div *ngIf="m.type !== 'system' && !shouldHideForCurrentUser(m)" class="message-row"
-                [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)"
-                [style.margin-bottom]="getMessageMarginBottom(i)">
+                [id]="'msg-' + (m._id || m.id)" [class.flex-row-reverse]="isMessageFromCurrentUser(m.senderId)"
+                [ngClass]="{'mt-3': m.isPinned}" [style.margin-bottom]="getMessageMarginBottom(i)">
 
                 <div *ngIf="!isMessageFromCurrentUser(m.senderId)" class="avatar-container" [style.width.px]="32"
                     [style.height.px]="32">
@@ -90,8 +107,14 @@
                             {{ getSenderName(m.senderId) }}
                         </div>
 
-                        <div class="p-2 rounded-lg text-sm relative message-bubble" [ngStyle]="getBubbleStyles(m)"
+                        <div class="p-2 rounded-lg text-sm relative"
+                            [ngStyle]="(m.type !== 'video' && m.type !== 'image') ? getBubbleStyles(m) : {}"
                             [class.opacity-50]="m.isTemp" [class.grouped-corner]="shouldHaveGroupedCorner(i)">
+
+                            <div *ngIf="m.isPinned" class="pinned-badge text-red-600"><i class=" fa-solid fa-thumbtack"
+                                    aria-hidden="true"></i>
+                                <span class="sr-only">Tin nhắn đã ghim</span>
+                            </div>
 
                             <div *ngIf="isMessageRevoked(m)" class="text-xs italic text-black">
                                 <div class="bg-white p-1 rounded-md">
@@ -183,6 +206,13 @@
                             <div class="menu-row">
                                 <button class="menu-action" (click)="onForwardMessage(m)">
                                     Chuyển tiếp <i class="fa-solid fa-paper-plane mr-2"></i>
+                                </button>
+                                <button *ngIf="!m.isPinned" class="menu-action" (click)="pinMessage(m)">
+                                    Ghim <i class="fa-solid fa-thumbtack mr-2"></i>
+                                </button>
+
+                                <button *ngIf="m.isPinned" class="menu-action" (click)="unpinMessage(m)">
+                                    Bỏ ghim <i class="fa-solid fa-times mr-2"></i>
                                 </button>
                                 <button class="menu-action" (click)="onCopyMessage(m)">
                                     Sao chép <i class="fa-regular fa-copy mr-2"></i>
@@ -292,3 +322,85 @@
 <app-revoke-choice-modal *ngIf="showRevokeConfirm" [message]="selectedMessageToRevoke" (confirm)="confirmRevoke($event)"
     (cancel)="cancelRevoke()">
 </app-revoke-choice-modal>
+
+<div *ngIf="showPinnedModal" class="fixed inset-0 z-[995] flex items-center justify-center bg-black/40"
+    (click)="closePinnedModal()" role="dialog" aria-modal="true" aria-labelledby="pinnedModalTitle">
+    <div class="pinned-modal-card bg-white rounded-lg shadow-lg w-[80%] max-w-2xl animate-modal-fade-in"
+        (click)="$event.stopPropagation()">
+        <header class="pinned-modal-header flex items-center justify-between px-4 py-3 border-b border-gray-300">
+            <button class="text-lg font-semibold px-2 py-1 cursor-pointer" (click)="closePinnedModal()"
+                aria-label="Đóng">
+                Hủy
+            </button>
+            <div id="pinnedModalTitle" class="text-lg font-semibold">Tin nhắn đã ghim</div>
+            <div class="w-12"></div>
+        </header>
+
+        <div class="pinned-modal-body max-h-[60vh] overflow-auto p-3">
+            <div *ngIf="pinnedMessages && pinnedMessages.length > 0; else emptyPinned">
+                <ul class="pinned-list">
+                    <li *ngFor="let p of filteredPinnedMessages; let idx = index"
+                        class="pinned-item flex gap-3 p-3 rounded hover:bg-gray-50">
+                        <div class="flex-shrink-0">
+                            <img *ngIf="p.sender?.avatarUrl" [src]="p.sender?.avatarUrl" alt="avatar"
+                                class="w-10 h-10 rounded-full object-cover" />
+                            <div *ngIf="!p.message?.senderId?.avatarUrl && !p.sender?.avatarUrl"
+                                class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <div class="text-sm font-medium truncate">
+                                        {{ p.message?.senderId?.fullName || p.sender?.fullName || p.sender?.username ||
+                                        'Người dùng' }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 truncate">
+                                        {{ (p.message?.content || p.content || '') | slice:0:180 }}
+                                    </div>
+                                </div>
+
+                                <div class="text-right flex-shrink-0">
+                                    <div class="text-xs text-gray-400">
+                                        {{ formatTime(p.pinnedAt) }}
+                                    </div>
+                                    <div class="mt-2 flex gap-2">
+                                        <button class="btn-outline text-xs cursor-pointer"
+                                            (click)="jumpToPinnedMessage(p)" title="Xem tin nhắn gốc">
+                                            Xem trong đoạn chat
+                                        </button>
+                                        <button class="btn-danger text-xs cursor-pointer"
+                                            (click)="unpinPinnedMessage(p)" title="Bỏ ghim">
+                                            Bỏ ghim
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div *ngIf="p.message?.mediaUrls?.length" class="mt-2">
+                                <img *ngIf="isImage(p.message.mediaUrls[0])" [src]="p.message.mediaUrls[0]"
+                                    class="w-36 h-24 object-cover rounded" alt="thumb" />
+                                <video *ngIf="isVideo(p.message.mediaUrls[0])" [src]="p.message.mediaUrls[0]"
+                                    class="w-36 h-24 object-cover rounded" muted></video>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <ng-template #emptyPinned>
+                <div class="text-center py-10 text-gray-500">
+                    <span class="text-sm">Chưa có tin nhắn được ghim.</span>
+                </div>
+            </ng-template>
+        </div>
+
+        <footer class="pinned-modal-footer px-4 py-3 border-t border-gray-300 flex items-center justify-end">
+            <div>
+                <button class="btn-secondary cursor-pointer" (click)="closePinnedModal()">Đóng</button>
+            </div>
+        </footer>
+    </div>
+</div>

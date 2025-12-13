@@ -164,7 +164,7 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
             error: () => {
                 this.conversationStateService.updateName(newName);
                 this.showRenameModal = false;
-                this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật tên cuộc tròuyện");
+                this.alertService.show("error", "Đã xảy ra lỗi khi cập nhật tên cuộc trò chuyện");
             }
         });
     }
