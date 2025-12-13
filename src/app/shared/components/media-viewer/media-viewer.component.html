@@ -4,10 +4,11 @@
         <i class="fa-solid fa-chevron-left"></i>
     </button>
     <ng-container *ngIf="isImage(medias[current]); else videoBlock">
-        <img [src]="medias[current]" class="max-h-[80vh] max-w-[90vw] rounded-xl shadow-xl" />
+        <img [src]="medias[current]" class="max-h-[80vh] max-w-[90vw] rounded-xl shadow-xl" (clickOutside)="close()" />
     </ng-container>
     <ng-template #videoBlock>
-        <video [src]="medias[current]" controls class="max-h-[80vh] max-w-[90vw] rounded-xl shadow-xl bg-black"></video>
+        <video [src]="medias[current]" controls class="max-h-[80vh] max-w-[90vw] rounded-xl shadow-xl bg-black"
+            (clickOutside)="close()"></video>
     </ng-template>
     <button *ngIf="medias.length > 1 && current < medias.length - 1" (click)="next()"
         class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-3xl p-2 !rounded-full hover:bg-black/40 cursor-pointer">
