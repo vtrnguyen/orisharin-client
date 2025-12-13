@@ -439,6 +439,12 @@
     background: #f8fafc;
 }
 
+.pinned-bar .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .pinned-modal-backdrop {
     background: rgba(0, 0, 0, 0.45);
 }

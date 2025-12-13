@@ -34,14 +34,16 @@
         class="pinned-bar px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-3 cursor-pointer"
         (click)="openPinnedModal()">
         <i class="fa-solid fa-thumbtack text-gray-600"></i>
-        <div>
-            <span class="text-sm">{{ getLatestPinned()?.sender?.fullName || getLatestPinned()?.sender?.username ||
-                'Người dùng' }}
-            </span>
-            <div class="text-sm truncate font-semibold" style="max-width: 100%;">
+
+        <div class="flex-1 min-w-0">
+            <div class="text-sm truncate">
+                {{ getLatestPinned()?.sender?.fullName || getLatestPinned()?.sender?.username || 'Người dùng' }}
+            </div>
+            <div class="text-sm truncate font-semibold">
                 {{ getLatestPinned()?.content || getLatestPinned()?.message?.content || 'Tin nhắn đã ghim' }}
             </div>
         </div>
+
         <div class="ml-auto text-xs text-gray-500">
             {{ formatTime(getLatestPinned()?.pinnedAt) }}
         </div>
