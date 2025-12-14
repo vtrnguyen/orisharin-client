@@ -7,11 +7,17 @@ import { UserService } from '../../../core/services/user.service';
 import { ConversationService } from '../../../core/services/conversation.service';
 import { AlertService } from '../../state-managements/alert.service';
 import { ConversationStateService } from '../../state-managements/conversation-state.service';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-add-participants-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, ClickOutsideModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ClickOutsideModule,
+        EscToCloseDirective,
+    ],
     templateUrl: './add-participants-modal.component.html',
     styleUrls: ['./add-participants-modal.component.scss']
 })

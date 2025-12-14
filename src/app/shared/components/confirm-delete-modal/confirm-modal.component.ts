@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ClickOutsideModule } from 'ng-click-outside';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-confirm-modal',
@@ -8,6 +9,7 @@ import { ClickOutsideModule } from 'ng-click-outside';
     imports: [
         CommonModule,
         ClickOutsideModule,
+        EscToCloseDirective,
     ],
     templateUrl: './confirm-modal.component.html',
     styleUrls: ['./confirm-modal.component.scss']

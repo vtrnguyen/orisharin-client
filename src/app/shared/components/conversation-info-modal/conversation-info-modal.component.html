@@ -1,5 +1,6 @@
-<div class="fixed flex items-center justify-center inset-0 z-[990] bg-black/60" (click)="onClose()">
-    <div class="panel animate-modal-fade-in" (click)="$event.stopPropagation()" (clickOutside)="onClose()">
+<div class="fixed flex items-center justify-center inset-0 z-[990] bg-black/60" (click)="onClose()" appEscClose
+    (appEscClose)="onClose()">
+    <div class="panel animate-modal-fade-in" (click)="onPanelClick($event)" (clickOutside)="onClose()">
 
         <div class="panel-header">
             <div class="header-left">
@@ -33,28 +34,56 @@
                     <div class="group-meta">{{ participants.length || 0 }} thành viên</div>
                 </div>
             </div>
+
             <div class="header-actions">
-                <button *ngIf="isGroup"
-                    class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer"
-                    (click)="startEditName()">Đổi tên</button>
+                <div class="relative" (click)="$event.stopPropagation()">
+                    <button class="icon-btn cursor-pointer" title="Cài đặt đoạn chat"
+                        (click)="toggleSettingsMenu($event)" aria-haspopup="true"
+                        [attr.aria-expanded]="showSettingsMenu">
+                        <i class="fa-solid fa-gear text-black text-xl"></i>
+                    </button>
 
-                <label class="px-4 py-1 rounded-lg bg-black text-white text-sm font-semibold cursor-pointer">
-                    Đổi ảnh
-                    <input type="file" accept="image/*" (change)="onAvatarSelected($event)" hidden />
-                </label>
-            </div>
-        </div>
+                    <div *ngIf="showSettingsMenu" #settingsDropdown
+                        class="settings-dropdown absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border z-50 animate-fade-in px-2 border-gray-300"
+                        (click)="$event.stopPropagation()" (clickOutside)="showSettingsMenu = false">
+                        <ul class="py-2">
+                            <li>
+                                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                    (click)="onSettingsRename()">
+                                    <i class="fa-solid fa-pen mr-3"></i> Đổi tên đoạn chat
+                                </button>
+                            </li>
+                            <li>
+                                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                    (click)="onSettingsChangeAvatar()">
+                                    <i class="fa-solid fa-image mr-3"></i> Đổi ảnh đại diện
+                                </button>
+                            </li>
+                            <li>
+                                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                    (click)="onSettingsChangeTheme()">
+                                    <i class="fa-solid fa-circle-half-stroke mr-3"></i> Đổi chủ đề
+                                </button>
+                            </li>
+                            <li>
+                                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                    (click)="onSettingsEditNicknames()">
+                                    <i class="fa-solid fa-a mr-3"></i> Chỉnh sửa biệt danh
+                                </button>
+                            </li>
+                            <li>
+                                <button class="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                                    (click)="onSettingsChangeEmoji()">
+                                    <i class="fa-solid fa-face-smile mr-3"></i> Đổi biểu tượng cảm xúc
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
 
-        <div class="section settings">
-            <div class="row">
-                <div class="label">Tắt thông báo</div>
-                <label class="switch-toggle" aria-label="Toggle notifications">
-                    <input type="checkbox" [checked]="notifyEnabled" (change)="toggleNotify()"
-                        [attr.aria-checked]="notifyEnabled" />
-                    <span class="track">
-                        <span class="thumb"></span>
-                    </span>
-                </label>
+                    <!-- hidden file input dedicated for change avatar -->
+                    <input type="file" #settingsAvatarInput accept="image/*" hidden
+                        (change)="onAvatarSelected($event)" />
+                </div>
             </div>
         </div>
 
@@ -116,3 +145,7 @@
     [cancelText]="'Hủy'" [confirmColor]="'text-red-600'" [zIndex]="999" (confirm)="confirmLeave()"
     (cancel)="showLeaveConfirm = false">
 </app-confirm-modal>
+
+<app-conversation-theme-modal *ngIf="showChangeThemeModal" [conversation]="conversation" (saved)="onThemeSaved($event)"
+    (close)="showChangeThemeModal = false">
+</app-conversation-theme-modal>

@@ -4,11 +4,16 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { Reaction } from '../../enums/reaction.enum';
 import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { Router } from '@angular/router';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-reaction-list-modal',
     standalone: true,
-    imports: [CommonModule, ClickOutsideModule],
+    imports: [
+        CommonModule,
+        ClickOutsideModule,
+        EscToCloseDirective,
+    ],
     templateUrl: './reaction-list-modal.component.html',
     styleUrls: ['./reaction-list-modal.component.scss']
 })

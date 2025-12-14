@@ -398,6 +398,23 @@ button.danger {
     opacity: 0.8;
 }
 
+.settings-dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #111827;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+}
+
+.settings-dropdown button:hover {
+    background: #f8fafc;
+}
+
 @media (max-width:640px) {
     .group-avatar-lg {
         width: 52px;

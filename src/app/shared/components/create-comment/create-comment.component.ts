@@ -12,11 +12,18 @@ import { formatTime } from '../../functions/format-time.util';
 import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { Router } from '@angular/router';
 import { CommentEventService } from '../../state-managements/comment-event.service';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
   selector: 'app-create-comment',
   standalone: true,
-  imports: [CommonModule, FormsModule, ClickOutsideModule, PickerComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ClickOutsideModule,
+    PickerComponent,
+    EscToCloseDirective,
+  ],
   templateUrl: './create-comment.component.html',
   styleUrl: './create-comment.component.scss'
 })

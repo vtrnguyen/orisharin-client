@@ -12,6 +12,8 @@ export class MessageSocketService {
     private msgCreated$ = new Subject<any>();
     private msgDeleted$ = new Subject<any>();
     private msgReacted$ = new Subject<any>();
+    private conversationLastMessageUpdated$ = new Subject<any>();
+    private typingUpdate$ = new Subject<any>();
     private error$ = new Subject<any>();
 
     constructor(
@@ -52,7 +54,15 @@ export class MessageSocketService {
 
         this.socket.on("message:reacted", (msg: any) => {
             this.ngZone.run(() => this.msgReacted$.next(msg?.payload ?? msg));
-        })
+        });
+
+        this.socket.on('conversation:lastMessageUpdated', (payload: any) => {
+            this.ngZone.run(() => this.conversationLastMessageUpdated$.next(payload));
+        });
+
+        this.socket.on('typing:update', (payload: any) => {
+            this.ngZone.run(() => this.typingUpdate$.next(payload));
+        });
 
         this.socket.on('message:error', (err: any) => {
             this.ngZone.run(() => this.error$.next(err));
@@ -81,6 +91,14 @@ export class MessageSocketService {
         return this.msgReacted$.asObservable();
     }
 
+    onConversationLastMessageUpdated(): Observable<any> {
+        return this.conversationLastMessageUpdated$.asObservable();
+    }
+
+    onTypingUpdate(): Observable<any> {
+        return this.typingUpdate$.asObservable();
+    }
+
     onError(): Observable<any> {
         return this.error$.asObservable();
     }
@@ -91,6 +109,16 @@ export class MessageSocketService {
             return;
         }
         this.socket.emit('message:send', payload);
+    }
+
+    startTyping(conversationId: string) {
+        if (!this.socket || !this.socket.connected) return;
+        this.socket.emit('typing:start', { conversationId });
+    }
+
+    stopTyping(conversationId: string) {
+        if (!this.socket || !this.socket.connected) return;
+        this.socket.emit('typing:stop', { conversationId });
     }
 
     isConnected(): boolean {

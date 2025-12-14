@@ -33,3 +33,10 @@
     background: rgba(0, 0, 0, 0.08);
     border-radius: 8px;
 }
+
+.last-message {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}

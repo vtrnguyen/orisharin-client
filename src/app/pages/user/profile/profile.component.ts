@@ -11,10 +11,11 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { UserService } from '../../../core/services/user.service';
 import { AlertService } from '../../../shared/state-managements/alert.service';
 import { FormsModule } from '@angular/forms';
-import { FollowingUserDto, UserProfileDto, UserProfileResponseDto } from '../../../shared/dtos/user-profile.dto';
+import { FollowingUserDto, UserProfileDto } from '../../../shared/dtos/user-profile.dto';
 import { FollowService } from '../../../core/services/follow.service';
 import { UserListItemComponent } from '../../../shared/components/user-list-item/user-list-item.component';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-delete-modal/confirm-modal.component';
+import { EscToCloseDirective } from '../../../shared/directives/esc-to-close.directive';
 
 @Component({
   selector: 'app-profile',
@@ -29,6 +30,7 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-delete
     LoadingComponent,
     UserListItemComponent,
     ConfirmModalComponent,
+    EscToCloseDirective
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
@@ -158,7 +160,7 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   openPostModal(initialContent: string = ''): void {
-    this.postModalContent = initialContent + ' ' || '';
+    this.postModalContent = initialContent;
     this.showPostModal = true;
   }
 

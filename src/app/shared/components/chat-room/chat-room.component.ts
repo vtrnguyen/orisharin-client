@@ -10,7 +10,7 @@ import { UserService } from "../../../core/services/user.service";
 import { MessageSocketService } from "../../../core/services/message-socket.service";
 import { MessageService } from "../../../core/services/message.service";
 import { LoadingComponent } from "../loading/loading.component";
-import { formatTime } from "../../functions/format-time.util";
+import { formatMessageDateLabel, formatTime } from "../../functions/format-time.util";
 import { navigateToProfile } from "../../functions/navigate-to-profile";
 import { TooltipComponent } from '../tooltip/tooltip.component';
 import { AlertService } from "../../state-managements/alert.service";
@@ -21,6 +21,8 @@ import { ReactionListModalComponent } from "../reaction-list-modal/reaction-list
 import { ConversationInfoModalComponent } from "../conversation-info-modal/conversation-info-modal.component";
 import { ConversationStateService } from "../../state-managements/conversation-state.service";
 import { RevokeChoiceModalComponent } from "../revoke-choice-modal/revoke-choice-modal.component";
+import { getThemeByType } from "../../constants/conversation-themes";
+import { ConversationThemes } from "../../interfaces/conversation-themes.interface";
 
 @Component({
     selector: "app-chat-room",
@@ -60,7 +62,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private socketCreatedSub?: Subscription;
     private socketDeletedSub?: Subscription;
     private socketErrSub?: Subscription;
+    private typingSub?: Subscription;
     formatTime = formatTime;
+    formatMessageDateLabel = formatMessageDateLabel;
     navigateToProfile = navigateToProfile;
     currentUserId: string | null = null;
     activeActionId: string | null = null;
@@ -70,6 +74,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     activeMoreMenuId: string | null = null;
     showRevokeConfirm = false;
     selectedMessageToRevoke: any = null;
+    typingUsers: Map<string, { user: any; timeout: any }> = new Map();
+    private typingTimeout?: any;
+    private isCurrentlyTyping = false;
 
     // pagination properties
     currentPage = 1;
@@ -105,6 +112,12 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     @ViewChild("messagesContainer", { static: false }) messagesContainer?: ElementRef;
     @ViewChild("fileInput", { static: false }) fileInput?: ElementRef<HTMLInputElement>;
+
+    // pinned UI state
+    pinnedMessages: any[] = [];
+    showPinnedModal = false;
+    filteredPinnedMessages: any[] = [];
+    pinnedSearch = '';
 
     constructor(
         private route: ActivatedRoute,
@@ -147,6 +160,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.socketCreatedSub?.unsubscribe();
         this.socketDeletedSub?.unsubscribe();
         this.socketReactedSub?.unsubscribe();
+        this.typingSub?.unsubscribe();
         this.socketErrSub?.unsubscribe();
         this.convSub?.unsubscribe();
         this.messageSocketService.disconnect();
@@ -154,6 +168,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.selectedAttachments.forEach(a => {
             try { URL.revokeObjectURL(a.url); } catch (e) { }
         });
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.typingUsers.forEach(({ timeout }) => clearTimeout(timeout));
+        this.typingUsers.clear();
         this.selectedAttachments = [];
     }
 
@@ -264,6 +281,29 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             this.messages = this.messages.filter(m => String(m._id ?? m.id) !== String(id));
             if (this.messages.length !== before) {
                 this.alertService.show("success", "Một tin nhắn đã bị thu hồi.");
+            }
+        });
+
+        this.typingSub = this.messageSocketService.onTypingUpdate().subscribe((payload) => {
+            console.log('>>> typingSub received:', payload, 'current roomId:', this.roomId);
+            if (payload.conversationId !== this.roomId) return;
+
+            if (payload.isTyping) {
+                const existingTimeout = this.typingUsers.get(payload.userId)?.timeout;
+                if (existingTimeout) clearTimeout(existingTimeout);
+
+                const timeout = setTimeout(() => {
+                    this.typingUsers.delete(payload.userId);
+                }, 3000);
+
+                this.typingUsers.set(payload.userId, {
+                    user: payload.user,
+                    timeout
+                });
+            } else {
+                const existing = this.typingUsers.get(payload.userId);
+                if (existing?.timeout) clearTimeout(existing.timeout);
+                this.typingUsers.delete(payload.userId);
             }
         });
 
@@ -1028,5 +1068,267 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     isReactionActive(m: any, type: string): boolean {
         const t = this.getUserReactionType(m);
         return !!t && String(t) === String(type);
+    }
+
+    getConversationTheme(): ConversationThemes {
+        const type = this.conversation?.theme ?? this.conversation?.themeColor ?? 'default';
+        return getThemeByType(type);
+    }
+
+    getMessagesStyle(): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        return { 'background': theme.bg };
+    }
+
+    getBubbleStyles(m: any): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        const isMe = this.isMessageFromCurrentUser(m.senderId);
+        if (m.type === 'system') return {};
+        if (m.isTemp) {
+            return { 'background': isMe ? theme.bubbleMe : theme.bubbleOther, 'color': isMe ? (theme.textMe ?? '#fff') : (theme.textOther ?? '#111') };
+        }
+        return {
+            'background': isMe ? theme.bubbleMe : theme.bubbleOther,
+            'color': isMe ? (theme.textMe ?? '#fff') : (theme.textOther ?? '#111'),
+        };
+    }
+
+    getIconButtonStyle(): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        return {
+            'color': theme.bubbleMe,
+            'border-color': theme.bubbleMe
+        };
+    }
+
+    getSendButtonStyle(): { [k: string]: string } {
+        const theme = this.getConversationTheme();
+        return {
+            'background': theme.bubbleMe,
+            'color': (theme.textMe ?? '#ffffff'),
+            'border': 'none'
+        };
+    }
+
+    getLatestPinned(): any | null {
+        const arr = this.conversation?.pinnedMessages ?? [];
+        if (!arr || arr.length === 0) return null;
+        return arr[arr.length - 1];
+    }
+
+    openPinnedModal() {
+        const raw = this.conversation?.pinnedMessages ?? [];
+        this.pinnedMessages = (raw || []).map((p: any) => {
+            const messageId = p.messageId?._id ? String(p.messageId._id) : (p.messageId || p._id || null);
+            const content = p.content ?? (p.message?.content ?? '');
+            return {
+                messageId,
+                message: p.message ?? null,
+                content,
+                pinnedAt: p.pinnedAt ? new Date(p.pinnedAt) : (p.pinnedAt ? new Date(p.pinnedAt) : null),
+                pinnedBy: p.pinnedBy ?? null,
+                sender: p.sender ?? null
+            };
+        }).reverse();
+        this.filteredPinnedMessages = this.pinnedMessages.slice();
+        this.pinnedSearch = '';
+        this.showPinnedModal = true;
+    }
+
+    closePinnedModal() {
+        this.showPinnedModal = false;
+        this.pinnedMessages = [];
+        this.filteredPinnedMessages = [];
+    }
+
+    async jumpToPinnedMessage(p: any) {
+        this.closePinnedModal();
+
+        const mid = p.messageId || (p.message && (p.message._id || p.message.id));
+        if (!mid) return;
+
+        const idx = this.messages.findIndex(m => String(m._id ?? m.id) === String(mid));
+        if (idx !== -1) {
+            setTimeout(() => {
+                const el = this.messagesContainer?.nativeElement;
+                if (!el) return;
+                const node = document.getElementById(`msg-${mid}`);
+                if (node && el) {
+                    el.scrollTop = node.offsetTop - 60;
+                    node.classList.add('highlight-pinned');
+                    setTimeout(() => node.classList.remove('highlight-pinned'), 2000);
+                } else {
+                    el.scrollTop = el.scrollHeight;
+                }
+            }, 50);
+            return;
+        }
+
+        this.messageService.getById(String(mid)).subscribe({
+            next: (res: any) => {
+                const payload = res?.data ?? res;
+                const msg = payload?.message ?? payload;
+                if (!msg) return;
+                this.messages.push(msg);
+                setTimeout(() => {
+                    const el = this.messagesContainer?.nativeElement;
+                    const node = document.getElementById(`msg-${mid}`);
+                    if (node && el) {
+                        el.scrollTop = node.offsetTop - 60;
+                        node.classList.add('highlight-pinned');
+                        setTimeout(() => node.classList.remove('highlight-pinned'), 2000);
+                    } else if (el) {
+                        el.scrollTop = el.scrollHeight;
+                    }
+                }, 100);
+            },
+            error: (err) => {
+                this.alertService.show('error', 'Không thể tải tin nhắn');
+            }
+        });
+    }
+
+    pinMessage(m: any) {
+        const id = m._id;
+        if (!id) return;
+        this.messageService.pin(id).subscribe({
+            next: (res: any) => {
+                m.isPinned = true;
+                const pinnedObj = {
+                    messageId: id,
+                    content: m.content || '',
+                    pinnedBy: this.currentUserId,
+                    pinnedAt: new Date(),
+                    sender: m.senderId,
+                };
+                this.conversation = this.conversation || {};
+                this.conversation.pinnedMessages = this.conversation.pinnedMessages || [];
+                this.conversation.pinnedMessages.push(pinnedObj);
+                this.alertService.show('success', 'Đã ghim tin nhắn');
+            },
+            error: (err) => {
+                console.error('Pin failed', err);
+                this.alertService.show('error', 'Không thể ghim tin nhắn');
+            }
+        });
+    }
+
+    unpinMessage(m: any) {
+        const id = m._id || m.id || (m.messageId ? (m.messageId._id || m.messageId) : null);
+        if (!id) return;
+        this.messageService.unpin(id).subscribe({
+            next: (res: any) => {
+                // update messages list: set isPinned false
+                const idx = this.messages.findIndex(x => String(x._id ?? x.id) === String(id));
+                if (idx !== -1) {
+                    this.messages[idx].isPinned = false;
+                }
+                // remove from conversation pinned messages
+                if (this.conversation?.pinnedMessages) {
+                    this.conversation.pinnedMessages = this.conversation.pinnedMessages.filter((p: any) => {
+                        const mid = (p.messageId && (p.messageId._id || p.messageId)) || p.messageId;
+                        return String(mid) !== String(id);
+                    });
+                }
+                this.alertService.show('success', 'Đã bỏ ghim tin nhắn');
+            },
+            error: (err) => {
+                console.error('Unpin failed', err);
+                this.alertService.show('error', 'Không thể bỏ ghim');
+            }
+        });
+    }
+
+    unpinPinnedMessage(p: any) {
+        const mid = p?.messageId;
+        if (!mid) return;
+
+        this.messageService.unpin(String(mid)).subscribe({
+            next: (res: any) => {
+                const msgIdx = this.messages.findIndex(m => String(m._id ?? m.id) === String(mid));
+                if (msgIdx !== -1) {
+                    this.messages[msgIdx].isPinned = false;
+                }
+
+                if (this.conversation?.pinnedMessages) {
+                    this.conversation.pinnedMessages = this.conversation.pinnedMessages.filter((item: any) => {
+                        const itemMid = (item.messageId && (item.messageId._id || item.messageId)) || item.messageId || item._id;
+                        return String(itemMid) !== String(mid);
+                    });
+                }
+
+                if (Array.isArray(this.pinnedMessages)) {
+                    this.pinnedMessages = this.pinnedMessages.filter((item: any) => String(item.messageId) !== String(mid));
+                }
+                if (Array.isArray(this.filteredPinnedMessages)) {
+                    this.filteredPinnedMessages = this.filteredPinnedMessages.filter((item: any) => String(item.messageId) !== String(mid));
+                }
+
+                this.alertService.show('success', 'Đã bỏ ghim tin nhắn');
+            },
+            error: (err) => {
+                console.error('Unpin (modal) failed', err);
+                this.alertService.show('error', 'Không thể bỏ ghim');
+            }
+        });
+    }
+
+    // display date separator if current message is on a different day than the previous one
+    isDifferentDay(index: number): boolean {
+        if (!this.messages || index < 0 || index >= this.messages.length) return false;
+        const curr = this.messages[index];
+        if (!curr) return false;
+        if (index === 0) return true;
+
+        const prev = this.messages[index - 1];
+        if (!prev) return true;
+
+        const currDate = new Date(curr.sentAt || curr.createdAt || curr.sentAt);
+        const prevDate = new Date(prev.sentAt || prev.createdAt || prev.sentAt);
+
+        return currDate.getFullYear() !== prevDate.getFullYear()
+            || currDate.getMonth() !== prevDate.getMonth()
+            || currDate.getDate() !== prevDate.getDate();
+    }
+
+    onInputChange() {
+        if (!this.roomId) return;
+
+        if (!this.isCurrentlyTyping) {
+            this.isCurrentlyTyping = true;
+            this.messageSocketService.startTyping(this.roomId);
+        }
+
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.typingTimeout = setTimeout(() => {
+            if (this.roomId) {
+                this.messageSocketService.stopTyping(this.roomId);
+                this.isCurrentlyTyping = false;
+            }
+        }, 2000);
+    }
+
+    get typingUsersList(): any[] {
+        return Array.from(this.typingUsers.values()).map(v => v.user);
+    }
+
+    get typingIndicatorText(): string {
+        const users = this.typingUsersList;
+        switch (users.length) {
+            case 0:
+                return '';
+            case 1:
+                {
+                    const name = users[0]?.fullName || users[0]?.username || 'Ai đó';
+                    return `${name} đang soạn tin nhắn...`;
+                }
+            case 2:
+                return `${users[0]?.fullName || users[0]?.username} và ${users[1]?.fullName || users[1]?.username} đang soạn tin nhắn...`;
+            default:
+                if (users.length > 2) {
+                    return `${users[0]?.fullName || users[0]?.username}, ${users[1]?.fullName || users[1]?.username} và ${users.length - 2} người khác đang soạn tin nhắn...`;
+                }
+                return `${users.length} người đang soạn tin nhắn...`;
+        }
     }
 }

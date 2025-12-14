@@ -32,6 +32,13 @@ export class ConversationStateService {
         });
     }
 
+    updateLastMessage(msg: any) {
+        this.update(curr => {
+            if (!curr) return curr;
+            return { ...curr, lastMessage: msg };
+        });
+    }
+
     emitAction(action: any) {
         try { this.actionSubject.next(action); } catch { }
     }

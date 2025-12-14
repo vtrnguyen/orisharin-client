@@ -15,3 +15,26 @@ export function formatTime(dateStr: string): string {
 
     return date.toLocaleDateString('vi-VN');
 }
+
+export function formatMessageDateLabel(dateLike: any): string {
+    if (!dateLike) return '';
+    const d = new Date(dateLike);
+    if (isNaN(d.getTime())) return '';
+
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const sameDay = (a: Date, b: Date) =>
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+
+    if (sameDay(d, today)) return 'Hôm nay';
+    if (sameDay(d, yesterday)) return 'Hôm qua';
+
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+}

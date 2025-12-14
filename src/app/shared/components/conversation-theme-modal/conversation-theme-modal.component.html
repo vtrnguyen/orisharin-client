@@ -1,0 +1,35 @@
+<div class="fixed inset-0 z-[995] flex items-center justify-center bg-black/40" (click)="onCancel()" appEscClose
+    (appEscClose)="onCancel()">
+    <div class="theme-panel" (click)="$event.stopPropagation()">
+        <div class="theme-header">
+            <button class="font-semibold px-2 py-1 cursor-pointer" (click)="onCancel()">Hủy</button>
+            <div class="font-bold text-lg text-gray-800">Chọn chủ đề</div>
+            <div class="w-10"></div>
+        </div>
+
+        <div class="theme-body">
+            <div class="theme-grid">
+                <button *ngFor="let t of themes" class="theme-tile" [class.selected]="selectedType === t.type"
+                    (click)="selectTheme(t.type)" type="button">
+                    <div class="preview" [ngStyle]="{'background': t.bg}">
+                        <div class="bubble" [ngStyle]="{
+                            'background': t.bubbleMe,
+                            'border': t.type === 'midnight' ? '1px solid rgba(255,255,255,0.06)' : 'none'
+                        }"></div>
+                    </div>
+                    <div class="label-row">
+                        <div class="name">{{ t.label }}</div>
+                        <div class="type">{{ t.type }}</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <div class="theme-actions">
+            <button class="btn cancel" (click)="onCancel()">Hủy</button>
+            <button class="btn save" (click)="onSave()" [disabled]="saving">
+                {{ saving ? 'Đang lưu...' : 'Lưu' }}
+            </button>
+        </div>
+    </div>
+</div>

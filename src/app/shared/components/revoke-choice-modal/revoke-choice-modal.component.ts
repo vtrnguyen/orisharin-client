@@ -2,11 +2,16 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { isImage, isVideo } from '../../functions/media-type.util';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-revoke-choice-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        EscToCloseDirective,
+    ],
     templateUrl: './revoke-choice-modal.component.html',
     styleUrls: ['./revoke-choice-modal.component.scss']
 })

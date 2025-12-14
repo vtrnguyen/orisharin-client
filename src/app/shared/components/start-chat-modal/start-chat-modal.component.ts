@@ -8,6 +8,7 @@ import { StartChatService } from '../../state-managements/start-chat.service';
 import { ConversationService } from '../../../core/services/conversation.service';
 import { Router } from '@angular/router';
 import { AlertService } from '../../state-managements/alert.service';
+import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 
 @Component({
     selector: 'app-start-chat-modal',
@@ -15,7 +16,8 @@ import { AlertService } from '../../state-managements/alert.service';
     imports: [
         CommonModule,
         FormsModule,
-        ClickOutsideModule
+        ClickOutsideModule,
+        EscToCloseDirective,
     ],
     templateUrl: './start-chat-modal.component.html',
     styleUrls: ['./start-chat-modal.component.scss']
