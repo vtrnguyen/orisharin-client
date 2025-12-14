@@ -16,6 +16,15 @@
     overflow-x: hidden;
 }
 
+.date-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    justify-content: center;
+}
+
 .attachments-preview {
     border-top: 1px solid rgba(0, 0, 0, 0.04);
     background: #f9fafb;

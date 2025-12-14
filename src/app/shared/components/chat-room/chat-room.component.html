@@ -78,9 +78,13 @@
         </div>
 
         <ng-container *ngFor="let m of messages; let i = index; trackBy: trackByMessageId">
+            <div *ngIf="isDifferentDay(i)" class="date-divider">
+                <span class="text-xs text-gray-400">{{ formatMessageDateLabel(m.sentAt || m.createdAt) }}</span>
+            </div>
+
             <!-- system message -->
             <div *ngIf="m.type === 'system'" class="py-1 flex items-center justify-center">
-                <div class="text-gray-600 text-xs text-center text-sm">
+                <div class="text-gray-400 text-xs text-center text-sm">
                     {{ m.content }}
                 </div>
             </div>

@@ -10,7 +10,7 @@ import { UserService } from "../../../core/services/user.service";
 import { MessageSocketService } from "../../../core/services/message-socket.service";
 import { MessageService } from "../../../core/services/message.service";
 import { LoadingComponent } from "../loading/loading.component";
-import { formatTime } from "../../functions/format-time.util";
+import { formatMessageDateLabel, formatTime } from "../../functions/format-time.util";
 import { navigateToProfile } from "../../functions/navigate-to-profile";
 import { TooltipComponent } from '../tooltip/tooltip.component';
 import { AlertService } from "../../state-managements/alert.service";
@@ -63,6 +63,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private socketDeletedSub?: Subscription;
     private socketErrSub?: Subscription;
     formatTime = formatTime;
+    formatMessageDateLabel = formatMessageDateLabel;
     navigateToProfile = navigateToProfile;
     currentUserId: string | null = null;
     activeActionId: string | null = null;
@@ -1239,5 +1240,23 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 this.alertService.show('error', 'Không thể bỏ ghim');
             }
         });
+    }
+
+    // display date separator if current message is on a different day than the previous one
+    isDifferentDay(index: number): boolean {
+        if (!this.messages || index < 0 || index >= this.messages.length) return false;
+        const curr = this.messages[index];
+        if (!curr) return false;
+        if (index === 0) return true;
+
+        const prev = this.messages[index - 1];
+        if (!prev) return true;
+
+        const currDate = new Date(curr.sentAt || curr.createdAt || curr.sentAt);
+        const prevDate = new Date(prev.sentAt || prev.createdAt || prev.sentAt);
+
+        return currDate.getFullYear() !== prevDate.getFullYear()
+            || currDate.getMonth() !== prevDate.getMonth()
+            || currDate.getDate() !== prevDate.getDate();
     }
 }
