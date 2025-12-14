@@ -1,4 +1,4 @@
-name: Deploy OriSharin Frontend
+name: Deploy Frontend
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Deploy OriSharin Frontend directly on VPS (pull + build + serve)
+      - name: Deploy on VPS
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -25,13 +25,13 @@ jobs:
           script: |
             cd /home/orisharin/apps/client
             
-            # Pull latest code
+            # Use HTTPS token for git pull (no publickey error)
+            git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
             git pull origin main || (git fetch && git reset --hard origin/main && git clean -fd)
             
-            # Install deps
             npm ci
 
-            # Inject production environment from GitHub Secrets
+            # Inject environment from Secrets
             cat > src/environments/environment.prod.ts << 'EOF'
             export const environment = {
               production: true,
@@ -40,11 +40,7 @@ jobs:
             };
             EOF
 
-            # Build with cache-busting
             npx ng build --configuration production --output-hashing=all
-
-            # Deploy to Nginx folder
             sudo rm -rf /var/www/orisharin/*
             sudo cp -r dist/client/browser/* /var/www/orisharin/
-            
             echo "Frontend deployed successfully!"
