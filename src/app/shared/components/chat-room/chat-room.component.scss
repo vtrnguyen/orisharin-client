@@ -67,6 +67,37 @@
     gap: 0.5rem;
 }
 
+.typing-indicator {
+    background: #f9fafb;
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.typing-dots {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+
+    span {
+        width: 6px;
+        height: 6px;
+        background: #9ca3af;
+        border-radius: 50%;
+        animation: typingBounce 1.4s infinite ease-in-out both;
+
+        &:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        &:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        &:nth-child(3) {
+            animation-delay: 0s;
+        }
+    }
+}
+
 .left {
     position: relative;
 }
@@ -609,5 +640,20 @@
 
     .reaction-btn.active:active {
         transform: translateY(-4px) scale(1.12);
+    }
+}
+
+@keyframes typingBounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0.6);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
     }
 }

@@ -62,6 +62,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private socketCreatedSub?: Subscription;
     private socketDeletedSub?: Subscription;
     private socketErrSub?: Subscription;
+    private typingSub?: Subscription;
     formatTime = formatTime;
     formatMessageDateLabel = formatMessageDateLabel;
     navigateToProfile = navigateToProfile;
@@ -73,6 +74,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     activeMoreMenuId: string | null = null;
     showRevokeConfirm = false;
     selectedMessageToRevoke: any = null;
+    typingUsers: Map<string, { user: any; timeout: any }> = new Map();
+    private typingTimeout?: any;
+    private isCurrentlyTyping = false;
 
     // pagination properties
     currentPage = 1;
@@ -156,6 +160,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.socketCreatedSub?.unsubscribe();
         this.socketDeletedSub?.unsubscribe();
         this.socketReactedSub?.unsubscribe();
+        this.typingSub?.unsubscribe();
         this.socketErrSub?.unsubscribe();
         this.convSub?.unsubscribe();
         this.messageSocketService.disconnect();
@@ -163,6 +168,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.selectedAttachments.forEach(a => {
             try { URL.revokeObjectURL(a.url); } catch (e) { }
         });
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.typingUsers.forEach(({ timeout }) => clearTimeout(timeout));
+        this.typingUsers.clear();
         this.selectedAttachments = [];
     }
 
@@ -273,6 +281,29 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             this.messages = this.messages.filter(m => String(m._id ?? m.id) !== String(id));
             if (this.messages.length !== before) {
                 this.alertService.show("success", "Một tin nhắn đã bị thu hồi.");
+            }
+        });
+
+        this.typingSub = this.messageSocketService.onTypingUpdate().subscribe((payload) => {
+            console.log('>>> typingSub received:', payload, 'current roomId:', this.roomId);
+            if (payload.conversationId !== this.roomId) return;
+
+            if (payload.isTyping) {
+                const existingTimeout = this.typingUsers.get(payload.userId)?.timeout;
+                if (existingTimeout) clearTimeout(existingTimeout);
+
+                const timeout = setTimeout(() => {
+                    this.typingUsers.delete(payload.userId);
+                }, 3000);
+
+                this.typingUsers.set(payload.userId, {
+                    user: payload.user,
+                    timeout
+                });
+            } else {
+                const existing = this.typingUsers.get(payload.userId);
+                if (existing?.timeout) clearTimeout(existing.timeout);
+                this.typingUsers.delete(payload.userId);
             }
         });
 
@@ -1258,5 +1289,46 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return currDate.getFullYear() !== prevDate.getFullYear()
             || currDate.getMonth() !== prevDate.getMonth()
             || currDate.getDate() !== prevDate.getDate();
+    }
+
+    onInputChange() {
+        if (!this.roomId) return;
+
+        if (!this.isCurrentlyTyping) {
+            this.isCurrentlyTyping = true;
+            this.messageSocketService.startTyping(this.roomId);
+        }
+
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.typingTimeout = setTimeout(() => {
+            if (this.roomId) {
+                this.messageSocketService.stopTyping(this.roomId);
+                this.isCurrentlyTyping = false;
+            }
+        }, 2000);
+    }
+
+    get typingUsersList(): any[] {
+        return Array.from(this.typingUsers.values()).map(v => v.user);
+    }
+
+    get typingIndicatorText(): string {
+        const users = this.typingUsersList;
+        switch (users.length) {
+            case 0:
+                return '';
+            case 1:
+                {
+                    const name = users[0]?.fullName || users[0]?.username || 'Ai đó';
+                    return `${name} đang soạn tin nhắn...`;
+                }
+            case 2:
+                return `${users[0]?.fullName || users[0]?.username} và ${users[1]?.fullName || users[1]?.username} đang soạn tin nhắn...`;
+            default:
+                if (users.length > 2) {
+                    return `${users[0]?.fullName || users[0]?.username}, ${users[1]?.fullName || users[1]?.username} và ${users.length - 2} người khác đang soạn tin nhắn...`;
+                }
+                return `${users.length} người đang soạn tin nhắn...`;
+        }
     }
 }

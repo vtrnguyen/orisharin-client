@@ -243,6 +243,16 @@
         </ng-container>
     </div>
 
+    <div *ngIf="typingUsersList.length > 0"
+        class="typing-indicator px-4 py-2 text-sm text-gray-500 flex items-center gap-2">
+        <div class="typing-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <span>{{ typingIndicatorText }}</span>
+    </div>
+
     <div class="composer">
         <div *ngIf="selectedAttachments.length" class="attachments-preview px-2 pb-2">
             <div class="flex gap-2 overflow-auto py-1">
@@ -278,7 +288,7 @@
 
             <div class="center">
                 <textarea [(ngModel)]="text" name="text" rows="1" placeholder="Nhập tin nhắn..." class="message-input"
-                    (input)="autoResize($event)" (keydown.enter)="onEnterKey($event)"></textarea>
+                    (input)="autoResize($event); onInputChange()" (keydown.enter)="onEnterKey($event)"></textarea>
             </div>
 
             <div class="right">
