@@ -310,8 +310,9 @@
                         <i class="fa-solid fa-icons"></i>
                     </button>
 
-                    <button class="icon-btn" (click)="quickHeart()" title="Thích" [ngStyle]="getIconButtonStyle()">
-                        <i class="fa-solid fa-heart"></i>
+                    <button class="icon-btn" (click)="sendQuickEmoji()" title="Biểu tượng cảm xúc"
+                        [ngStyle]="getIconButtonStyle()">
+                        {{ getConversationQuickEmoji() }}
                     </button>
                 </ng-container>
 

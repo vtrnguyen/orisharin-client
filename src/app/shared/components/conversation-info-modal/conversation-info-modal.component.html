@@ -149,3 +149,7 @@
 <app-conversation-theme-modal *ngIf="showChangeThemeModal" [conversation]="conversation" (saved)="onThemeSaved($event)"
     (close)="showChangeThemeModal = false">
 </app-conversation-theme-modal>
+
+<app-conversation-emoji-modal *ngIf="showEmojiPickerModal" [conversation]="conversation" (saved)="onEmojiSaved($event)"
+    (close)="showEmojiPickerModal = false">
+</app-conversation-emoji-modal>

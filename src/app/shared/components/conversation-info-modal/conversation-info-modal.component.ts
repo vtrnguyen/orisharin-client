@@ -13,6 +13,7 @@ import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
 import { UserService } from '../../../core/services/user.service';
 import { ConversationService } from '../../../core/services/conversation.service';
 import { ConversationThemeModalComponent } from "../conversation-theme-modal/conversation-theme-modal.component";
+import { ConversationEmojiModalComponent } from '../conversation-emoji-modal/conversation-emoji-modal.component';
 
 @Component({
     selector: 'app-conversation-info-modal',
@@ -26,7 +27,8 @@ import { ConversationThemeModalComponent } from "../conversation-theme-modal/con
         ParticipantMenuModalComponent,
         ConfirmModalComponent,
         EscToCloseDirective,
-        ConversationThemeModalComponent
+        ConversationThemeModalComponent,
+        ConversationEmojiModalComponent,
     ],
     templateUrl: './conversation-info-modal.component.html',
     styleUrls: ['./conversation-info-modal.component.scss']
@@ -389,5 +391,17 @@ export class ConversationInfoModalComponent implements OnInit, OnDestroy {
         if (this.conversation) {
             this.conversation.theme = themeType;
         }
+    }
+
+    onEmojiSaved(emoji: string) {
+        if (!this.conversation) return;
+        this.conversation.quickEmoji = emoji;
+        this.conversationStateService.update(curr => {
+            if (!curr) return curr;
+            const id = curr.id ?? curr._id;
+            if (String(id) !== String(this.conversation?.id ?? this.conversation?._id)) return curr;
+            return { ...curr, quickEmoji: emoji };
+        });
+        this.showEmojiPickerModal = false;
     }
 }
