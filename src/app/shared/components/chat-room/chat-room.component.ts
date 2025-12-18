@@ -556,7 +556,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     sendQuickEmoji() {
-        this.text = "";
+        this.text = this.getConversationQuickEmoji();
         this.send();
     }
 
