@@ -18,7 +18,7 @@ export class ConversationEmojiModalComponent implements OnInit, OnDestroy {
     @Output() saved = new EventEmitter<string>();
     @Output() close = new EventEmitter<void>();
 
-    selectedEmoji: string = '';
+    selectedEmoji: string = '👍';
     saving = false;
     private sub?: Subscription;
 

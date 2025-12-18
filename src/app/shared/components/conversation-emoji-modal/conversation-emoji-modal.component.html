@@ -8,7 +8,7 @@
 
         <div class="card-body">
             <div class="preview">
-                <div class="selected-emoji">{{ selectedEmoji || 'Chưa chọn' }}</div>
+                <div class="selected-emoji">{{ selectedEmoji || '👍' }}</div>
             </div>
 
             <emoji-mart (emojiSelect)="onEmojiPicked($event)" [style]="{ 'width': '100%' }"
