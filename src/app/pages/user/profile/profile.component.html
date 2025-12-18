@@ -116,9 +116,8 @@
         </button>
     </div>
 
-    <div class="bg-white rounded-2xl shadow px-4 py-2 mb-6">
-        <div *ngIf="isOwner"
-            class="flex items-center justify-between gap-3 p-4 rounded-t-2xl mb-2 pb-6 border-b border-gray-300">
+    <div class="bg-white rounded-2xl shadow px-4 py-4 mb-6">
+        <div *ngIf="isOwner" class="bg-white rounded-2xl shadow p-4 mb-3 flex items-center justify-between gap-3">
             <div class="flex items-center flex-1">
                 <img [src]="userInfo.avatarUrl || ''" class="w-10 h-10 rounded-full object-cover" alt="avatar" />
                 <button class="flex-1 text-left text-gray-500 px-4 py-2 transition outline-none cursor-text"
