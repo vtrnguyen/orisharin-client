@@ -41,6 +41,10 @@ export class ConversationService {
         return this.http.patch<any>(`${this.apiUrl}/${conversationId}/theme`, { theme });
     }
 
+    updateQuickEmoji(conversationId: string, quickEmoji: string): Observable<any> {
+        return this.http.patch<any>(`${this.apiUrl}/${conversationId}/quick-emoji`, { quickEmoji });
+    }
+
     addParticipants(conversationId: string, userIds: string[]): Observable<any> {
         const body = { userIds: Array.isArray(userIds) ? userIds : [] };
         return this.http.patch<any>(`${this.apiUrl}/${conversationId}/participants`, body);

@@ -555,7 +555,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.showStickerPicker = !this.showStickerPicker;
     }
 
-    quickHeart() {
+    sendQuickEmoji() {
         this.text = "";
         this.send();
     }
@@ -1071,8 +1071,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     getConversationTheme(): ConversationThemes {
-        const type = this.conversation?.theme ?? this.conversation?.themeColor ?? 'default';
+        const type = this.conversation?.theme ?? 'default';
         return getThemeByType(type);
+    }
+
+    getConversationQuickEmoji(): string {
+        const quickEmoji = this.conversation?.quickEmoji ?? '❤️';
+        return quickEmoji;
     }
 
     getMessagesStyle(): { [k: string]: string } {
