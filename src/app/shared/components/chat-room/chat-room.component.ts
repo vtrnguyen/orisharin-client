@@ -1076,7 +1076,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     getConversationQuickEmoji(): string {
-        const quickEmoji = this.conversation?.quickEmoji ?? '❤️';
+        const quickEmoji = this.conversation?.quickEmoji ?? '👍';
         return quickEmoji;
     }
 

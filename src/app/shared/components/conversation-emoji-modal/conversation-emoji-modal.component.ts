@@ -37,7 +37,7 @@ export class ConversationEmojiModalComponent implements OnInit, OnDestroy {
 
     onEmojiPicked(emoji: { native?: string; colons?: string; unified?: string } | string) {
         if (!emoji) return;
-        this.selectedEmoji = (emoji as any).emoji.native ?? '❤️';
+        this.selectedEmoji = (emoji as any).emoji.native ?? '👍';
     }
 
     onSave() {
