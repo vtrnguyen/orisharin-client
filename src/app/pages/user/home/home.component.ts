@@ -37,7 +37,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   navigateToProfile = navigateToProfile;
 
-  // IntersectionObserver setup
   @ViewChildren('postItem', { read: ElementRef }) postItems!: QueryList<ElementRef>;
   private intersectionObserver: IntersectionObserver | null = null;
 
@@ -56,11 +55,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.postEventService.postCreated$.subscribe(() => {
       this.resetAndReload();
     });
-    // removed window scroll listener in favor of IntersectionObserver
   }
 
   ngAfterViewInit() {
-    // Re-observe when list changes
     this.postItems.changes.subscribe(() => {
       this.observeLastPost();
     });
@@ -136,7 +133,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.newPostContent = '';
   }
 
-  // remove post from local list when child emits deleted
   onPostDeleted(postId: string) {
     this.posts = this.posts.filter(p => {
       const pid = p.id || p._id || (p.post && (p.post._id || p.post.id));
