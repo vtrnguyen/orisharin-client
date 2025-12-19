@@ -89,9 +89,13 @@ export class PostModalComponent implements OnInit, OnDestroy, AfterViewInit {
       content: this.content,
       files: this.files,
     }).subscribe({
-      next: () => {
+      next: (response: any) => {
         this.isLoading = false;
-        this.postEventService.emitPostCreated();
+        if (response && response.success && response.data) {
+          this.postEventService.emitPostCreated(response.data);
+        } else {
+          this.postEventService.emitPostCreated();
+        }
         this.close.emit();
         this.content = '';
         this.images = [];
@@ -99,7 +103,6 @@ export class PostModalComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       error: (err) => {
         this.isLoading = false;
-        alert("Đăng bài thất bại: " + (err?.error?.message || 'Có lỗi xảy ra!'));
       }
     });
   }

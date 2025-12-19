@@ -8,7 +8,7 @@ export class PostEventService {
     private postCreatedSource = new Subject<void>();
     postCreated$ = this.postCreatedSource.asObservable();
 
-    emitPostCreated() {
-        this.postCreatedSource.next();
+    emitPostCreated(post?: any) {
+        this.postCreatedSource.next(post);
     }
 }

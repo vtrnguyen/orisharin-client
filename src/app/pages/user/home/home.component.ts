@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { navigateToProfile } from '../../../shared/functions/navigate-to-profile';
+import { AlertService } from '../../../shared/state-managements/alert.service';
 
 @Component({
   selector: 'app-home',
@@ -46,14 +47,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private postEventService: PostEventService,
     public router: Router,
     private userService: UserService,
+    private alertService: AlertService,
   ) { }
 
   ngOnInit() {
     this.userInfo = this.authService.getCurrentUser();
     this.userInfo.avatar = this.userService.getCurrentUserAvatarUrl();
     this.loadPosts(true);
-    this.postEventService.postCreated$.subscribe(() => {
-      this.resetAndReload();
+    this.postEventService.postCreated$.subscribe((newPost: any) => {
+      if (newPost) {
+        const item = this.buildPostListItem(newPost);
+        this.posts = [item, ...this.posts];
+        this.alertService.show('success', 'Đã thêm bài viết mới');
+      }
     });
   }
 
@@ -138,5 +144,23 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       const pid = p.id || p._id || (p.post && (p.post._id || p.post.id));
       return pid !== postId;
     });
+  }
+
+  private buildPostListItem(postData: any) {
+    const author = {
+      username: this.userInfo?.username || '',
+      fullName: this.userInfo?.fullName || this.userInfo?.username || '',
+      avatarUrl: this.userInfo?.avatar || this.userService.getCurrentUserAvatarUrl(),
+    };
+
+    return {
+      post: postData,
+      author,
+      likesCount: postData.likesCount ?? 0,
+      commentsCount: postData.commentsCount ?? 0,
+      repostsCount: postData.repostsCount ?? 0,
+      sharesCount: postData.sharesCount ?? 0,
+      createdAt: postData.createdAt ?? new Date().toISOString(),
+    };
   }
 }

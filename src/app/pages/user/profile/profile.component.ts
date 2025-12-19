@@ -16,6 +16,7 @@ import { FollowService } from '../../../core/services/follow.service';
 import { UserListItemComponent } from '../../../shared/components/user-list-item/user-list-item.component';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-delete-modal/confirm-modal.component';
 import { EscToCloseDirective } from '../../../shared/directives/esc-to-close.directive';
+import { PostEventService } from '../../../shared/state-managements/post-event.service';
 
 @Component({
   selector: 'app-profile',
@@ -94,6 +95,7 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     private alertService: AlertService,
     private followService: FollowService,
     private router: Router,
+    private postEventService: PostEventService,
   ) { }
 
   ngOnInit(): void {
@@ -111,7 +113,17 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     this.page = 1;
     this.posts = [];
     this.hasMore = true;
-    this.loadPosts(true);
+    this.loadPosts(true)
+
+    this.postEventService.postCreated$.subscribe((newPost: any) => {
+      if (!newPost) return;
+      // check if the new post's authorId matches the profile user id
+      if (newPost.authorId && newPost.authorId === this.userInfo?.id) {
+        const item = this.buildPostListItem(newPost);
+        this.posts = [item, ...this.posts];
+        this.alertService.show('success', 'Đã thêm bài viết mới');
+      }
+    });;
   }
 
   ngOnDestroy(): void {
@@ -122,11 +134,11 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Re-observe when the list changes (new posts appended)
+    // re-observe when the list changes (new posts appended)
     this.postItems.changes.subscribe(() => {
       this.observeLastPost();
     });
-    // Initial observe
+    // initial observe
     this.observeLastPost();
   }
 
@@ -174,12 +186,12 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
     this.showEditProfileModal = false;
     document.body.style.overflow = 'auto';
 
-    // Reset avatar states
+    // reset avatar states
     this.selectedAvatar = null;
     this.avatarPreview = null;
     this.avatarRemoved = false;
 
-    // Reload user info to reset any preview changes
+    // reload user info to reset any preview changes
     this.loadUserProfile(this.currentUsername);
   }
 
@@ -532,5 +544,23 @@ export class ProfileComponent implements OnInit, OnDestroy, AfterViewInit {
 
   closeWebsiteModal(): void {
     this.showWebsiteModal = false;
+  }
+
+  private buildPostListItem(postData: any) {
+    const author = {
+      username: this.userInfo?.username || '',
+      fullName: this.userInfo?.fullName || this.userInfo?.username || '',
+      avatarUrl: this.userInfo?.avatarUrl || this.userService.getCurrentUserAvatarUrl(),
+    };
+
+    return {
+      post: postData,
+      author,
+      likesCount: postData.likesCount ?? 0,
+      commentsCount: postData.commentsCount ?? 0,
+      repostsCount: postData.repostsCount ?? 0,
+      sharesCount: postData.sharesCount ?? 0,
+      createdAt: postData.createdAt ?? new Date().toISOString(),
+    };
   }
 }
