@@ -1,4 +1,4 @@
-<div class="fixed flex items-center justify-center inset-0 z-[99] bg-black/80" appEscClose (appEscClose)="close.emit()">
+<div class="fixed flex items-center justify-center inset-0 z-[99] bg-black/60" appEscClose (appEscClose)="close.emit()">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-0 relative animate-fade-in"
         (clickOutside)="close.emit()">
 
@@ -59,8 +59,10 @@
 
                 <div class="flex items-center justify-between mt-4">
                     <div class="flex gap-2 items-center">
-                        <label class="cursor-pointer text-gray-600"><i class="fa-regular fa-face-smile"
-                                (click)="toggleEmojiPicker()"></i></label>
+                        <app-tooltip [text]="'Thêm biểu tượng cảm xúc'">
+                            <label class="cursor-pointer text-gray-600"><i class="fa-regular fa-face-smile"
+                                    (click)="toggleEmojiPicker()"></i></label>
+                        </app-tooltip>
                     </div>
                     <button class="font-semibold px-4 py-2 rounded-lg shadow cursor-pointer"
                         [disabled]="isLoading || (!content.trim() && images.length === 0)" (click)="submitShare()">

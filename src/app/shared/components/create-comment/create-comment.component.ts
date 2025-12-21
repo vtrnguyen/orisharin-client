@@ -13,6 +13,7 @@ import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { Router } from '@angular/router';
 import { CommentEventService } from '../../state-managements/comment-event.service';
 import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
+import { TooltipComponent } from "../tooltip/tooltip.component";
 
 @Component({
   selector: 'app-create-comment',
@@ -23,6 +24,7 @@ import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
     ClickOutsideModule,
     PickerComponent,
     EscToCloseDirective,
+    TooltipComponent
   ],
   templateUrl: './create-comment.component.html',
   styleUrl: './create-comment.component.scss'

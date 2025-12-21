@@ -8,6 +8,7 @@ import { isImage } from '../../functions/media-type.util';
 import { PostEventService } from '../../state-managements/post-event.service';
 import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
+import { TooltipComponent } from "../tooltip/tooltip.component";
 
 @Component({
   selector: 'app-post-modal',
@@ -18,6 +19,7 @@ import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
     ClickOutsideModule,
     PickerComponent,
     EscToCloseDirective,
+    TooltipComponent
   ],
   templateUrl: './post-modal.component.html',
   styleUrls: ['./post-modal.component.scss']
@@ -115,6 +117,14 @@ export class PostModalComponent implements OnInit, OnDestroy, AfterViewInit {
 
   toggleEmojiPicker() {
     this.showEmojiPicker = !this.showEmojiPicker;
+  }
+
+  toggleCreatePoll() {
+
+  }
+
+  toggleTagLocation() {
+
   }
 
   addEmoji(event: any) {

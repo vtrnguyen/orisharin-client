@@ -12,6 +12,7 @@ import { isImage, isVideo } from '../../functions/media-type.util';
 import { navigateToProfile } from '../../functions/navigate-to-profile';
 import { Router } from '@angular/router';
 import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
+import { TooltipComponent } from "../tooltip/tooltip.component";
 
 @Component({
     selector: 'app-share-post-modal',
@@ -21,7 +22,7 @@ import { EscToCloseDirective } from '../../directives/esc-to-close.directive';
         FormsModule,
         ClickOutsideModule,
         EscToCloseDirective,
-        // PickerComponent
+        TooltipComponent
     ],
     templateUrl: './share-post-modal.component.html',
     styleUrls: ['./share-post-modal.component.scss']
