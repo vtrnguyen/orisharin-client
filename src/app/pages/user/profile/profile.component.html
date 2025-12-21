@@ -161,7 +161,7 @@
 
 <ng-container *ngIf="showEditProfileModal" appEscClose (appEscClose)="closeEditProfileModal()">
     <div class="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative animate-modal-fade-in"
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative animate-fade-in"
             (clickOutside)="closeEditProfileModal()">
 
             <div class="w-full p-6">
@@ -259,7 +259,7 @@
 <!-- add website modal -->
 <ng-container *ngIf="showAddWebsiteModal" appEscClose (appEscClose)="closeAddWebsiteModal()">
     <div class="fixed inset-0 z-[999] bg-black/80 flex items-center justify-center">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative animate-modal-fade-in"
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative animate-fade-in"
             (clickOutside)="closeAddWebsiteModal()">
 
             <div class="w-full p-6">
@@ -301,7 +301,7 @@
 <!-- add follow list modal -->
 <ng-container *ngIf="showFollowModal" appEscClose (appEscClose)="showFollowModal = false">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-0 flex flex-col animate-modal-fade-in"
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-0 flex flex-col animate-fade-in"
             (clickOutside)="showFollowModal = false">
             <div class="flex">
                 <button class="flex-1 py-3 font-semibold cursor-pointer"
@@ -349,7 +349,7 @@
 <!-- introduce modal -->
 <ng-container *ngIf="showIntroduceModal" appEscClose (appEscClose)="closeIntroduceModal()">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[350px] p-6 animate-modal-fade-in relative"
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[350px] p-6 animate-fade-in relative"
             (clickOutside)="showIntroduceModal = false">
             <div *ngIf="isLoadingIntroduce" class="flex justify-center items-center py-8">
                 <i class="fa-solid fa-spinner fa-spin text-2xl text-gray-400"></i>
@@ -375,7 +375,7 @@
 <!-- website links modal -->
 <ng-container *ngIf="showWebsiteModal" appEscClose (appEscClose)="closeWebsiteModal()">
     <div class="fixed inset-0 z-[999] bg-black/60 flex items-center justify-center">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-4 animate-modal-fade-in"
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-[480px] p-4 animate-fade-in"
             (clickOutside)="closeWebsiteModal()">
 
             <div class="flex items-center justify-between mb-4">

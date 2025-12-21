@@ -22,10 +22,6 @@
     animation: slideInRight 300ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
 }
 
-.animate-fade-in {
-    animation: fadeIn 300ms ease-out forwards;
-}
-
 aside {
     will-change: transform;
     backface-visibility: hidden;

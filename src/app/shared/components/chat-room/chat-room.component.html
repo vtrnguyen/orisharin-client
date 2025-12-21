@@ -342,7 +342,7 @@
 
 <div *ngIf="showPinnedModal" class="fixed inset-0 z-[995] flex items-center justify-center bg-black/40"
     (click)="closePinnedModal()" role="dialog" aria-modal="true" aria-labelledby="pinnedModalTitle">
-    <div class="pinned-modal-card bg-white rounded-lg shadow-lg w-[80%] max-w-2xl animate-modal-fade-in"
+    <div class="pinned-modal-card bg-white rounded-lg shadow-lg w-[80%] max-w-2xl animate-fade-in"
         (click)="$event.stopPropagation()">
         <header class="pinned-modal-header flex items-center justify-between px-4 py-3 border-b border-gray-300">
             <button class="text-lg font-semibold px-2 py-1 cursor-pointer" (click)="closePinnedModal()"

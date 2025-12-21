@@ -1,6 +1,6 @@
 <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/60" (click)="onClose()" appEscClose
     (appEscClose)="onClose()">
-    <div class="modal-box bg-white rounded-2xl shadow-xl w-full relative transition-all duration-300 ease-out opacity-0 scale-95 animate-modal-fade-in"
+    <div class="modal-box bg-white rounded-2xl shadow-xl w-full relative animate-fade-in"
         (click)="$event.stopPropagation()" (clickOutside)="onClose()">
         <div class="modal-header flex items-center justify-between border-b border-gray-300 px-6 py-4">
             <button class="font-semibold px-2 py-1 cursor-pointer" (click)="onClose()">Hủy</button>

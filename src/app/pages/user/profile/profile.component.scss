@@ -180,12 +180,8 @@ button {
 }
 
 .profile-modal {
-    .animate-modal-fade-in {
-        animation: modalFadeIn 0.3s ease-out;
-    }
-
     .animate-fade-in {
-        animation: fadeIn 0.2s ease-out;
+        animation: modalFadeIn 0.3s ease-out;
     }
 
     .avatar-image {

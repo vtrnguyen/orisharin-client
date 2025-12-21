@@ -1,6 +1,6 @@
 <div class="fixed inset-0 z-[1100] flex items-center justify-center bg-black/30" (click)="onClose()" appEscClose
     (appEscClose)="onClose()">
-    <div class="menu-box animate-modal-fade-in" (click)="$event.stopPropagation()">
+    <div class="menu-box animate-fade-in" (click)="$event.stopPropagation()">
         <div class="menu-list">
             <button *ngIf="isAdmin && participant && (participant.id ?? participant._id) !== currentUserId"
                 class="menu-item text-red-500" (click)="removeFromGroup()" [disabled]="loadingAction">

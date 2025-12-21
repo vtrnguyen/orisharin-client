@@ -1,6 +1,6 @@
 <div class="fixed inset-0 z-[995] flex items-center justify-center bg-black/40" (click)="onCancel()" appEscClose
     (appEscClose)="onCancel()">
-    <div class="rename-panel" (click)="$event.stopPropagation()">
+    <div class="rename-panel animate-fade-in" (click)="$event.stopPropagation()">
         <div class="rename-header">
             <button class="font-semibold px-2 py-1 cursor-pointer" (click)="onCancel()">Hủy</button>
             <div class="font-bold text-lg text-gray-800">Đổi tên nhóm</div>

@@ -1,7 +1,7 @@
 <div class="fixed flex items-center justify-center inset-0 z-[99]" appEscClose (appEscClose)="closeModal()">
     <div class="overlay bg-black/60 fixed inset-0" (click)="closeModal()"></div>
 
-    <div class="modal-container bg-white rounded-2xl shadow-xl w-full max-w-xl p-0 relative transition-all duration-300 ease-out opacity-0 scale-95 animate-modal-fade-in"
+    <div class="modal-container bg-white rounded-2xl shadow-xl w-full max-w-xl p-0 relative transition-all duration-300 ease-out opacity-0 scale-95 animate-fade-in"
         (clickOutside)="closeModal()" (click)="$event.stopPropagation()">
         <div class="p-4">
             <div class="header flex items-center justify-center mb-3 px-2">
